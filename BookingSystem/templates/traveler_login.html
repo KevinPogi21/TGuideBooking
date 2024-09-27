@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <h1>Login as Traveler</h1>
+
+    <!--{% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div>
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}-->
+    
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.email.label(class="form-control-label") }}
+            {% if form.email.error %}
+                {{ form.email(class="form-control is-inavlid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.email.error %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ form.email(class="form-control") }}
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.password.label(class="form-control-label") }}
+            {% if form.password.error %}
+                {{ form.password(class="form-control is-inavlid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.password.error %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ form.password(class="form-control") }}
+            {% endif %}
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+        <div class="">
+            <small class="text-muted">
+                Need An Account? <a class="ml-2" href="{{ url_for('main.register') }}">Sign Up Now</a>
+            </small>
+        </div>
+    </form>
+{% endblock %}

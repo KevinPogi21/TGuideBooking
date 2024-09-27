@@ -1,0 +1,27 @@
+.btn-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+}
+.register-btn {
+    margin: 20px;
+    text-align: center;
+    width: 250px;
+    height: 300px;
+}
+.register-btn img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+.register-btn .btn {
+    margin-top: 10px;
+    width: 100%;
+}
+
+
+
+
+

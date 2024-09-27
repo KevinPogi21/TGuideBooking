@@ -1,0 +1,14 @@
+{% extends 'tourguideregister.html' %}
+{% block content %}
+    <h1>TourGuide Dashboard</h1>
+    
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div>
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+{% endblock content %}s
