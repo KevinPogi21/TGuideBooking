@@ -1,16 +1,119 @@
-{% extends 'layout.html' %}
-{% block content %}
 
-    <h1>Home Page</h1>
-        {% with messages = get_flashed_messages(with_categories=true) %}
+{% extends 'layout.html' %}
+
+{% block content %}
+    
+        <!-- Add your content here, within the background rectangle -->
         
-        {% if messages %}
-            <div>
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
-                {% endfor %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div>
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="hero">
+            <div class="hero-content">
+                <h1>PinoyGabay:<br>connecting travelers to local tour guides.</h1>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing. Nunc vel velit at felis tempus porta in vitae urna. A efficitur velit. Duis efficitur fringilla semper.</p>
+                <a href="#" class="btn">Book Now</a>
+            </div>
+        </div>
+
+        <!-- Popular Places Section -->
+        <div class="popular-places">
+            <h2>POPULAR PLACES</h2>
+            <div class="imagesbolinao">
+                <div class="image-containerPP">
+                    <img src="img\Bolinao-Pangasinan-39.jpg" alt="Patar Beach" class="rounded-image"> <!-- First image -->
+                    <p>PATAR BEACH</p>
+                </div>
+                <div class="image-containerPP">
+                    <img src="img\Bolinao-Pangasinan-39.jpg" alt="Patar Beach" class="rounded-image"> <!-- Second image -->
+                    <p>PATAR BEACH</p>
+                </div>
+                <div class="image-containerPP">
+                    <img src="img\Bolinao-Pangasinan-39.jpg" alt="Patar Beach" class="rounded-image"> <!-- Third image -->
+                    <p>PATAR BEACH</p>
+                </div>
+                <div class="image-containerPP">
+                  <img src="img\Bolinao-Pangasinan-39.jpg" alt="Patar Beach" class="rounded-image"> <!-- Fourth image -->
+                  <p>PATAR BEACH</p>
+              </div>
+            </div>
+        </div>
+
+        <!-- SBS Section -->
+        <div class="sbs">
+            <div class="sbs-content">
+                <h2>Step-by-Step on<br>How to Book a Local Tour Guide</h2>
+            </div>
+            <div class="step step-left">
+              <div class="step-image-container">
+                <img src="img/GOJO.jpeg" alt="Image 1" class="step-image">
+              </div>
+              <div class="step-content">
+                <h3 class="step-header">STEP 1: REGISTER</h3>
+                <p class="step-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br> Nunc vel velit at felis tempus porta<br> in vitae urna. Morbi lacinia efficitur velit.<br>Duis efficitur fringilla semper. Curabitur sollicitudin<br>accumsan enim id fringilla. Morbi odio purus, mollis at aliquet eget.</p>
+              </div>
             </div>
             
-        {% endif %}
-    {% endwith %}
+            <div class="step step-right">
+              <div class="step-content">
+                <h3 class="step-header">STEP 2: CHOOSE A TOUR GUIDE</h3>
+                <p class="step-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br> Nunc vel velit at felis tempus porta<br> in vitae urna. Morbi lacinia efficitur velit.<br>Duis efficitur fringilla semper. Curabitur sollicitudin<br>accumsan enim id fringilla. Morbi odio purus, mollis at aliquet eget.</p>
+              </div>
+              <div class="step-image-container">
+                <img src="img/GOJO.jpeg" alt="Image 2" class="step-image">
+              </div>
+            </div>
+            
+            <div class="step step-left">
+              <div class="step-image-container">
+                <img src="img/GOJO.jpeg" alt="Image 3" class="step-image">
+              </div>
+              <div class="step-content">
+                <h3 class="step-header">STEP 3: BOOK YOUR TOUR GUIDE</h3>
+                <p class="step-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br> Nunc vel velit at felis tempus porta<br> in vitae urna. Morbi lacinia efficitur velit.<br>Duis efficitur fringilla semper. Curabitur sollicitudin<br>accumsan enim id fringilla. Morbi odio purus, mollis at aliquet eget.</p>
+              </div>
+            </div>
+            
+            <div class="step step-right">
+              <div class="step-content">
+                <h3 class="step-header">STEP 4: CONFIRM YOUR BOOKING</h3>
+                <p class="step-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br> Nunc vel velit at felis tempus porta<br> in vitae urna. Morbi lacinia efficitur velit.<br>Duis efficitur fringilla semper. Curabitur sollicitudin<br>accumsan enim id fringilla. Morbi odio purus, mollis at aliquet eget.</p>
+              </div>
+              <div class="step-image-container">
+                <img src="img/GOJO.jpeg" alt="Image 4" class="step-image">
+              </div>
+            </div>                        
+          </div>
+
+          <!-- TESTIMONIALS SECTION -->
+            <div class="testimonials">
+              <h2>TESTIMONIALS</h2>
+              <div class="imagesTestimonial"> <!-- Ensure this wraps around all testimonial items -->
+                  <div class="testimonials1">
+                      <img src="img/Bolinao-Pangasinan-39.jpg" alt="Tes" class="rounded-imageT"> <!-- First image -->
+                      <p>The Beach is so good</p>
+                  </div>
+                  <div class="testimonials1">
+                      <img src="img/Bolinao-Pangasinan-39.jpg" alt="Tes" class="rounded-imageT"> <!-- Second image -->
+                      <p>Beach I said what I said</p>
+                  </div>
+                  <div class="testimonials1">
+                      <img src="img/Bolinao-Pangasinan-39.jpg" alt="Tes" class="rounded-imageT"> <!-- Third image -->
+                      <p>When magsasummer ulit?</p>
+                  </div>
+                  <div class="testimonials1">
+                      <img src="img/Bolinao-Pangasinan-39.jpg" alt="Tes" class="rounded-imageT"> <!-- Fourth image -->
+                      <p>We'll definitely recommend<br>this place argh</p>
+                  </div>
+              </div>
+            </div>
+    
 {% endblock content %}
+

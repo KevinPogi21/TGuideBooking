@@ -2,7 +2,7 @@
 {% block content %}
     <h1>TourGuide Dashboard</h1>
     
-        {% with messages = get_flashed_messages(with_categories=true) %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <div>
                 {% for category, message in messages %}
@@ -11,4 +11,5 @@
             </div>
         {% endif %}
     {% endwith %}
+
 {% endblock content %}s

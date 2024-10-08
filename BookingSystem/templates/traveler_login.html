@@ -18,7 +18,7 @@
         <div class="form-group">
             {{ form.email.label(class="form-control-label") }}
             {% if form.email.error %}
-                {{ form.email(class="form-control is-inavlid") }}
+                {{ form.email(class="form-control is-invalid") }}
                 <div class="invalid-feedback">
                     {% for error in form.email.error %}
                         <span>{{ error }}</span>
@@ -31,7 +31,7 @@
         <div class="form-group">
             {{ form.password.label(class="form-control-label") }}
             {% if form.password.error %}
-                {{ form.password(class="form-control is-inavlid") }}
+                {{ form.password(class="form-control is-invalid") }}
                 <div class="invalid-feedback">
                     {% for error in form.password.error %}
                         <span>{{ error }}</span>
@@ -41,10 +41,15 @@
                 {{ form.password(class="form-control") }}
             {% endif %}
         </div>
+        <div class="text-right">
+            <small class="text-muted">
+                <a href="{{ url_for('main.traveler_reset_request') }}">Forgot Your Password?</a>
+            </small>
+        </div>
         <button type="submit" class="btn btn-primary">Login</button>
         <div class="">
             <small class="text-muted">
-                Need An Account? <a class="ml-2" href="{{ url_for('main.register') }}">Sign Up Now</a>
+                Need An Account? <a class="ml-2" href="{{ url_for('main.traveler_register') }}">Sign Up Now</a>
             </small>
         </div>
     </form>
