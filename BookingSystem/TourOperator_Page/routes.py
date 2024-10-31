@@ -31,7 +31,7 @@ def create_tourguide():
             db.session.add(new_tourguide)
             db.session.commit()
             flash('Tour Guide account created successfully!', 'success')
-            return redirect(url_for('tourguide.tourguide_dashboard'))  # Redirect to the tour guide dashboard
+            return redirect(url_for('touroperator.touroperator_dashboard'))  # Redirect to the tour guide dashboard
 
         except Exception as e:
             # Handle errors gracefully
@@ -39,7 +39,7 @@ def create_tourguide():
             flash('An error occurred while creating the account. Please try again.', 'danger')
             print(f"Database error: {e}")  # Debugging information
 
-    return render_template('create_tourguide.html', form=form)  # Render the create tour guide template
+    return render_template('touroperator_dashboard.html', form=form)  # Render the create tour guide template
 
 
 @touroperator.route('/dashboard')

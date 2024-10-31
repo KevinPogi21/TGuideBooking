@@ -56,57 +56,51 @@
             <button class="edit-btn" id="edit-about-btn">&#9998;</button>
             <button class="save-btn hidden" id="save-about-btn">&#10003;</button>
           </h2>
-          <textarea id="about-text" disabled>Welcome! I am excited to show you around...</textarea>
+          <textarea id="about-text" disabled>{{ current_user.bio }}</textarea>
         </div>
 
         <!-- Characteristics and Skills Section -->
          
-        <section class="why-choose-me-row">
-            <!-- Characteristics Box -->
-            <div class="characteristics-box">
-              <h3>
+<!-- Characteristics and Skills Section -->
+      <section class="why-choose-me-row">
+        <!-- Characteristics Box -->
+        <div class="characteristics-box">
+            <h3>
                 Characteristics 
                 <button class="edit-btn" id="edit-char-btn">&#9998;</button>
                 <button class="save-btn hidden" id="save-char-btn">&#10003;</button>
-              </h3>
-              <ul class="checklist" id="characteristics-list">
+            </h3>
+            <ul class="checklist" id="characteristics-list">
+                {% for characteristic in current_user.characteristics %}
                 <li>
-                  <span class="checkmark">&#10003;</span>
-                  <span class="editable">Friendly and Professional</span>
-                  <button class="remove-btn hidden">&#8722;</button>
+                    <span class="checkmark">&#10003;</span>
+                    <span class="editable" contenteditable="false">{{ characteristic.characteristic }}</span>
+                    <button class="remove-btn hidden">&#8722;</button>
                 </li>
-                <li>
-                  <span class="checkmark">&#10003;</span>
-                  <span class="editable">Punctual and Reliable</span>
-                  <button class="remove-btn hidden">&#8722;</button>
-                </li>
-              </ul>              
-              <button class="add-btn hidden" id="add-char-btn">Add Characteristic</button>
-            </div>
-    
-            <!-- Skills Box -->
-            <div class="skills-box">
-              <h3>
+                {% endfor %}
+            </ul>              
+            <button class="add-btn hidden" id="add-char-btn">Add Characteristic</button>
+        </div>
+
+        <!-- Skills Box -->
+        <div class="skills-box">
+            <h3>
                 Skills 
                 <button class="edit-btn" id="edit-skills-btn">&#9998;</button>
                 <button class="save-btn hidden" id="save-skills-btn">&#10003;</button>
-              </h3>
-              <ul class="checklist" id="skills-list">
+            </h3>
+            <ul class="checklist" id="skills-list">
+                {% for skill in current_user.skills %}
                 <li>
-                  <span class="checkmark">&#10003;</span>
-                  <span class="editable">Island and Nature Tours</span>
-                  <button class="remove-btn hidden">&#8722;</button>
+                    <span class="checkmark">&#10003;</span>
+                    <span class="editable" contenteditable="false">{{ skill.skill }}</span>
+                    <button class="remove-btn hidden">&#8722;</button>
                 </li>
-                <li>
-                  <span class="checkmark">&#10003;</span>
-                  <span class="editable">Fluent in English and Tagalog</span>
-                  <button class="remove-btn hidden">&#8722;</button>
-                </li>
-              </ul>
-              
-              <button class="add-btn hidden" id="add-skills-btn">Add Skill</button>
-            </div>
-          </section>
+                {% endfor %}
+            </ul>
+            <button class="add-btn hidden" id="add-skills-btn">Add Skill</button>
+        </div>
+      </section>
       </div>
 
             <!-- Bookings Tab -->
@@ -209,7 +203,7 @@
                 <!-- Profile Picture Upload -->
                 <!-- Profile Picture Upload -->
                 <div class="profile-overview">
-                  <img src="{{ url_for('static', filename='profile_pics/' + current_user.image_file) }}" alt="Profile Picture" class="profile-pic" id="profile-pic" />
+                  <img src="" alt="Profile Picture" class="profile-pic" id="profile-pic" />
 
                     <input type="file" id="upload-pic" class="hidden" accept="image/*" />
                     <button class="primary-btn" id="change-pic-btn">Change Profile Picture</button>
