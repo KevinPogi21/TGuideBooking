@@ -1,9 +1,13 @@
+import secrets
 import os
-from flask import Blueprint, render_template, url_for, flash, redirect
+from flask import current_app, session
+from flask import Blueprint, render_template, url_for, flash, redirect, request
 from BookingSystem import db, bcrypt, mail
-from BookingSystem.forms import TravelerLoginForm, TravelerRegistrationForm, TourGuideLoginForm, TourGuideRegistrationForm, TravelerRequestResetForm, TravelerResetPasswordForm, TourGuideRequestResetForm, TourGuideResetPasswordForm
-from BookingSystem.models import UserTraveler, UserTourGuide, send_confirmation_traveler_email, send_confirmation_tourguide_email
-from flask_login import login_user, current_user, logout_user
+from BookingSystem.forms import TravelerLoginForm, TravelerRegistrationForm, TravelerRequestResetForm, TravelerResetPasswordForm, UpdateAccountForm, UserTourOperator
+from BookingSystem.models import UserTraveler, UserAdmin, send_confirmation_traveler_email, UserTourGuide
+from flask_login import login_user, current_user, logout_user, login_required
+
+
 #from flask_mail import Message
 
 from flask_dance.contrib.google import make_google_blueprint, google
@@ -53,100 +57,108 @@ def home():
 def register():
     return render_template('register.html')
 
+
 # TRAVELER LOGIN
+
 @main.route('/traveler_login', methods=['GET', 'POST'])
 def traveler_login():
-    if current_user. is_authenticated:
-        return redirect(url_for('main.home'))
+    # If someone is already logged in, log them out to avoid session conflicts
+    if current_user.is_authenticated:
+        logout_user()
+        print(f"Previous user logged out. Current user (should be anonymous): {current_user}")
+
     form = TravelerLoginForm()
     if form.validate_on_submit():
-        traveler = UserTraveler.query.filter_by(email=form.email.data).first()
-        if traveler and bcrypt.check_password_hash(traveler.password, form.password.data):
-            if traveler.confirmed:
-                login_user(traveler)
-                return redirect(url_for('main.home'))
+        user = (
+            UserAdmin.query.filter_by(email=form.email.data).first() or
+            UserTourOperator.query.filter_by(email=form.email.data).first() or
+            UserTraveler.query.filter_by(email=form.email.data).first() or
+            UserTourGuide.query.filter_by(email=form.email.data).first()
+        )
+
+        if user:
+            print(f"User found: {user.email}, Role: {user.role}")
+
+            if bcrypt.check_password_hash(user.password, form.password.data):
+                # Log out any previous session
+                logout_user()
+                print(f"Logged out previous user. Current user: {current_user}")
+                
+                # Log in the current user
+                login_user(user, remember=True)
+                print(f"Logged in user: {user.email}, Role: {user.role}, Session: {session}")
+
+                # Handle role-based redirection
+                role_redirects = {
+                    'admin': 'admin.admin_dashboard',
+                    'touroperator': 'touroperator.touroperator_dashboard',
+                    'traveler': 'main.home',
+                    'tourguide': 'tourguide.tourguide_dashboard',
+                }
+
+                redirect_url = url_for(role_redirects.get(user.role, 'main.home'))
+                print(f"Redirecting to: {redirect_url}") 
+                return redirect(redirect_url)
+                
             else:
-                flash('Your account is not confirmed yet. Please check your email.', 'warning')
-                return redirect(url_for('main.pending_confirmation'))
+                flash('Invalid password. Please try again.', 'danger')
         else:
-            flash('Login Unsuccessful. Please check email and password', 'danger')
-    return render_template('traveler_login.html', title='TravelerLogin', form=form)
+            flash('No account found with that email.', 'danger')
+
+    return render_template('traveler_login.html', title='Traveler Login', form=form)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # TRAVELER REGISTER 
 @main.route('/traveler_register', methods=['GET', 'POST'])
 def traveler_register():
-    if current_user. is_authenticated:
+    if current_user.is_authenticated:
         return redirect(url_for('main.home'))
     form = TravelerRegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         new_traveler = UserTraveler(
+            first_name=form.first_name.data,
+            last_name=form.last_name.data,
+            nationality=form.nationality.data,
             email=form.email_address.data,
-            username=form.username.data,
-            sex=form.sex.data,
-            nationality=form.nationality.data, 
             password=hashed_password,
-            image_file='default.jpg'
+            image_file='default.jpg',
+            role='traveler',  
+            confirmed=False  
         )
         db.session.add(new_traveler)
         db.session.commit()
         send_confirmation_traveler_email(new_traveler)
-        #flash(f'Account created for Traveler {form.username.data}!', 'success')
         flash('Registration successful! Please confirm your email to complete the process.', 'info')
         return redirect(url_for('main.pending_confirmation'))
     else:
         print(form.errors)
-    return render_template('traveler_register.html', title='TravelerRegister', form=form)
+    return render_template('traveler_register.html', title='Traveler Register', form=form)
+
 
 @main.route('/pending_confirmation')
 def pending_confirmation():
     return render_template('pending_confirmation.html') 
 
-# TOURGUIDE LOGIN 
-@main.route('/tourguidelogin', methods=['GET', 'POST'])
-def tourguide_login():
-    form = TourGuideLoginForm()
-    if form.validate_on_submit():
-        tourguide = UserTourGuide.query.filter_by(email=form.email.data).first()
-        if tourguide and bcrypt.check_password_hash(tourguide.password, form.password.data):
-            if tourguide.confirmed:
-                login_user(tourguide)
-                return redirect(url_for('main.tourguide_dashboard'))
-            else:
-                flash('Your account is not confirmed yet. Please check your email.', 'warning')
-                return redirect(url_for('main.pending_confirmation'))
-        else:
-            flash('Login Unsuccessful. Please check email and password', 'danger')
-    return render_template('tourguidelogin.html', title='TourGuideLogin', form=form)
 
-# TOURGUIDE REGISTER 
-@main.route('/tourguideregister', methods=['GET', 'POST'])
-def tourguide_register():
-    form = TourGuideRegistrationForm()
-    if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        new_tour_guide = UserTourGuide(
-            email=form.email_address.data,
-            username=form.username.data,
-            sex=form.sex.data,
-            nationality=form.nationality.data, 
-            password=hashed_password,
-            image_file='default.jpg'
-        )
-        db.session.add(new_tour_guide)
-        db.session.commit()
-        send_confirmation_tourguide_email(new_tour_guide)
-        flash('Registration successful! Please confirm your email to complete the process.', 'info')
-        return redirect(url_for('main.pending_confirmation'))
-    else:
-        print(form.errors)
-    return render_template('tourguideregister.html', title='TourGuideRegister', form=form)
 
-@main.route('/tourguide_dashboard')
-def tourguide_dashboard():
-    
-    flash('Welcome to your dashboard!', 'success')
-    return render_template('tourguide_dashboard.html')
+
+
 
 
 #CONFIRMATION EMAIL FOR TRAVELER
@@ -166,22 +178,7 @@ def confirm_email(token):
     else:
         return redirect(url_for('main.tourguide_login'))
     
-#CONFIRMATION EMAIL FOR TOURGUIDE
-@main.route('/confirm_tourguide_email/<token>')
-def confirm_tourguide_email(token):
-    user = UserTourGuide.verify_confirmation_token(token)
-    if not user:
-        user = UserTourGuide.verify_confirmation_token(token)
-    if user is None:
-        flash('The confirmation link is invalid or has expired.', 'warning')
-        return redirect(url_for('main.home'))
-    user.confirmed = True
-    db.session.commit()
-    flash('Your email has been confirmed! You can now log in.', 'success')
-    if isinstance(user, UserTourGuide):
-        return redirect(url_for('main.tourguide_login'))
-    else:
-        return redirect(url_for('main.traveler_login')) 
+
     
 
 
@@ -222,56 +219,61 @@ def traveler_reset_token(token):
 
 
 
-# RESET PASSWORD FOR TOURGUIDE
-
-@main.route('/tourguide_reset_password', methods=['GET', 'POST'])
-def tourguide_reset_request():
-    form = TourGuideRequestResetForm()
-    
-    if form.validate_on_submit():
-        tourguide = UserTourGuide.query.filter_by(email=form.email.data).first()
-        if tourguide:
-            tourguide.send_reset_email()
-            flash('An email has been sent with instructions to reset your password.', 'info')
-            return redirect(url_for('main.tourguide_login'))
-        else:
-            flash('There is no account with that email. Please register first.', 'warning')
-            return redirect(url_for('main.tourguideregister'))
-    
-    return render_template('tourguide_reset_request.html', title='Reset Password', form=form)
 
 
 
-@main.route('/tourguide_reset_password/<token>', methods=['GET', 'POST'])
-def tourguide_reset_token(token):
-    tourguide = UserTourGuide.verify_reset_token(token)  # Verify the token first
-    if tourguide is None:
-        flash('That is an invalid or expired token', 'warning')
-        return redirect(url_for('main.tourguide_reset_request')) 
-
-    form = TourGuideResetPasswordForm()
-    if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        tourguide.password = hashed_password
-        db.session.commit()
-        flash('Your password has been updated! You are able to log in now.', 'success')
-        return redirect(url_for('main.tourguide_login'))
-    return render_template('tourguide_reset_token.html', title='Reset Password', form=form)
-
+# TRAVELER PROFILE
+def save_picture(form_picture):
+    random_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+    picture_path = os.path.join(current_app.root_path, 'static/profile_pics', picture_fn)
+    form_picture.save(picture_path)
+    print(f"Picture saved to: {picture_path}")  # Debugging print statement
+    return picture_fn
 
 @main.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('main.home')) 
+    return redirect(url_for('main.home'))
+
+
+    
+@main.route('/account/', methods=['GET', 'POST'])
+@login_required
+def account():
+    form = UpdateAccountForm()
+    if form.picture.data:
+        picture_file = save_picture(form.picture.data)
+        current_user.image_file = picture_file
+        db.session.commit()  # Save the new image file name to the database
+    
+    print(f"Current image file: {current_user.image_file}")  # Debugging print statement
+    image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
+    return render_template('account.html', title='Account', image_file=image_file, form=form)
+
+
+@main.route('/booking')
+def booking():
+    return render_template('booking.html')
+
+@main.route('/tourguide_form')
+def tourguideform():
+    return render_template('tourguide_form.html')
+
+
+
 
 
 
     
+
     
     
-    
-    
-    
+ 
+
+
+
 
 
 

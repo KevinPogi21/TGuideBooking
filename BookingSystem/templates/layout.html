@@ -1,57 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flask App</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home - PinoyGabay</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='Homepage_design.css') }}">
 </head>
 <body>
-   
-    <!-- Navbar -->
-    <!--<nav class="navbar navbar-expand-lg navbar-light bg-light">-->
-    <nav class="navbar navbar-expand-lg" style="background-color: #A4D5D3;">
-        <a class="navbar-brand" href="{{ url_for('main.home') }}">Tour Guide Booking</a>  <!-- Updated here -->
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                {% if current_user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.logout') }}">Logout</a>
-                    </li>
-                {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.home') }}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.register') }}">Register</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.traveler_login') }}">Traveler Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.tourguide_login') }}">TourGuide Login</a>
-                    </li>
 
-                {% endif %}
-            </ul>
-        </div>
-    </nav>
+  <!-- Navbar -->
+<!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="{{ url_for('main.home') }}" class="navbar-brand">PinoyGabay</a>
+      <div class="navbar-links collapse navbar-collapse" id="navbarNav">
 
+        {% if current_user.is_authenticated %}
+          {% if current_user.role == 'traveler' %}
+            <a class="nav-link" href="{{ url_for('main.account') }}" aria-label="Account">Account</a>
+            <a class="nav-link" href="{{ url_for('main.booking') }}" aria-label="Booking">Booking</a>
 
-    <!-- Page Content -->
-    <div class="container mt-5">
-        {% block content %}
-        
-        {% endblock %}
-        
+          {% elif current_user.role == 'touroperator' %}
+            <a class="nav-link" href="{{ url_for('touroperator.touroperator_dashboard') }}" aria-label="Tour Operator Dashboard">Tour Operator</a>
+
+          {% elif current_user.role == 'tourguide' %}
+            <a class="nav-link" href="{{ url_for('tourguide.tourguide_dashboard') }}" aria-label="Tour Guide Dashboard">Tour Guide</a>
+
+          {% elif current_user.role == 'admin' %}
+            <a class="nav-link" href="{{ url_for('admin.admin_dashboard') }}" aria-label="Admin Dashboard">Admin</a>
+
+          {% endif %}
+
+          <a class="nav-link" href="{{ url_for('main.logout') }}" aria-label="Logout">Logout</a>
+
+        {% else %}
+          <a class="nav-link" href="{{ url_for('main.home') }}" aria-label="Home">Home</a>
+          <a class="nav-link" href="{{ url_for('main.traveler_register') }}" aria-label="Signup">Signup</a>
+          <a class="nav-link" href="{{ url_for('main.traveler_login') }}" aria-label="Login">Login</a>
+
+        {% endif %}
+
+      </div>
     </div>
-    
+  </nav>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <div>
+    {% block content %}
+    {% endblock %}
+  </div>
+
 </body>
 </html>

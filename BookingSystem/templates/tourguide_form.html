@@ -1,0 +1,233 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tour Guide Profile - PinoyGabay</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='booking.css') }}">
+    </head>
+    <body>
+    <!-- Navbar -->
+
+
+    
+
+    <div class="form_container">
+        <!-- Left Section: Tour Guide Details -->
+        <div class="left-column">
+        <div class="profile-overview">
+            <img src= "{{ url_for('static', filename='traveler.jpg') }}" alt="Tour Guide Picture" class="profile-pic" />
+            <div class="profile-details">
+            <h2 class="h2-guide-name">Mabuhay! I Am <span>Vincenzo Cassano</span>, Your Friendly Tour Guide</h2>
+            <p class="ratings">★★★★☆ (21 Reviews)</p>
+            </div>
+        
+        </div>
+
+        <div class="about-me">
+            <h2>About Me</h2>
+            <p>
+            Welcome! I am excited to show you around. I specialize in guiding through local attractions, 
+            ensuring you have an authentic and enjoyable experience. Whether it’s island hopping, historical tours, 
+            or local culture immersion, I'm here to make your trip unforgettable.
+            </p>
+        </div>
+        <!-- Why Choose Me Section -->
+            <section class="why-choose-me-row">
+                <div class="characteristics-box">
+                <h3>Characteristics</h3>
+                <ul class="checklist">
+                    <li><span class="checkmark">&#10003;</span> Friendly and Professional</li>
+                    <li><span class="checkmark">&#10003;</span> Punctual and Reliable</li>
+                    <li><span class="checkmark">&#10003;</span> Excellent Communicator</li>
+                    <li><span class="checkmark">&#10003;</span> Passionate about Local Culture</li>
+                </ul>
+                </div>
+
+                <div class="skills-box">
+                <h3>Skills</h3>
+                <ul class="checklist">
+                    <li><span class="checkmark">&#10003;</span> Island and Nature Tours</li>
+                    <li><span class="checkmark">&#10003;</span> Historical Insights</li>
+                    <li><span class="checkmark">&#10003;</span> Fluent in English and Tagalog</li>
+                    <li><span class="checkmark">&#10003;</span> First Aid Certified</li>
+                </ul>
+                </div>
+            </section>
+
+        <div class="container">
+            <h2>Traveler Reviews</h2>
+        <div class="traveler-reviews">
+            
+            
+            <!-- Review Card -->
+            <div class="review-card">
+                <!-- Tour Picture at the Top -->
+                <img src="{{ url_for('static', filename='tourguide.jpg') }}" alt="Tour Picture" class="tour-image" />
+            
+                <!-- Bottom Section: Traveler Info and Review -->
+                <div class="review-content">
+                <div class="traveler-info">
+                    <img src="{{ url_for('static', filename='traveler.jpg') }}" alt="Traveler Picture" class="traveler-pic" />
+                    <div class="traveler-details">
+                    <h3>Hyunwoo</h3>
+                    <div class="ratings">4.2 ★★★★☆</div>
+                    </div>
+                </div>
+            
+                <p class="review-text">
+                    Had an amazing experience! The guide was knowledgeable and friendly. 
+                    I highly recommend the island tour.
+                </p>
+            
+                <div class="review-footer">
+                    <p class="review-date">Oct. 10, 2024</p>
+                    <p class="toured-by">Toured by: <span class="tour-guide-name">Tour Guide 1</span></p>
+                </div>
+                </div>
+
+                
+            </div>
+
+            <div class="review-card">
+                <!-- Tour Picture at the Top -->
+                <img src="{{ url_for('static', filename='tourguide.jpg') }}" alt="Tour Picture" class="tour-image" />
+            
+                <!-- Bottom Section: Traveler Info and Review -->
+                <div class="review-content">
+                <div class="traveler-info">
+                    <img src="{{ url_for('static', filename='traveler1.jpg') }}" alt="Traveler Picture" class="traveler-pic" />
+                    <div class="traveler-details">
+                    <h3>Hyunwoo</h3>
+                    <div class="ratings">4.2 ★★★★☆</div>
+                    </div>
+                </div>
+            
+                <p class="review-text">
+                    Had an amazing experience! The guide was knowledgeable and friendly. 
+                    I highly recommend the island tour.
+                </p>
+            
+                <div class="review-footer">
+                    <p class="review-date">Oct. 10, 2024</p>
+                    <p class="toured-by">Toured by: <span class="tour-guide-name">Tour Guide 1</span></p>
+                </div>
+                </div>
+
+                
+            </div>
+            </div>
+            <button class="see-more-btn">See More Reviews</button>
+        </div>
+        </div>
+
+        <!-- Right Section: Sticky Booking Form -->
+        <div class="right-column">
+        <div class="booking-form">
+            <h2>Book Your Tour</h2>
+            <form>
+            <label for="date">Select Date</label>
+            <input type="date" id="date" required />
+
+            <label for="tour-type">Tour Guide Type</label>
+            <select id="tour-type" required>
+                <option value="">Choose Type</option>
+                <option value="island">Island Tour</option>
+                <option value="hiking">Hiking Guide</option>
+            </select>
+
+            <label for="personalized">Personalized Tour</label>
+            <textarea id="personalized" rows="4" placeholder="Enter your preferences or notes"></textarea>
+            
+            <!-- Price and Button Row -->
+            <div class="price-button-row">
+                <span class="price-label">₱1,200</span>
+                <button type="button" class="confirm-btn" onclick="openModal()">Confirm Booking</button>
+            </div>
+            </form>
+        </div>
+        </div>
+    </div>
+        <!-- Booking Confirmation Modal -->
+    <div id="booking-modal" class="modal">
+        <div class="modal-content">
+
+        <h2>Confirm Your Booking</h2>
+        <div>
+            <!-- Close Button in the Top-Right Corner -->
+            <button onClick="history_back()" class="close-btn" id="close-modal">&times;</button>
+
+        </div>
+
+        <div class="booking-details">
+            <p><strong>Tour Guide:</strong> Tour Guide 1</p>
+            <p><strong>Tour Date:</strong> October 21, 2024</p>
+            <p><strong>Tour Type:</strong> Island Tour</p>
+            <p><strong>Traveler:</strong> Traveler Name</p>
+            <p><strong>Quantity of Traveler:</strong> QTY</p>
+            <p><strong>Price:</strong> ₱1,500</p>
+            <!-- Special Note Section -->
+            <div class="note-section">
+            <p><strong>Note:</strong> Please ensure to bring comfortable shoes and water for the hiking tour. This is a full-day activity, so prepare accordingly!</p>
+            </div>
+
+        </div>
+
+        <div class="button-container" style="display: flex; justify-content: right;">
+        <button type="button" class="confirm-btn" onclick="showThankYouMessage()">Confirm Booking</button>
+        </div>
+        </div>
+    </div>
+
+    <!-- Thank You Popup -->
+    <div id="thank-you-popup" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h2>Thank You!</h2>
+        <p>Your booking has been confirmed.</p>
+    </div>
+    </div>
+
+    <script>
+        // Get modal and popup elements
+        const bookingModal = document.getElementById("booking-modal");
+        const thankYouPopup = document.getElementById("thank-you-popup");
+        const closeModalButton = document.getElementById("close-modal");
+    
+        // Open Modal Function
+        function openModal() {
+        bookingModal.style.display = "flex"; // Show the modal
+        document.body.style.overflow = "hidden"; // Disable background scrolling
+        }
+    
+        // Close Modal Function
+        function closeModal() {
+        bookingModal.style.display = "none"; // Hide the modal
+        document.body.style.overflow = "auto"; // Enable background scrolling
+        }
+    
+        // Attach event listener to close button
+        closeModalButton.addEventListener('click', closeModal);
+    
+        // Show Thank You Popup After Confirming Booking
+        function showThankYouMessage() {
+        closeModal(); // Close the booking modal
+        thankYouPopup.style.display = "flex"; // Show thank you popup
+    
+        // Hide the popup automatically after 3 seconds
+        setTimeout(() => {
+            thankYouPopup.style.display = "none";
+        }, 3000);
+        }
+    
+        // Optional: Close Modal by Clicking Outside of It
+        window.onclick = function (event) {
+        if (event.target === bookingModal) {
+            closeModal();
+        }
+        };
+    </script>
+    </body>
+    </html>
+{% endblock content %}

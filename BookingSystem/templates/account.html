@@ -1,0 +1,215 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Traveler Profile</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='TravelerProfile.css') }}">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+</head>
+<body>
+
+<div class="profile-container">
+  <!-- Left Sticky Tabs Panel -->
+  <aside class="tabs-panel">
+    <nav>
+      <ul>
+        <li><a href="#profile-section" class="tab-link">Profile</a></li>
+        <li><a href="#my-tours-section" class="tab-link">My Tours</a></li>
+        <li><a href="#my-reviews-section" class="tab-link">My Reviews</a></li>
+        <li><a href="#account-section" class="tab-link">Account</a></li>
+        <li><a href="{{ url_for('main.logout') }}"  class="tab-link">Log Out</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Right Content Section -->
+  <main class="content-area">
+    <!-- Profile Section -->
+    <section id="profile-section" class="content-section">
+        <h2>Profile</h2>
+        <div class="profile-overview">
+        <div class="profile-pic-container">
+            <img src="Image/traveler.JPG" alt="Profile Picture" class="profile-pic" id="profile-pic">
+            <button class="edit-pic-btn" id="edit-pic-btn">&#9998;</button>
+        </div>
+        <p>Total Tours: <span id="tour-count">5</span></p>
+        </div>
+    
+        <!-- Confirmation Modal -->
+        <div id="confirm-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Change Profile Picture</h3>
+            <p>Do you want to change your profile picture?</p>
+            <div class="button-container">
+            <button class="primary-btn" id="confirm-change-btn">Yes</button>
+            <button class="primary-btn cancel-btn" id="cancel-change-btn">No</button>
+            </div>
+        </div>
+        </div>
+    
+        <!-- Cropper Modal -->
+        <div id="cropper-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Adjust Your Picture</h3>
+            <div id="cropper-container"></div>
+            <button class="primary-btn" id="crop-btn">Crop and Save</button>
+            <button class="primary-btn cancel-btn" id="close-cropper-modal">Close</button>
+        </div>
+        </div>
+    
+        <input type="file" id="upload-pic" class="hidden" accept="image/*">
+    </section>
+
+
+        <!-- My Tours Section -->
+      <!-- My Tours Section -->
+      <section id="my-tours" class="content-section">
+        <h2>My Tours</h2>
+        
+          <!-- Bookings Tabs Container -->
+          <div class="bookings-container">
+            <!-- Toggle for Tabs on Mobile -->
+            <button class="toggle-tabs-btn" id="toggle-tabs-btn">Show Tabs</button>
+            <div class="bookings-tabs hidden" id="bookings-tabs">
+              <button class="booking-tab-btn active" data-status="all">All (5)</button>
+              <button class="booking-tab-btn" data-status="upcoming">Upcoming (2)</button>
+              <button class="booking-tab-btn" data-status="completed">Completed (1)</button>
+              <button class="booking-tab-btn" data-status="cancelled">Cancelled (2)</button>
+            </div>
+
+          <div class="bookings-content">
+          <div class="booking-category" data-status="upcoming">
+            <h4 class="status-label">Upcoming</h4>
+            <div class="booking-card">
+              <div class="booking-info">
+                <span class="booking-date">Oct 30, 2024</span>
+                <span class="tour-package">Island Hopping Tour</span>
+                <span class="traveler-name">Traveler: Jane Doe</span>
+              </div>
+              <button class="details-btn" onclick="openBookingDetails('Booking #123')">View Details</button>
+            </div>
+          </div>
+
+          <div class="booking-category" data-status="completed">
+            <h4 class="status-label">Completed</h4>
+            <div class="booking-card">
+              <div class="booking-info">
+                <span class="booking-date">Oct 25, 2024</span>
+                <span class="tour-package">Mountain Trekking</span>
+                <span class="traveler-name">Traveler: Mark Lee</span>
+              </div>
+              <button class="details-btn" onclick="openBookingDetails('Booking #125')">View Details</button>
+            </div>
+          </div>
+
+          <div class="booking-category" data-status="cancelled">
+            <h4 class="status-label">Cancelled</h4>
+            <div class="booking-card">
+              <div class="booking-info">
+                <span class="booking-date">Oct 22, 2024</span>
+                <span class="tour-package">Food Tour</span>
+                <span class="traveler-name">Traveler: Amy Cooper</span>
+              </div>
+              <button class="details-btn" onclick="openBookingDetails('Booking #126')">View Details</button>
+            </div>
+          </div>
+
+          <div class="booking-category" data-status="cancelled">
+            <h4 class="status-label">Cancelled</h4>
+            <div class="booking-card">
+              <div class="booking-info">
+                <span class="booking-date">Oct 22, 2024</span>
+                <span class="tour-package">Food Tour</span>
+                <span class="traveler-name">Traveler: Amy Cooper</span>
+              </div>
+              <button class="details-btn" onclick="openBookingDetails('Booking #126')">View Details</button>
+            </div>
+          </div>
+          </div>
+
+
+          <!-- Booking Details Modal -->
+          <div id="booking-modal" class="modal hidden">
+            <div class="modal-content">
+              <h3>Booking Details</h3>
+              <p id="booking-info">Here will be the booking details...</p>
+              <button class="primary-btn" id="close-booking-modal">Close</button>
+            </div>
+          </div>
+          </div>
+      </section>
+
+      
+
+    <!-- My Reviews Section -->
+    <section id="my-reviews-section" class="content-section">
+      <h2>My Reviews</h2>
+  <!-- Review Card -->
+  <div class="review-card">
+    <img src="Image/tourguide.jpg" alt="Tour Guide" class="guide-photo" />
+    <div class="review-info">
+      <h3>Island Hopping Tour</h3>
+      <p>Guide: Jane Doe</p>
+    </div>
+    <button class="primary-btn review-btn" data-guide="Jane Doe" data-tour="Island Hopping Tour">Review</button>
+  </div>
+
+  <!-- Review Modal -->
+  <div id="review-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>How was your tour?</h2>
+
+      <!-- Star Rating -->
+      <div class="star-rating" id="star-rating">
+        <span class="star" data-value="1">&#9733;</span>
+        <span class="star" data-value="2">&#9733;</span>
+        <span class="star" data-value="3">&#9733;</span>
+        <span class="star" data-value="4">&#9733;</span>
+        <span class="star" data-value="5">&#9733;</span>
+      </div>
+
+      <h3>Leave a Review</h3>
+      <form id="review-form">
+        <div class="input-container">
+          <textarea id="review-text" rows="5" placeholder="Write your review here..." required></textarea>
+        </div>
+
+        <div class="input-container">
+          <label for="review-image">Upload Photo</label>
+          <input type="file" id="review-image" accept="image/*" />
+        </div>
+
+        <!-- Buttons Row -->
+        <div class="button-row">
+          <button type="button" class="secondary-btn" id="close-review-modal">Cancel</button>
+          <button type="submit" class="primary-btn">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+    </section>
+
+    <!-- Account Section -->
+    <section id="account-section" class="content-section">
+      <h2>Account Settings</h2>
+      <div class="account-options">
+        <button class="primary-btn">Change Password</button>
+        <button class="delete-btn">Delete Account</button>
+      </div>
+    </section>
+
+    <!-- Logout Section -->
+    <section id="logout-section" class="content-section">
+      <h2>Log Out</h2>
+      <button class="primary-btn" >Log Out</button>
+    </section>
+  </main>
+
+</div>
+
+
+</body>
+</html>

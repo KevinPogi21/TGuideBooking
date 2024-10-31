@@ -1,0 +1,329 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tour Guide Dashboard - PinoyGabay</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='TourGuide.css') }}">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+</head>
+<body>
+  <div class="dashboard-container">
+      <!-- Hamburger Menu -->
+      <button class="btn-sidebar-toggle" id="sidebar-toggle">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
+
+      <!-- Sidebar Navigation -->
+      <nav class="side-nav" id="side-nav">
+        <h2>Dashboard</h2>
+        <ul>
+          <li><a href="#" class="nav-link active" data-tab="profile">Profile</a></li>
+          <li><a href="#" class="nav-link" data-tab="dashboard">My Bookings</a></li>
+          <li><a href="#" class="nav-link" data-tab="calendar">Calendar & Availability</a></li>
+          <li><a href="#" class="nav-link" data-tab="account">Account</a></li>
+          <li><a href="{{ url_for('main.logout') }}"  class="tab-link">Log Out</a></li>
+        </ul>
+      </nav>
+
+     <!-- Tab Content -->
+    <div class="tab-content">
+      <div class="tab-pane active" id="profile">
+        <h2>Edit Profile</h2>
+        <hr>
+
+        <div class="profile-overview">
+          <img src="Image/traveler.JPG" alt="Tour Guide Picture" class="profile-pic" />
+          <div class="profile-details">
+            <h2 class="h2-guide-name">Mabuhay! I Am <span>{{ current_user.fname }} {{ current_user.lname }}</span>, Your Friendly Tour Guide</h2>
+          </div>
+        </div>
+        
+
+
+
+
+
+        <!-- About Me Section -->
+        <div class="about-me">
+          <h2>
+            About Me
+            <button class="edit-btn" id="edit-about-btn">&#9998;</button>
+            <button class="save-btn hidden" id="save-about-btn">&#10003;</button>
+          </h2>
+          <textarea id="about-text" disabled>Welcome! I am excited to show you around...</textarea>
+        </div>
+
+        <!-- Characteristics and Skills Section -->
+         
+        <section class="why-choose-me-row">
+            <!-- Characteristics Box -->
+            <div class="characteristics-box">
+              <h3>
+                Characteristics 
+                <button class="edit-btn" id="edit-char-btn">&#9998;</button>
+                <button class="save-btn hidden" id="save-char-btn">&#10003;</button>
+              </h3>
+              <ul class="checklist" id="characteristics-list">
+                <li>
+                  <span class="checkmark">&#10003;</span>
+                  <span class="editable">Friendly and Professional</span>
+                  <button class="remove-btn hidden">&#8722;</button>
+                </li>
+                <li>
+                  <span class="checkmark">&#10003;</span>
+                  <span class="editable">Punctual and Reliable</span>
+                  <button class="remove-btn hidden">&#8722;</button>
+                </li>
+              </ul>              
+              <button class="add-btn hidden" id="add-char-btn">Add Characteristic</button>
+            </div>
+    
+            <!-- Skills Box -->
+            <div class="skills-box">
+              <h3>
+                Skills 
+                <button class="edit-btn" id="edit-skills-btn">&#9998;</button>
+                <button class="save-btn hidden" id="save-skills-btn">&#10003;</button>
+              </h3>
+              <ul class="checklist" id="skills-list">
+                <li>
+                  <span class="checkmark">&#10003;</span>
+                  <span class="editable">Island and Nature Tours</span>
+                  <button class="remove-btn hidden">&#8722;</button>
+                </li>
+                <li>
+                  <span class="checkmark">&#10003;</span>
+                  <span class="editable">Fluent in English and Tagalog</span>
+                  <button class="remove-btn hidden">&#8722;</button>
+                </li>
+              </ul>
+              
+              <button class="add-btn hidden" id="add-skills-btn">Add Skill</button>
+            </div>
+          </section>
+      </div>
+
+            <!-- Bookings Tab -->
+<div class="tab-pane" id="dashboard">
+  <h2>My Tours</h2>
+
+  <!-- Notification Panel -->
+  <div class="notification-panel">
+    <h3>Notifications</h3>
+    <ul class="notification-list">
+      <li class="notification-item">
+        New Booking from Jane Doe 
+        <button class="primary-btn small" onclick="viewNotificationDetails('Booking #123')">View</button>
+      </li>
+      <li class="notification-item">
+        Cancellation: Island Tour 
+        <button class="primary-btn small" onclick="viewNotificationDetails('Cancellation #456')">View</button>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Bookings Tabs Container -->
+  <div class="bookings-container">
+    <!-- Toggle for Tabs on Mobile -->
+    <button class="toggle-tabs-btn" id="toggle-tabs-btn">Show Tabs</button>
+    <div class="bookings-tabs hidden" id="bookings-tabs">
+      <button class="booking-tab-btn active" data-status="all">All (5)</button>
+      <button class="booking-tab-btn" data-status="upcoming">Upcoming (2)</button>
+      <button class="booking-tab-btn" data-status="completed">Completed (1)</button>
+      <button class="booking-tab-btn" data-status="cancelled">Cancelled (2)</button>
+    </div>
+
+<div class="bookings-content">
+  <div class="booking-category" data-status="upcoming">
+    <h4 class="status-label">Upcoming</h4>
+    <div class="booking-card">
+      <div class="booking-info">
+        <span class="booking-date">Oct 30, 2024</span>
+        <span class="tour-package">Island Hopping Tour</span>
+        <span class="traveler-name">Traveler: Jane Doe</span>
+      </div>
+      <button class="details-btn" onclick="openBookingDetails('Booking #123')">View Details</button>
+    </div>
+  </div>
+
+  <div class="booking-category" data-status="completed">
+    <h4 class="status-label">Completed</h4>
+    <div class="booking-card">
+      <div class="booking-info">
+        <span class="booking-date">Oct 25, 2024</span>
+        <span class="tour-package">Mountain Trekking</span>
+        <span class="traveler-name">Traveler: Mark Lee</span>
+      </div>
+      <button class="details-btn" onclick="openBookingDetails('Booking #125')">View Details</button>
+    </div>
+  </div>
+
+  <div class="booking-category" data-status="cancelled">
+    <h4 class="status-label">Cancelled</h4>
+    <div class="booking-card">
+      <div class="booking-info">
+        <span class="booking-date">Oct 22, 2024</span>
+        <span class="tour-package">Food Tour</span>
+        <span class="traveler-name">Traveler: Amy Cooper</span>
+      </div>
+      <button class="details-btn" onclick="openBookingDetails('Booking #126')">View Details</button>
+    </div>
+  </div>
+
+  <div class="booking-category" data-status="cancelled">
+    <h4 class="status-label">Cancelled</h4>
+    <div class="booking-card">
+      <div class="booking-info">
+        <span class="booking-date">Oct 22, 2024</span>
+        <span class="tour-package">Food Tour</span>
+        <span class="traveler-name">Traveler: Amy Cooper</span>
+      </div>
+      <button class="details-btn" onclick="openBookingDetails('Booking #126')">View Details</button>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Booking Details Modal -->
+  <div id="booking-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Booking Details</h3>
+      <p id="booking-info">Here will be the booking details...</p>
+      <button class="primary-btn" id="close-booking-modal">Close</button>
+    </div>
+  </div>
+</div>
+</div>
+                        
+            <!-- Account Tab -->
+            <div class="tab-pane active" id="account">
+                <div class="account-card">
+                <h2 class="account-header">Account</h2> 
+            
+                <!-- Profile Picture Upload -->
+                <!-- Profile Picture Upload -->
+                <div class="profile-overview">
+                  <img src="{{ url_for('static', filename='profile_pics/' + current_user.image_file) }}" alt="Profile Picture" class="profile-pic" id="profile-pic" />
+
+                    <input type="file" id="upload-pic" class="hidden" accept="image/*" />
+                    <button class="primary-btn" id="change-pic-btn">Change Profile Picture</button>
+                    <button class="primary-btn hidden" id="save-pic-btn">Save</button>
+                
+                      <!-- Cropper Modal -->
+                      <div id="cropper-modal" class="modal hidden">
+                        <div class="modal-content">
+                          <h3>Adjust Your Picture</h3>
+                          <div id="cropper-container"></div>
+                          <button class="primary-btn" id="crop-btn">Crop and Save</button>
+                          <button class="primary-btn" id="close-cropper-modal">Close</button>
+                        </div>
+                      </div>
+            
+                <!-- Name Section -->
+                <!-- Name Section -->
+                <div class="input-group">
+                  <label for="name">
+                      Name:
+                      <span id="full-name">{{ current_user.fname }} {{ current_user.lname }}</span> 
+                      <input type="text" id="first-name" class="hidden" placeholder="First Name" value="{{ current_user.fname }}">
+                      <input type="text" id="last-name" class="hidden" placeholder="Last Name" value="{{ current_user.lname }}">
+                      
+                      <button class="edit-btn" id="edit-name-btn">&#9998;</button> <!-- Pencil Icon -->
+                      <button class="save-btn hidden" id="save-name-btn">&#10003;</button> <!-- Check Icon -->
+                  </label>
+              
+
+                  
+                  <input type="text" id="first-name1" class="input-group hidden" placeholder="First Name" value="{{ current_user.fname }}" />
+                  <input type="text" id="last-name1" class="input-group hidden" placeholder="Last Name" value="{{ current_user.lname }}" />
+              </div>
+            
+                <h2>Contact Information</h2>
+
+                <!-- Email Section -->
+                <div class="input-group">
+                  <label for="email">
+                    Email:
+                    <span id="email-display">{{ current_user.email }}</span> 
+                    <input type="email" id="email-input" class="hidden" placeholder="Enter new email">
+                    
+                    <button class="edit-btn" id="edit-email-btn">&#9998;</button> <!-- Pencil Icon -->
+                    <button class="save-btn hidden" id="save-email-btn">&#10003;</button> <!-- Check Icon -->
+                  </label>
+                </div>
+                
+
+                <!-- Contact Number Section -->
+                <div class="input-group">
+                  <label for="contact-number">
+                    Contact Number:
+                    <span id="contact-number-display">{{ current_user.contact_number }}</span> 
+                    <input type="text" id="contact-number-input" class="hidden" placeholder="Enter new contact number">
+                
+                    <button class="edit-btn" id="edit-contact-btn">&#9998;</button> <!-- Pencil Icon -->
+                    <button class="save-btn hidden" id="save-contact-btn">&#10003;</button> <!-- Check Icon -->
+                  </label>
+                </div>
+                
+
+                <!-- Password Section -->
+                <div class="input-group">
+                  <label for="current-password">
+                    Current Password
+                    <button class="edit-btn" id="edit-password-btn">&#9998;</button> <!-- Pencil Icon -->
+                    <button class="save-btn hidden" id="save-password-btn">&#10003;</button> <!-- Check Icon -->
+                  </label>
+                  <input type="password" id="current-password" placeholder="••••••••"  />
+                </div>
+                
+                <!-- New Password Fields (Initially Hidden) -->
+                <div class="input-group hidden" id="reenter-password-group">
+                  <label for="reenter-password">Re-enter Current Password</label>
+                  <input type="password" id="reenter-password" placeholder="Re-enter current password" />
+                </div>
+                
+                <div class="input-group hidden" id="new-password-group">
+                  <label for="new-password">New Password</label>
+                  <input type="password" id="new-password" placeholder="Enter new password" />
+                </div>
+                
+                <div class="input-group hidden" id="confirm-password-group">
+                  <label for="confirm-password">Confirm New Password</label>
+                  <input type="password" id="confirm-password" placeholder="Confirm new password" />
+                </div>
+                
+            
+                <!-- Profile Visibility Toggle -->
+                <div class="account-section">
+                  <h3>Profile Visibility</h3>
+                  <label class="toggle-container">
+                      <span class="toggle-label" id="toggle-label">Inactive</span>
+                      <div class="toggle-switch" id="profile-toggle" role="button" aria-pressed="false"></div>
+                  </label>
+              </div>
+              
+
+            
+                <!-- Account Deletion -->
+                 <div class="account-section">
+                    <h3>Account Settings</h3>
+                    <button class="primary-btn delete-btn">Delete Account</button>
+                 </div>
+              </div>
+            </div>
+      <div class="tab-pane" id="logout">
+        <li><a href="#"  class="tab-link">Log Out</a></li>
+        <p>You have been logged out. Redirecting...</p>
+      </div>
+  </div>
+</div>
+</div>
+  <script src="{{ url_for('static', filename='TourGuide.js') }}"></script>
+</body>
+</html>

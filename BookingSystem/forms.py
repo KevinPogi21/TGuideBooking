@@ -1,8 +1,12 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed
+from flask_login import current_user
 from wtforms import StringField, PasswordField, SubmitField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from BookingSystem.models import UserTraveler, UserTourGuide
+from BookingSystem.models import UserTraveler, UserTourOperator, UserTourGuide
 from wtforms import ValidationError
+from BookingSystem import db
+
 
 #  VALIDATORS FOR STRONG PASSWORD
 def UppercaseValidator(form, field):
@@ -28,27 +32,20 @@ def SpecialCharacterValidator(form, field):
 
 # REGISTRATION AND LOGIN FORM FOR TRAVELER
 class TravelerRegistrationForm(FlaskForm):
-    email_address = StringField('Email Address', validators=[DataRequired(), Length(min=6, max=254)])
-    #confirm_email = StringField('Confirm Email', validators=[DataRequired(), Email(), EqualTo('email_address', message='Emails must match')])
-    username = StringField('Username', validators=[DataRequired()])
-    sex = SelectField('Sex', choices=[('male', 'Male'), ('female', 'Female')], validators=[DataRequired()])
-    nationality = SelectField('Nationality', choices=[        ('Philippines', 'Philippines'),
-        ('United States', 'United States'),
-        ('Japan', 'Japan'),
-        ('Canada', 'Canada')], validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=8, message='Password must be at least 8 characters long.'),
-            UppercaseValidator,
-            LowercaseValidator,
-            DigitalValidator,
-            SpecialCharacterValidator])
-    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message='Passwords must match')])
-    submit = SubmitField('Sign Up')
     
-    def validate_username(self, username):
-        traveler = UserTraveler.query.filter_by(username = username.data).first()
-        if traveler:
-            raise ValidationError('That username is taken. Please Choose a different one.')
-        
+    first_name= StringField('Username', validators=[DataRequired()])
+    last_name = StringField('Username', validators=[DataRequired()])
+    nationality = StringField('Nationality', validators=[DataRequired()])
+    email_address = StringField('Email Address', validators=[DataRequired(), Length(min=6, max=300)])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=8, message='Password must be at least 8 characters long.'),
+        UppercaseValidator,
+        LowercaseValidator,
+        DigitalValidator,
+        SpecialCharacterValidator])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message='Passwords must match')])    
+    submit = SubmitField('Sign Up')     
+                                            
+                                                         
     def validate_email_address(self, email_address):
         traveler = UserTraveler.query.filter_by(email = email_address.data).first()
         if traveler:
@@ -59,47 +56,7 @@ class TravelerLoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
     
-    
-    
-    
-    
-    
-    
-    
-#  REGISTRAION AND LOGIN FORM FOR TOURGUIDE
-class TourGuideRegistrationForm(FlaskForm):
-    email_address = StringField('Email Address', validators=[DataRequired(), Length(min=6, max=254)])
-    #confirm_email = StringField('Confirm Email', validators=[DataRequired(), Email(), EqualTo('email_address', message='Emails must match')])
-    username = StringField('Username', validators=[DataRequired()])
-    sex = SelectField('Sex', choices=[ ('male', 'Male'), ('female', 'Female')], validators=[DataRequired()])
-    nationality = SelectField('Nationality', choices=[        ('Philippines', 'Philippines'),
-        ('United States', 'United States'),
-        ('Japan', 'Japan'),
-        ('Canada', 'Canada'),], validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message='Passwords must match')])
-    submit = SubmitField('Sign Up')
-    
-    def validate_username(self, username):
-        tourguide = UserTourGuide.query.filter_by(username = username.data).first()
-        if tourguide:
-            raise ValidationError('That username is taken. Please Choose a different one.')
-        
-    def validate_email_address(self, email_address):
-        tourguide = UserTourGuide.query.filter_by(email = email_address.data).first()
-        if tourguide:
-            raise ValidationError('That Email is taken. Please Choose a different one.')
-
-class TourGuideLoginForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    submit = SubmitField('Login')
-    
-    
-    
-    
-    
-    
+ 
     
    #TRAVELER RESET PASSWORD FORM 
 class TravelerRequestResetForm(FlaskForm):
@@ -116,18 +73,21 @@ class TravelerResetPasswordForm(FlaskForm):
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message='Passwords must match')])
     submit = SubmitField('Reset Password')
     
+
+class UpdateAccountForm(FlaskForm):
+
+    username = StringField('Username', validators=[DataRequired()])
+   #sex = SelectField('Sex', choices=[('male', 'Male'), ('female', 'Female')], validators=[DataRequired()])
+    nationality = SelectField('Nationality', choices=[        ('Philippines', 'Philippines'),
+        ('United States', 'United States'),
+        ('Japan', 'Japan'),
+        ('Canada', 'Canada')], validators=[DataRequired()])
+    picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg','png'])])
+    submit = SubmitField('Update')
     
-# TOURGUIDE RESET PASSWORD
-class TourGuideRequestResetForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    submit = SubmitField('Request Password Reset')
-    
-    def validate_email(self, email):
-        tourguide = UserTourGuide.query.filter_by(email = email.data).first()
-        if tourguide is None:
-            raise ValidationError('There is no account with email. You must register first.')
+    def validate_username(self, username):
+        if username.data != current_user.username:
+            traveler = UserTraveler.query.filter_by(username = username.data).first()
+            if traveler:
+                raise ValidationError('That username is taken. Please Choose a different one.')
         
-class TourGuideResetPasswordForm(FlaskForm):
-    password = PasswordField('Password', validators=[DataRequired()])
-    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message='Passwords must match')])
-    submit = SubmitField('Reset Password')

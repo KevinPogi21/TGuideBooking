@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tour Operator Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='TourOperator.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <script src="{{ url_for('static', filename='TourOperator.js') }}" defer ></script>
+
+</head>
+<body>
+    <!-- Tour Operator Dashboard -->
+<div class="dashboard-container">
+    <!-- Sidebar Navigation -->
+    <nav class="side-nav">
+      <h2>Operator Dashboard</h2>
+      <ul>
+        <li><a href="#" class="nav-link active" data-tab="tour-management">Tour Management</a></li>
+        <li><a href="#" class="nav-link" data-tab="manage-municipality">Manage Municipality</a></li>
+        <li><a href="#" class="nav-link" data-tab="tour-guide-management">Tour Guide Management</a></li>
+        <li><a href="#" class="nav-link" data-tab="account">Account</a></li>
+        <li><a href="{{ url_for('main.logout') }}"  class="tab-link">Log Out</a></li>
+      </ul>
+    </nav>
+  
+    <!-- Tab Content -->
+    <div class="tab-content">
+      <!-- Tour Management Tab -->
+      <div class="tab-pane active" id="tour-management">
+        <h2>Tour Management Overview</h2>
+        <div class="overview">
+          <div class="overview-card">
+            <h3>Active Guides</h3>
+            <p>10</p>
+          </div>
+          <div class="overview-card">
+            <h3>Ongoing Tours</h3>
+            <p>5</p>
+          </div>
+          <div class="overview-card">
+            <h3>Pending Bookings</h3>
+            <p>8</p>
+          </div>
+          <div class="overview-card">
+            <h3>Completed Tours</h3>
+            <p>15</p>
+          </div>
+        </div>
+  
+<!-- Bookings Tabs Container -->
+<div class="bookings-container">
+    <div class="bookings-tabs">
+      <button class="booking-tab-btn active" data-status="all">All (5)</button>
+      <button class="booking-tab-btn" data-status="upcoming">Upcoming (2)</button>
+      <button class="booking-tab-btn" data-status="ongoing">Ongoing (1)</button>
+      <button class="booking-tab-btn" data-status="completed">Completed (1)</button>
+      <button class="booking-tab-btn" data-status="cancelled">Cancelled (1)</button>
+    </div>
+  
+    <!-- Bookings Content -->
+    <div class="bookings-content">
+      <!-- Category Label: Upcoming -->
+      <div class="booking-category" data-status="upcoming">
+        <h4>Upcoming</h4>
+        <div class="booking-card">
+          <div class="booking-info">
+            <span class="booking-date">Oct 30, 2024</span>
+            <span class="tour-package">Island Hopping Tour</span>
+            <span class="traveler-name">Traveler: Jane Doe</span>
+            <span class="tour-guide-name">Guide: Peter Park</span>
+          </div>
+          <button class="details-btn" onclick="openBookingDetails('Booking #123')">View Details</button>
+        </div>
+      </div>
+  
+      <!-- Category Label: Ongoing -->
+      <div class="booking-category" data-status="ongoing">
+        <h4>Ongoing</h4>
+        <div class="booking-card">
+          <div class="booking-info">
+            <span class="booking-date">Nov 1, 2024</span>
+            <span class="tour-package">City Tour</span>
+            <span class="traveler-name">Traveler: John Smith</span>
+            <span class="tour-guide-name">Guide: Amy Brown</span>
+          </div>
+          <button class="details-btn" onclick="openBookingDetails('Booking #124')">View Details</button>
+        </div>
+      </div>
+  
+      <!-- Category Label: Completed -->
+      <div class="booking-category" data-status="completed">
+        <h4>Completed</h4>
+        <div class="booking-card">
+          <div class="booking-info">
+            <span class="booking-date">Oct 25, 2024</span>
+            <span class="tour-package">Mountain Trekking</span>
+            <span class="traveler-name">Traveler: Mark Lee</span>
+            <span class="tour-guide-name">Guide: Sam Lee</span>
+          </div>
+          <button class="details-btn" onclick="openBookingDetails('Booking #125')">View Details</button>
+        </div>
+      </div>
+  
+      <!-- Category Label: Cancelled -->
+      <div class="booking-category" data-status="cancelled">
+        <h4>Cancelled</h4>
+        <div class="booking-card">
+          <div class="booking-info">
+            <span class="booking-date">Oct 22, 2024</span>
+            <span class="tour-package">Food Tour</span>
+            <span class="traveler-name">Traveler: Amy Cooper</span>
+            <span class="tour-guide-name">Guide: Peter Park</span>
+          </div>
+          <button class="details-btn" onclick="openBookingDetails('Booking #126')">View Details</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Booking Details Modal -->
+  <div id="booking-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Booking Details</h3>
+      <p id="booking-info">Here will be the booking details...</p>
+      <button class="primary-btn" id="close-booking-modal">Close</button>
+    </div>
+  </div>
+  
+      </div>
+  
+      <!-- Manage Municipality Tab -->
+      <div class="tab-pane" id="manage-municipality">
+        <h2>Manage Municipality</h2>
+        <button class="primary-btn">Add/Edit Page Content</button>
+        <button class="primary-btn">CRUD Tour Packages</button>
+      </div>
+  
+      <!-- Tour Guide Management Tab -->
+          <!-- Tour Guide Management Tab -->
+          <div class="tab-pane" id="tour-guide-management">
+            <h2>Tour Guide Management</h2>
+          <!-- Add Tour Guide Button -->
+          <button class="primary-btn" id="add-tour-guide-btn">Add Tour Guide</button>
+
+          <!-- Add Tour Guide Modal -->
+          <div class="modal hidden" id="tour-guide-modal">
+            <div class="modal-content">
+              <button class="close-btn" id="close-tour-guide-modal">&times;</button>
+              <h1 class="modal-title">Create Tour Guide Account</h1>
+              <p class="modal-subtitle">Fill in the required details to create a new tour guide account.</p>
+
+              <form method="POST" id="tour-guide-form" action="{{ url_for('touroperator.create_tourguide') }}">
+                {{ form.hidden_tag() }}  <!-- CSRF token if using Flask-WTF -->
+            
+                <div class="input-container">
+                    <label for="fname">First Name</label>
+                    {{ form.fname(class="input", placeholder="Enter Guide First Name") }}
+                    {% if form.fname.errors %}
+                        <span class="error">{{ form.fname.errors[0] }}</span>
+                    {% endif %}
+                </div>
+            
+                <div class="input-container">
+                    <label for="lname">Last Name</label>
+                    {{ form.lname(class="input", placeholder="Enter Guide Last Name") }}
+                    {% if form.lname.errors %}
+                        <span class="error">{{ form.lname.errors[0] }}</span>
+                    {% endif %}
+                </div>
+            
+                <div class="input-container">
+                    <label for="email">Email</label>
+                    {{ form.email(class="input", placeholder="Enter Guide Email") }}
+                    {% if form.email.errors %}
+                        <span class="error">{{ form.email.errors[0] }}</span>
+                    {% endif %}
+                </div>
+            
+                <div class="input-container">
+                    <label for="contact_number">Contact Number</label>
+                    {{ form.contact_number(class="input", placeholder="Enter Contact Number") }}
+                    {% if form.contact_number.errors %}
+                        <span class="error">{{ form.contact_number.errors[0] }}</span>
+                    {% endif %}
+                </div>
+            
+                <div class="input-container">
+                    <label for="password">Password</label>
+                    {{ form.password(class="input", placeholder="Enter Password") }}
+                    {% if form.password.errors %}
+                        <span class="error">{{ form.password.errors[0] }}</span>
+                    {% endif %}
+                </div>
+            
+                <div class="input-container">
+                    <label for="confirm_password">Confirm Password</label>
+                    {{ form.confirm_password(class="input", placeholder="Confirm Password") }}
+                    {% if form.confirm_password.errors %}
+                        <span class="error">{{ form.confirm_password.errors[0] }}</span>
+                    {% endif %}
+                </div>
+            
+                <div class="button-container">
+                    <button type="submit" class="primary-btn">Create Account</button>
+                </div>
+            </form>
+            
+            
+
+            </div>
+          </div>
+            </div>
+
+  
+            <!-- Account Tab -->
+            <div class="tab-pane active" id="account">
+                <div class="account-card">
+                <h2 class="account-header">Account</h2> 
+            
+                <!-- Profile Picture Upload -->
+                <!-- Profile Picture Upload -->
+                <div class="profile-overview">
+                    <img src="Image/traveler.JPG" alt="Profile Picture" class="profile-pic" id="profile-pic" />
+                    <input type="file" id="upload-pic" class="hidden" accept="image/*" />
+                    <button class="primary-btn" id="change-pic-btn">Change Profile Picture</button>
+                    <button class="primary-btn hidden" id="save-pic-btn">Save</button>
+                
+                      <!-- Cropper Modal -->
+                      <div id="cropper-modal" class="modal hidden">
+                        <div class="modal-content">
+                          <h3>Adjust Your Picture</h3>
+                          <div id="cropper-container"></div>
+                          <button class="primary-btn" id="crop-btn">Crop and Save</button>
+                          <button class="primary-btn" id="close-cropper-modal">Close</button>
+                        </div>
+                      </div>
+            
+                <!-- Name Section -->
+                <!-- Name Section -->
+                    <!-- Name Section -->
+                    <div class="input-group">
+                        <label for="name">
+                        Name:
+                        <button class="edit-btn" id="edit-name-btn">&#9998;</button>
+                        <button class="save-btn hidden" id="save-name-btn">&#10003;</button>
+                        </label>
+                        <input type="text" id="name" placeholder="Vincenzo Cassano" disabled />
+                    </div>
+                    
+            
+                <h2>Contact Information</h2>
+
+                <!-- Email Section -->
+                <div class="input-group">
+                  <label for="email">
+                    Email 
+                    <button class="edit-btn" id="edit-email-btn">&#9998;</button>
+                    <button class="save-btn hidden" id="save-email-btn">&#10003;</button>
+                  </label>
+                  <input type="email" id="email" placeholder="vincenzo@example.com" disabled /> 
+                </div>
+
+                <!-- Contact Number Section -->
+                <div class="input-group">
+                  <label for="contact-number">
+                    Contact Number 
+                    <button class="edit-btn" id="edit-contact-btn">&#9998;</button>
+                    <button class="save-btn hidden" id="save-contact-btn">&#10003;</button>
+                  </label>
+                  <input type="text" id="contact-number" placeholder="Enter contact number" disabled />
+                </div>
+
+                <!-- Password Section -->
+                <div class="input-group">
+                  <label for="current-password">
+                    Current Password
+                    <button class="edit-btn" id="edit-password-btn">&#9998;</button>
+                    <button class="save-btn hidden" id="save-password-btn">&#10003;</button>
+                  </label>
+                  <input type="password" id="current-password" placeholder="••••••••" disabled />
+                </div>
+
+                <!-- New Password Fields (Initially Hidden) -->
+                <div class="input-group hidden" id="reenter-password-group">
+                  <label for="reenter-password">Re-enter Current Password</label>
+                  <input type="password" id="reenter-password" placeholder="Re-enter current password" />
+                </div>
+
+                <div class="input-group hidden" id="new-password-group">
+                  <label for="new-password">New Password</label>
+                  <input type="password" id="new-password" placeholder="Enter new password" />
+                </div>
+
+                <div class="input-group hidden" id="confirm-password-group">
+                  <label for="confirm-password">Confirm New Password</label>
+                  <input type="password" id="confirm-password" placeholder="Confirm new password" />
+                </div>
+            </div>
+        </div>
+  
+  <!-- Logout Confirmation Modal -->
+  <div id="logout-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Confirm Logout</h3>
+      <button class="primary-btn" id="confirm-logout">Logout</button>
+      <button class="primary-btn" id="cancel-logout">Cancel</button>
+    </div>
+  </div>
+
+
+
+</body>
+</html>
