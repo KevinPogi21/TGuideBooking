@@ -92,7 +92,7 @@ def traveler_login():
                 role_redirects = {
                     'admin': 'admin.admin_dashboard',
                     'touroperator': 'touroperator.touroperator_dashboard',
-                    'traveler': 'main.home',
+                    'traveler': 'main.traveler_dashboard',
                     'tourguide': 'tourguide.tourguide_dashboard',
                 }
 
@@ -261,7 +261,9 @@ def booking():
 def tourguideform():
     return render_template('tourguide_form.html')
 
-
+@main.route('/traveler_dashboard')
+def traveler_dashboard():
+    return render_template('traveler_dashboard.html')
 
 
 

@@ -6,7 +6,7 @@ tabLinks.forEach(link => {
     e.preventDefault();
     const targetSection = document.querySelector(link.getAttribute('href'));
     window.scrollTo({
-      top: targetSection.offsetTop - 20, // Adjust for spacing
+      top: targetSection.offsetTop - 150, // Adjust for spacing
       behavior: 'smooth'
     });
 
@@ -16,6 +16,7 @@ tabLinks.forEach(link => {
   });
 });
 
+// Change Profile
 const profilePic = document.getElementById('profile-pic');
 const editPicBtn = document.getElementById('edit-pic-btn');
 const uploadPicInput = document.getElementById('upload-pic');
@@ -91,65 +92,52 @@ closeCropperModal.addEventListener('click', () => {
 
 
 
+// My Tours Toggles Function
+const toggleButtons = document.querySelectorAll('.toggle-btn');
+const tourCards = document.querySelectorAll('.tour-card');
 
-const categoryButtons = document.querySelectorAll('.tour-category-btn');
-const tourCategories = document.querySelectorAll('.tour-category-content');
+// Initialize layout on load to fix spacing issue
+window.addEventListener('DOMContentLoaded', () => {
+  toggleButtons[0].click(); // Simulate a click to trigger layout adjustment
+});
 
-categoryButtons.forEach((btn) => {
-  btn.addEventListener('click', () => {
-    // Toggle active button
-    categoryButtons.forEach((btn) => btn.classList.remove('active'));
-    btn.classList.add('active');
+// Toggle visibility based on category
+toggleButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    // Remove active state from all buttons
+    toggleButtons.forEach((btn) => btn.classList.remove('active'));
+    button.classList.add('active');
 
-    // Show corresponding category content
-    const status = btn.dataset.status;
-    tourCategories.forEach((category) => {
-      category.style.display = category.dataset.status === status ? 'block' : 'none';
+    const status = button.dataset.status;
+
+    // Show/Hide cards based on the selected status
+    tourCards.forEach((card) => {
+      const cardStatus = card.dataset.status;
+      card.style.display =
+        status === 'all' || cardStatus === status ? 'block' : 'none';
     });
   });
 });
 
 
 
-// Toggle Tabs on Mobile
-const toggleTabsBtn = document.getElementById('toggle-tabs-btn');
-const bookingsTabs = document.getElementById('bookings-tabs');
-const bookingTabBtns = document.querySelectorAll('.booking-tab-btn');
-const bookingCategories = document.querySelectorAll('.booking-category');
+// Review Cards Hide Function
+const toggleReviewsBtn = document.getElementById('toggle-reviews');
+const reviewsContainer = document.getElementById('reviews-container');
 
-// Toggle tabs visibility on small screens
-toggleTabsBtn.addEventListener('click', () => {
-  bookingsTabs.classList.toggle('hidden');
-  toggleTabsBtn.textContent = bookingsTabs.classList.contains('hidden') ? 'Show Tabs' : 'Hide Tabs';
-});
+// Toggle Reviews Visibility
+toggleReviewsBtn.addEventListener('click', () => {
+  reviewsContainer.classList.toggle('hidden');
 
-// Handle tab selection and auto-collapse on mobile
-bookingTabBtns.forEach((btn) => {
-  btn.addEventListener('click', () => {
-    // Set active tab
-    bookingTabBtns.forEach((btn) => btn.classList.remove('active'));
-    btn.classList.add('active');
-
-    const status = btn.dataset.status;
-
-    // Show/Hide booking categories based on tab selection
-    bookingCategories.forEach((category) => {
-      const categoryStatus = category.dataset.status;
-      category.style.display =
-        status === 'all' || categoryStatus === status ? 'block' : 'none';
-    });
-
-    // Collapse the tabs if on mobile
-    if (window.innerWidth <= 768) {
-      bookingsTabs.classList.add('hidden');
-      toggleTabsBtn.textContent = 'Show Tabs'; // Reset button text
-    }
-  });
+  // Change icon based on visibility
+  toggleReviewsBtn.innerHTML = 
+    reviewsContainer.classList.contains('hidden') ? '&#128584;' : '&#128065;';
 });
 
 
 
-// Booking Details Modal Logic
+
+// Show Booking modal logic
 const bookingModal = document.getElementById('booking-modal');
 const bookingInfo = document.getElementById('booking-info');
 const closeBookingModal = document.getElementById('close-booking-modal');
@@ -163,7 +151,8 @@ closeBookingModal.addEventListener('click', () => {
   bookingModal.classList.remove('show');
 });
 
-// Open and Close Review Modal
+
+// Open and Close To Review Modal
 const reviewButtons = document.querySelectorAll('.review-btn');
 const reviewModal = document.getElementById('review-modal');
 const closeReviewModal = document.getElementById('close-review-modal');
@@ -190,3 +179,130 @@ stars.forEach((star, index) => {
   });
 });
 
+
+
+
+
+// Change Password and Email
+const editEmailBtn = document.getElementById('edit-email-btn');
+const editPasswordBtn = document.getElementById('edit-password-btn');
+const passwordConfirmModal = document.getElementById('password-confirm-modal');
+const confirmPasswordInput = document.getElementById('confirm-password-input');
+const passwordConfirmBtn = document.getElementById('password-confirm-btn');
+const passwordCancelBtn = document.getElementById('password-cancel-btn');
+const changeEmailModal = document.getElementById('change-email-modal');
+const changePasswordModal = document.getElementById('change-password-modal');
+const modalOverlay = document.getElementById('modal-overlay');
+const saveEmailBtn = document.getElementById('save-email-btn');
+const cancelEmailBtn = document.getElementById('cancel-email-btn');
+const savePasswordBtn = document.getElementById('save-password-btn');
+const cancelPasswordBtn = document.getElementById('cancel-password-btn');
+
+let activeAction = '';
+
+// Open the password confirmation modal
+editEmailBtn.addEventListener('click', () => {
+  activeAction = 'email';
+  openPasswordModal();
+});
+
+editPasswordBtn.addEventListener('click', () => {
+  activeAction = 'password';
+  openPasswordModal();
+});
+
+// Confirm password and open the appropriate modal
+passwordConfirmBtn.addEventListener('click', () => {
+  if (confirmPasswordInput.value === 'password123') {
+    closeModal();
+    if (activeAction === 'email') {
+      openChangeEmailModal();
+    } else if (activeAction === 'password') {
+      openChangePasswordModal();
+    }
+  } else {
+    alert('Incorrect password. Please try again.');
+  }
+});
+
+// Save new email (for testing purposes)
+saveEmailBtn.addEventListener('click', () => {
+  const newEmail = document.getElementById('new-email-input').value;
+  alert(`New email saved: ${newEmail}`);
+  closeModal();
+});
+
+// Save new password (for testing purposes)
+savePasswordBtn.addEventListener('click', () => {
+  const newPassword = document.getElementById('new-password').value;
+  const confirmNewPassword = document.getElementById('confirm-new-password').value;
+
+  if (newPassword === confirmNewPassword) {
+    alert('Password changed successfully!');
+    closeModal();
+  } else {
+    alert('Passwords do not match. Please try again.');
+  }
+});
+
+// Cancel button handlers
+passwordCancelBtn.addEventListener('click', closeModal);
+cancelEmailBtn.addEventListener('click', closeModal);
+cancelPasswordBtn.addEventListener('click', closeModal);
+
+// Helper functions to open and close modals
+function openPasswordModal() {
+  passwordConfirmModal.classList.add('show');
+  modalOverlay.classList.add('show');
+}
+
+function openChangeEmailModal() {
+  changeEmailModal.classList.add('show');
+  modalOverlay.classList.add('show');
+}
+
+function openChangePasswordModal() {
+  changePasswordModal.classList.add('show');
+  modalOverlay.classList.add('show');
+}
+
+function closeModal() {
+  document.querySelectorAll('.modal').forEach(modal => modal.classList.remove('show'));
+  modalOverlay.classList.remove('show');
+  confirmPasswordInput.value = ''; // Clear password input
+}
+
+
+
+// Scoped Logout Modal Logic
+(function() {
+  // Get elements for logout modal
+  const openLogoutModalBtn = document.getElementById('open-logout-modal');
+  const logoutModal = document.getElementById('logout-modal');
+  const modalOverlay = document.getElementById('modal-overlay');
+  const cancelLogoutBtn = document.getElementById('cancel-logout');
+  const confirmLogoutBtn = document.getElementById('confirm-logout');
+
+  // Function to open the logout modal
+  function openLogoutModal() {
+    logoutModal.classList.add('show');
+    modalOverlay.classList.add('show');
+  }
+
+  // Function to close the logout modal
+  function closeLogoutModal() {
+    logoutModal.classList.remove('show');
+    modalOverlay.classList.remove('show');
+  }
+
+  // Event listeners for the logout modal
+  openLogoutModalBtn.addEventListener('click', openLogoutModal);
+  cancelLogoutBtn.addEventListener('click', closeLogoutModal);
+  modalOverlay.addEventListener('click', closeLogoutModal);
+
+  // Confirm Logout and Redirect
+  confirmLogoutBtn.addEventListener('click', () => {
+    closeLogoutModal(); // Close modal
+    window.location.href = 'Traveler - TGList.html'; // Redirect to TGList.html
+  });
+})();

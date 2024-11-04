@@ -1,100 +1,114 @@
-{% extends 'layout.html' %}
-{% block content %}
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
+
+
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home - PinoyGabay</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='booking.css') }}">
-    </head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='Traveler.css') }}">
+  </head>
     <body>
 
-    <!-- Navbar -->
+      <!-- Navbar -->
+      <nav class="navbar">
+        <div class="navbar-container">
+          <a href="Traveler - TGList.html" class="navbar-brand">PinoyGabay</a>
+            <div class="navbar-links">
+              
+              <a href="{{ url_for('main.booking') }}" class="nav-link">My Bookings</a>
 
+              <!-- Profile Icon -->
+              <div class="profile-container-nav">
+                <a href="{{ url_for('main.account') }}">
+                  <img src="{{ url_for('static', filename='doonaaaaa.jpg') }}" alt="Profile" class="profile-icon" />
+                </a>
+              </div>
+            </div>
+        </div>
+      </nav>
 
-    <div class="container">
-
-        <h1 class="page-title">Choose Your Tour Guide</h1>
-        
+      <div class="container">
+        <h1 class="page-title" >Choose Your Tour Guide</h1>
         <div class="tour-guide-list">
-
-            <!-- Tour Guide Card -->
-        <div class="tour-guide-card">
+          <!-- Tour Guide Card -->
+          <div class="tour-guide-card">
             <div class="profile-picture">
-            <img src="{{ url_for('static', filename='tourguide.jpg') }}" alt="Tour Guide Profile Picture">
+              <img src="{{ url_for('static', filename='tourguide.jpg') }}" alt="Tour Guide Profile Picture">
             </div>
+
             <div class="guide-info">
-            <h2 class="guide-name">Mabuhay! I Am <span>[Guide Name]</span>, Your Friendly Tour Guide</h2>
-            <div class="ratings">★★★★☆ (21 Reviews)</div>
-            <p class="price">Starting Price: ₱1,500</p>
-            <a href="{{ url_for('main.tourguideform') }}">
-            <button class="book-btn" onclick="redirectToProfile()">Book Now</button>  <!-- Redirect on click -->
-            </a>
+              <h2 class="guide-name">Mabuhay! I Am <span>[Guide Name]</span>, Your Friendly Tour Guide</h2>
+              <div class="ratings">★★★★☆ (21 Reviews)</div>
+              <p class="price">Starting Price: ₱1,500</p>
+              <a href="{{ url_for('main.tourguideform') }}">
+                  <button class="book-btn" onclick="redirectToProfile()">Book Now</button>  <!-- Redirect on click -->
+              </a>
+
             </div>
-            
-        </div>
-
-
-            
-            <!-- Tour Guide Card -->
-        <div class="tour-guide-card">
+          </div>
+          
+          <!-- Tour Guide Card -->
+          <div class="tour-guide-card">
             <div class="profile-picture">
-                <img src="{{ url_for('static', filename='tourguide.jpg') }}" alt="Tour Guide Profile Picture">
+              <img src="{{ url_for('static', filename='tourguide.jpg') }}" alt="Tour Guide Profile Picture">
             </div>
-            <div class="guide-info">
-                <h2 class="guide-name">Mabuhay! I Am <span>[Guide Name]</span>, Your Friendly Tour Guide</h2>
-                <div class="ratings">★★★★☆ (21 Reviews)</div>
-                <p class="price">Starting Price: ₱1,500</p>
-                <a href="{{ url_for('main.tourguideform') }}">
-                    <button class="book-btn" onclick="redirectToProfile()">Book Now</button>  <!-- Redirect on click -->
-                </a>
-            </div>
-        </div>
 
-            
-            
-            <!-- Tour Guide Card -->
-            <div class="tour-guide-card">
+            <div class="guide-info">
+              <h2 class="guide-name">Mabuhay! I Am <span>[Guide Name]</span>, Your Friendly Tour Guide</h2>
+              <div class="ratings">★★★★☆ (21 Reviews)</div>
+              <p class="price">Starting Price: ₱1,500</p>
+              <a href="{{ url_for('main.tourguideform') }}">
+                  <button class="book-btn" onclick="redirectToProfile()">Book Now</button>  <!-- Redirect on click -->
+              </a>
+
+            </div>
+          </div>
+
+          <!-- Tour Guide Card -->
+          <div class="tour-guide-card">
             <div class="profile-picture">
-                <img src="{{ url_for('static', filename='tourguide.jpg') }}" alt="Tour Guide Profile Picture">
+              <img src="{{ url_for('static', filename='tourguide.jpg') }}" alt="Tour Guide Profile Picture">
             </div>
+
             <div class="guide-info">
-                <h2 class="guide-name">Mabuhay! I Am <span>[Guide Name]</span>, Your Friendly Tour Guide</h2>
-                <div class="ratings">★★★★☆ (21 Reviews)</div>
-                <p class="price">Starting Price: ₱1,500</p>
-                <a href="{{ url_for('main.tourguideform') }}">
-                    <button class="book-btn" onclick="redirectToProfile()">Book Now</button>  <!-- Redirect on click -->
-                </a>
+              <h2 class="guide-name">Mabuhay! I Am <span>[Guide Name]</span>, Your Friendly Tour Guide</h2>
+              <div class="ratings">★★★★☆ (21 Reviews)</div>
+              <p class="price">Starting Price: ₱1,500</p>
+              <a href="{{ url_for('main.tourguideform') }}">
+                  <button class="book-btn" onclick="redirectToProfile()">Book Now</button>  <!-- Redirect on click -->
+              </a>
+
             </div>
-        </div>
-        <!-- Tour Guide Card -->
-        <div class="tour-guide-card">
+          </div>
+
+          <!-- Tour Guide Card -->
+          <div class="tour-guide-card">
             <div class="profile-picture">
-            <img src="{{ url_for('static', filename='tourguide.jpg') }}" alt="Tour Guide Profile Picture">
+              <img src="{{ url_for('static', filename='tourguide.jpg') }}" alt="Tour Guide Profile Picture">
             </div>
+
             <div class="guide-info">
-            <h2 class="guide-name">Mabuhay! I Am <span>[Guide Name]</span>, Your Friendly Tour Guide</h2>
-            <div class="ratings">★★★★☆ (21 Reviews)</div>
-            <p class="price">Starting Price: ₱1,500</p>
-            <a href="{{ url_for('main.tourguideform') }}">
-                <button class="book-btn" onclick="redirectToProfile()">Book Now</button>  <!-- Redirect on click -->
-            </a>
+              <h2 class="guide-name">Mabuhay! I Am <span>[Guide Name]</span>, Your Friendly Tour Guide</h2>
+              <div class="ratings">★★★★☆ (21 Reviews)</div>
+              <p class="price">Starting Price: ₱1,500</p>
+              <a href="{{ url_for('main.tourguideform') }}">
+                  <button class="book-btn" onclick="redirectToProfile()">Book Now</button>  <!-- Redirect on click -->
+              </a>
+
             </div>
+          </div>
         </div>
-    </div>
-    </div>
+      </div>
 
-
-
-    <!-- JavaScript -->
-    <script>
+      <!-- JavaScript -->
+      <script>
         // Redirect function to tour guide form
         function redirectToProfile() {
-        window.location.href = 'TourGuideForm.html';
+          window.location.href = 'Traveler - TGProfile.html';
         }
-    </script>
-
+      </script>
     </body>
-    </html>
-{% endblock content %}
+  </html>
+
+

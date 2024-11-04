@@ -39,14 +39,14 @@ def load_user(user_id):
 # USERTRAVELER DATABASE
 class UserTraveler(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(50), nullable=False)
-    last_name = db.Column(db.String(50), nullable=False)
-    nationality = db.Column(db.String(50), nullable=False)
+    first_name = db.Column(db.String(50))
+    last_name = db.Column(db.String(50))
+    nationality = db.Column(db.String(50))
     email = db.Column(db.String(120), unique=True, nullable=False)
-    contact_number = db.Column(db.String(20), nullable=False)
+    
     password = db.Column(db.String(150), nullable=False)
     role = db.Column(db.String(30), nullable=False, default='traveler')
-    image_file = db.Column(db.String(50), nullable=False, default='default.jpg')
+    image_file = db.Column(db.String(50), default='default.jpg')
     confirmed = db.Column(db.Boolean, default=False)
 
 

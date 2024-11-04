@@ -4,42 +4,78 @@ const sideNav = document.getElementById('side-nav');
 const navLinks = document.querySelectorAll('.nav-link');
 const tabPanes = document.querySelectorAll('.tab-pane');
 
+// Logout modal elements
+const logoutModal = document.getElementById('logout-modal');
+const logoutOverlay = document.getElementById('logout-overlay');
+const confirmLogoutBtn = document.getElementById('confirm-logout-btn');
+const cancelLogoutBtn = document.getElementById('cancel-logout-btn');
+const mainContent = document.querySelector('.tab-content'); // The main content area
+
 // Toggle Sidebar on Mobile
-sidebarToggle.addEventListener('click', () => {
+sidebarToggle?.addEventListener('click', () => {
   sideNav.classList.toggle('active');
 });
 
-// Close Sidebar on Mobile after Clicking a Link
+// Handle tab switching and show logout modal
 navLinks.forEach((link) => {
   link.addEventListener('click', (e) => {
     e.preventDefault();
-    
-    // Switch Active Tab
-    navLinks.forEach((link) => link.classList.remove('active'));
-    link.classList.add('active');
 
     const targetTab = link.dataset.tab;
-    tabPanes.forEach((pane) => {
-      pane.style.display = pane.id === targetTab ? 'block' : 'none';
-    });
 
-    // Close Sidebar on Mobile after Clicking a Link
+    if (targetTab === 'logout') {
+      showLogoutModal(); // Show the logout modal
+    } else {
+      switchActiveTab(targetTab); // Switch to the clicked tab
+    }
+
+    // Close the sidebar if on mobile
     if (window.innerWidth <= 768) {
       sideNav.classList.remove('active');
     }
-
-    if (targetTab === 'logout') {
-      const logoutUrl = "{{ url_for('tourguide.logout') }}"; // Ensure this URL is correct
-      console.log("Logout URL: ", logoutUrl); // Log the URL to check its value
-      setTimeout(() => {
-        window.location.href = logoutUrl; // Redirect to the logout URL
-      }, 2000);
-    }
-    
-    
-    
   });
 });
+
+// Switch active tabs
+function switchActiveTab(targetTab) {
+  navLinks.forEach((link) => link.classList.remove('active'));
+  document.querySelector(`[data-tab="${targetTab}"]`).classList.add('active');
+
+  tabPanes.forEach((pane) => {
+    pane.style.display = pane.id === targetTab ? 'block' : 'none';
+  });
+}
+
+
+// Show Logout Modal and Overlay
+function showLogoutModal() {
+  logoutModal.classList.add('show');
+  logoutOverlay.classList.add('show');
+  mainContent.classList.add('blurred'); // Apply blur effect to main content
+}
+
+// Hide Logout Modal and Remove Overlay
+function hideLogoutModal() {
+  logoutModal.classList.remove('show');
+  logoutOverlay.classList.remove('show');
+  mainContent.classList.remove('blurred'); // Remove blur effect
+}
+
+// Confirm Logout and Redirect
+confirmLogoutBtn.addEventListener('click', () => {
+  window.location.href = 'Traveler - TGList.html'; // Redirect to homepage
+});
+
+// Cancel Logout and Close Modal
+cancelLogoutBtn.addEventListener('click', hideLogoutModal);
+
+// Handle Logout Link Click
+document.querySelector('[data-tab="logout"]').addEventListener('click', (e) => {
+  e.preventDefault();
+  showLogoutModal();
+});
+
+
 
 // Ensure Profile Tab Displays on Load
 window.addEventListener('DOMContentLoaded', () => {
@@ -54,44 +90,8 @@ const editAboutBtn = document.getElementById('edit-about-btn');
 const saveAboutBtn = document.getElementById('save-about-btn');
 const aboutText = document.getElementById('about-text');
 
-// Function to toggle edit mode
-function toggleEdit(textarea, editBtn, saveBtn, isEditing = true) {
-    if (isEditing) {
-        textarea.disabled = false; // Enable textarea for editing
-        textarea.focus(); // Focus on the textarea for immediate editing
-    } else {
-        textarea.disabled = true; // Disable textarea after saving
-        // Optional: Make a request to update the about text in the backend
-        const updatedAboutText = textarea.value.trim();
-        if (updatedAboutText) {
-            fetch('/update-about', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ about: updatedAboutText }),
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => console.log('About text updated:', data))
-            .catch(error => console.error('Error updating about text:', error));
-        }
-    }
-
-    // Toggle visibility of buttons
-    editBtn.classList.toggle('hidden', !isEditing);
-    saveBtn.classList.toggle('hidden', isEditing);
-}
-
-
-
-// Event listeners for edit and save buttons
 editAboutBtn.addEventListener('click', () => toggleEdit(aboutText, editAboutBtn, saveAboutBtn));
 saveAboutBtn.addEventListener('click', () => toggleEdit(aboutText, editAboutBtn, saveAboutBtn, false));
-
-
 
 // Editable Fields Toggle Function
 function toggleEdit(input, editBtn, saveBtn, isEditing = true) {
@@ -101,50 +101,17 @@ function toggleEdit(input, editBtn, saveBtn, isEditing = true) {
   if (isEditing) input.focus();
 }
 
-// Function to create a new editable list item
-function createEditableListItem() {
-  const listItem = document.createElement('li');
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.className = 'editable';
-  input.placeholder = 'New Item';
-  listItem.appendChild(document.createElement('span')).innerHTML = '&#10003;'; // Checkmark
-  listItem.appendChild(input);
-  
-  const removeBtn = document.createElement('button');
-  removeBtn.className = 'remove-btn';
-  removeBtn.innerHTML = '&#8722;';
-  removeBtn.addEventListener('click', () => listItem.remove()); // Remove item on click
-  listItem.appendChild(removeBtn);
-  
-  return listItem;
-}
-
-// Editable Characteristics and Skills Setup
+// Editable Characteristics and Skills
 function setupEditableList(editBtn, saveBtn, addBtn, list) {
-  editBtn.addEventListener('click', () => {
-      const inputs = list.querySelectorAll('.editable');
-      inputs.forEach(input => toggleEdit(input, editBtn, saveBtn, true));
-      addBtn.classList.remove('hidden'); // Show add button
-  });
-
-  saveBtn.addEventListener('click', () => {
-      const inputs = list.querySelectorAll('.editable');
-      inputs.forEach(input => toggleEdit(input, editBtn, saveBtn, false));
-      addBtn.classList.add('hidden'); // Hide add button
-  });
+  editBtn.addEventListener('click', () => toggleListEdit(list, true, addBtn, editBtn, saveBtn));
+  saveBtn.addEventListener('click', () => toggleListEdit(list, false, addBtn, editBtn, saveBtn));
 
   addBtn.addEventListener('click', () => {
-      const newItem = createEditableListItem();
-      list.appendChild(newItem);
-      newItem.querySelector('.editable').focus();
+    const newItem = createEditableListItem();
+    list.appendChild(newItem);
+    newItem.querySelector('.editable').focus();
   });
 }
-
-// Initialize the editable lists
-setupEditableList(document.getElementById('edit-char-btn'), document.getElementById('save-char-btn'), document.getElementById('add-char-btn'), document.getElementById('characteristics-list'));
-setupEditableList(document.getElementById('edit-skills-btn'), document.getElementById('save-skills-btn'), document.getElementById('add-skills-btn'), document.getElementById('skills-list'));
-
 
 // Helper: Create an Editable List Item
 function createEditableListItem() {
@@ -184,470 +151,337 @@ setupEditableList(
 );
 
 
+// Price Editing Logic
+const editPriceBtn = document.getElementById('edit-price-btn');
+const savePriceBtn = document.getElementById('save-price-btn');
+const priceDisplay = document.getElementById('tour-price');
+const priceInput = document.getElementById('price-input');
 
+// Enable Price Editing
+editPriceBtn.addEventListener('click', () => {
+    priceDisplay.classList.add('hidden');
+    priceInput.classList.remove('hidden');
+    priceInput.value = parseFloat(priceDisplay.textContent.replace('₱', '')); // Populate input
+    editPriceBtn.classList.add('hidden');
+    savePriceBtn.classList.remove('hidden');
+});
 
-// Edit and Save Name
-const editNameBtn = document.getElementById('edit-name-btn');
-const saveNameBtn = document.getElementById('save-name-btn');
-const fullName = document.getElementById('full-name');
-const firstNameInput = document.getElementById('first-name');
-const lastNameInput = document.getElementById('last-name');
+// Save Edited Price
+savePriceBtn.addEventListener('click', () => {
+    priceDisplay.textContent = `₱${priceInput.value}`;
+    priceDisplay.classList.remove('hidden');
+    priceInput.classList.add('hidden');
+    editPriceBtn.classList.remove('hidden');
+    savePriceBtn.classList.add('hidden');
+});
 
-// Function to toggle the edit mode
-function toggleEditName(isEditing) {
-  firstNameInput.classList.toggle('hidden', !isEditing);
-  lastNameInput.classList.toggle('hidden', !isEditing);
-  fullName.classList.toggle('hidden', isEditing);
-  editNameBtn.classList.toggle('hidden', isEditing);
-  saveNameBtn.classList.toggle('hidden', !isEditing);
+// Elements for Profile Activation Modal
+const profileToggle = document.getElementById('profile-toggle');
+const toggleStatus = document.getElementById('toggle-status');
+const activationModal = document.getElementById('activation-confirmation-modal');
+const activationOverlay = document.getElementById('activation-overlay');
+const confirmCompleteBtn = document.getElementById('confirm-complete-btn');
+const cancelActivationBtn = document.getElementById('cancel-activation-btn');
 
-  if (isEditing) {
-    firstNameInput.focus(); // Focus on the first name input when editing
+// Open modal when attempting to activate profile
+profileToggle.addEventListener('click', () => {
+  if (!profileToggle.classList.contains('active')) {
+    openActivationModal();
+  } else {
+    profileToggle.classList.remove('active');
+    toggleStatus.textContent = 'Inactive';
   }
+});
+
+// Confirm profile activation and allow toggle
+confirmCompleteBtn.addEventListener('click', () => {
+  closeActivationModal();
+  profileToggle.classList.add('active');
+  toggleStatus.textContent = 'Active';
+});
+
+// Cancel button to close modal
+cancelActivationBtn.addEventListener('click', closeActivationModal);
+
+// Open and close functions for the activation modal
+function openActivationModal() {
+  activationModal.classList.add('show');
+  activationOverlay.classList.add('show');
 }
 
-// Event listener for the Edit button
-editNameBtn.addEventListener('click', () => {
-  const [first, last] = fullName.textContent.trim().split(' '); // Trim and split name into first and last
-  firstNameInput.value = first || ''; // Ensure input is not null
-  lastNameInput.value = last || '';
-
-  toggleEditName(true); // Enable editing mode
-});
-
-// Event listener for the Save button
-saveNameBtn.addEventListener('click', () => {
-  const newFirstName = firstNameInput.value.trim();
-  const newLastName = lastNameInput.value.trim();
-
-  // Validate the input
-  if (newFirstName === '' || newLastName === '') {
-    alert('Both first name and last name must be filled out.'); // Alert for empty input
-    return;
-  }
-
-  const newName = `${newFirstName} ${newLastName}`; // Save new name
-  fullName.textContent = newName; // Update the displayed name
-
-  toggleEditName(false); // Disable editing mode
-
-  // Optional: Make a request to update the name in the backend
-  fetch('/update-name', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ firstName: newFirstName, lastName: newLastName }),
-  })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(data => console.log('Name updated:', data))
-    .catch(error => console.error('Error updating name:', error));
-});
-
-
-
-
-// Edit and Save Email
-// Get necessary elements
-const editEmailBtn = document.getElementById('edit-email-btn');
-const saveEmailBtn = document.getElementById('save-email-btn');
-const emailDisplay = document.getElementById('email-display');
-const emailInput = document.getElementById('email-input');
-
-// Event listeners for editing and saving email
-editEmailBtn.addEventListener('click', () => {
-  emailInput.value = emailDisplay.textContent.trim(); // Populate input with current email
-  toggleEditEmail(true); // Enable editing mode
-});
-
-saveEmailBtn.addEventListener('click', () => {
-  const newEmail = emailInput.value.trim(); // Get the updated email
-  emailDisplay.textContent = newEmail; // Update the display span
-
-  toggleEditEmail(false); // Disable editing mode
-
-  // Optional: Send the updated email to the backend
-  fetch('/update-email', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: newEmail }),
-  })
-    .then(response => response.json())
-    .then(data => console.log('Email updated:', data))
-    .catch(error => console.error('Error:', error));
-});
-
-// Toggle function for editing and saving email
-function toggleEditEmail(isEditing) {
-  emailInput.classList.toggle('hidden', !isEditing); // Show/hide input
-  emailDisplay.classList.toggle('hidden', isEditing); // Hide/display email span
-  editEmailBtn.classList.toggle('hidden', isEditing); // Toggle edit button
-  saveEmailBtn.classList.toggle('hidden', !isEditing); // Toggle save button
-
-  if (isEditing) emailInput.focus(); // Focus on input when editing
+function closeActivationModal() {
+  activationModal.classList.remove('show');
+  activationOverlay.classList.remove('show');
 }
 
 
 
 
-// Edit and Save Contact Number
-// Get necessary elements
-const editContactBtn = document.getElementById('edit-contact-btn');
-const saveContactBtn = document.getElementById('save-contact-btn');
-const contactNumberDisplay = document.getElementById('contact-number-display');
-const contactNumberInput = document.getElementById('contact-number-input');
-
-// Event listeners for editing and saving contact number
-editContactBtn.addEventListener('click', () => {
-  contactNumberInput.value = contactNumberDisplay.textContent.trim(); // Populate input with current number
-  toggleEditContact(true); // Enable editing mode
-});
-
-saveContactBtn.addEventListener('click', () => {
-  const newContactNumber = contactNumberInput.value.trim(); // Get updated contact number
-  contactNumberDisplay.textContent = newContactNumber; // Update the display span
-
-  toggleEditContact(false); // Disable editing mode
-
-  // Optional: Send the updated contact number to the backend
-  fetch('/update-contact-number', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ contact_number: newContactNumber }),
-  })
-    .then(response => response.json())
-    .then(data => console.log('Contact number updated:', data))
-    .catch(error => console.error('Error:', error));
-});
-
-// Toggle function for editing and saving contact number
-function toggleEditContact(isEditing) {
-  contactNumberInput.classList.toggle('hidden', !isEditing); // Show/hide input
-  contactNumberDisplay.classList.toggle('hidden', isEditing); // Hide/display contact number span
-  editContactBtn.classList.toggle('hidden', isEditing); // Toggle edit button
-  saveContactBtn.classList.toggle('hidden', !isEditing); // Toggle save button
-
-  if (isEditing) contactNumberInput.focus(); // Focus on input when editing
-}
-
-
-
-//??
-// Toggle function to handle editing and saving
-function toggleEditField(inputField, editBtn, saveBtn) {
-  const isEditing = !inputField.disabled;
-  inputField.disabled = isEditing; // Toggle the disabled state
-  editBtn.classList.toggle('hidden', !isEditing);
-  saveBtn.classList.toggle('hidden', isEditing);
-
-  if (!isEditing) inputField.focus(); // Focus the field if starting to edit
-}
-
-
-
-// Password Management
-// Get necessary elements
-const editPasswordBtn = document.getElementById('edit-password-btn');
-const savePasswordBtn = document.getElementById('save-password-btn');
-const currentPasswordInput = document.getElementById('current-password');
-
-const reenterPasswordGroup = document.getElementById('reenter-password-group');
-const reenterPasswordInput = document.getElementById('reenter-password');
-
-const newPasswordGroup = document.getElementById('new-password-group');
-const newPasswordInput = document.getElementById('new-password');
-
-const confirmPasswordGroup = document.getElementById('confirm-password-group');
-const confirmPasswordInput = document.getElementById('confirm-password');
-
-// Event listener to enable editing
-editPasswordBtn.addEventListener('click', () => {
-  togglePasswordEdit(true); // Enable editing mode
-});
-
-// Event listener to save password
-savePasswordBtn.addEventListener('click', () => {
-  const currentPassword = currentPasswordInput.value.trim();
-  const reenteredPassword = reenterPasswordInput.value.trim();
-  const newPassword = newPasswordInput.value.trim();
-  const confirmPassword = confirmPasswordInput.value.trim();
-
-  // Validation checks
-  if (newPassword !== confirmPassword) {
-    alert('New passwords do not match!');
-    return;
-  }
-  if (newPassword.length < 6) {
-    alert('Password must be at least 6 characters long.');
-    return;
-  }
-  if (!currentPassword || !reenteredPassword || !newPassword) {
-    alert('Please fill in all fields.');
-    return;
-  }
-
-  // Optional: Send new password to backend
-  fetch('/bookingsystem/tourguide/update-password', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-        current_password: currentPassword,
-        new_password: newPassword
-    })
-})
-.then(response => {
-    if (!response.ok) {
-        return response.text().then(text => {
-            console.error('Error response:', text); // Log HTML response
-            throw new Error('Failed to update password');
-        });
-    }
-    return response.json();
-})
-.then(data => {
-    alert(data.message);
-})
-.catch(error => {
-    console.error('Error:', error);
-    alert(`An error occurred while updating the password: ${error.message}`);
-});
-
-});
-
-// Toggle function for password editing mode
-function togglePasswordEdit(isEditing) {
-  currentPasswordInput.disabled = !isEditing;
-
-  // Show or hide the additional password input fields
-  reenterPasswordGroup.classList.toggle('hidden', !isEditing);
-  newPasswordGroup.classList.toggle('hidden', !isEditing);
-  confirmPasswordGroup.classList.toggle('hidden', !isEditing);
-
-  // Toggle visibility of edit and save buttons
-  editPasswordBtn.classList.toggle('hidden', isEditing);
-  savePasswordBtn.classList.toggle('hidden', !isEditing);
-
-  // Clear password inputs when switching modes
-  if (!isEditing) {
-    reenterPasswordInput.value = '';
-    newPasswordInput.value = '';
-    confirmPasswordInput.value = '';
-  }
-
-  if (isEditing) reenterPasswordInput.focus(); // Focus on the re-enter field
-}
-
-
-
-
-
-
-document.addEventListener('DOMContentLoaded', function() {
-  const firstNameInput = document.getElementById('fname'); // First name input
-  const lastNameInput = document.getElementById('lname'); // Last name input
-  const emailInput = document.getElementById('email'); // Email input
-  const contactNumberInput = document.getElementById('contact_number'); // Contact number input
-  const profileToggle = document.getElementById('profile-toggle'); // Profile toggle
-  const profilePicInput = document.getElementById('profile-pic'); // Profile picture input
-  const toggleLabel = document.getElementById('toggle-label'); // Label for toggle
-
-  // Function to check if all required fields are filled
-  function checkFieldsFilled() {
-      return firstNameInput.value.trim() !== '' &&
-             lastNameInput.value.trim() !== '' &&
-             emailInput.value.trim() !== '' &&
-             contactNumberInput.value.trim() !== '' &&
-             profilePicInput.files.length > 0; // Check if a file is selected
-  }
-
-  // Function to update toggle state based on fields
-  function updateToggleState() {
-    const allFieldsFilled = checkFieldsFilled();
-    console.log('First Name:', firstNameInput.value);
-    console.log('Last Name:', lastNameInput.value);
-    console.log('Email:', emailInput.value);
-    console.log('Contact Number:', contactNumberInput.value);
-    console.log('Profile Picture Selected:', profilePicInput.files.length > 0);
-
-    if (allFieldsFilled) {
-        profileToggle.classList.add('active');
-        profileToggle.style.cursor = 'pointer';
-        profileToggle.disabled = false;
-        toggleLabel.textContent = 'Active';
-        profileToggle.setAttribute('aria-pressed', 'true');
-    } else {
-        profileToggle.classList.remove('active');
-        profileToggle.style.cursor = 'not-allowed';
-        profileToggle.disabled = true;
-        toggleLabel.textContent = 'Inactive';
-        profileToggle.setAttribute('aria-pressed', 'false');
-    }
-}
-
-
-  // Event listeners to check when inputs change
-  firstNameInput.addEventListener('input', updateToggleState);
-  lastNameInput.addEventListener('input', updateToggleState);
-  emailInput.addEventListener('input', updateToggleState);
-  contactNumberInput.addEventListener('input', updateToggleState);
-  profilePicInput.addEventListener('change', updateToggleState); // Listen for file input changes
-
-  // Event listener for profile toggle click
-  profileToggle.addEventListener('click', function(event) {
-      if (profileToggle.disabled) {
-          event.preventDefault(); // Prevent the default action if disabled
-      } else {
-          // Add the action you want to take when the toggle is clicked and enabled
-          console.log("Toggle activated!");
-      }
-  });
-
-  // Initial check when the page loads
-  updateToggleState();
-});
-
-
-
-document.addEventListener('DOMContentLoaded', function() {
-// Profile Active/Inactive Toggle
-  const profileToggle = document.getElementById('profile-toggle');
-  const toggleLabel = document.querySelector('.toggle-label');
-
-  profileToggle.addEventListener('click', () => {
-    profileToggle.classList.toggle('active');
-    toggleLabel.textContent = profileToggle.classList.contains('active') ? 'Active' : 'Inactive';
-  });
-});
-
-
-
-document.addEventListener('DOMContentLoaded', function() {
 // Profile Picture Cropper Modal Logic
-  const changePicBtn = document.getElementById('change-pic-btn');
-  const uploadPicInput = document.getElementById('upload-pic');
-  const profilePic = document.getElementById('profile-pic');
-  const cropperModal = document.getElementById('cropper-modal');
-  const cropperContainer = document.getElementById('cropper-container');
-  const cropBtn = document.getElementById('crop-btn');
-  const closeCropperBtn = document.getElementById('close-cropper-modal');
-  const savePicBtn = document.getElementById('save-pic-btn');
-  let cropper;
+const changePicBtn = document.getElementById('change-pic-btn');
+const uploadPicInput = document.getElementById('upload-pic');
+const profilePic = document.getElementById('profile-pic');
+const cropperModal = document.getElementById('cropper-modal');
+const cropperContainer = document.getElementById('cropper-container');
+const cropBtn = document.getElementById('crop-btn');
+const closeCropperBtn = document.getElementById('close-cropper-modal');
+const savePicBtn = document.getElementById('save-pic-btn');
+let cropper;
 
-  // Open file input
-  changePicBtn.addEventListener('click', () => uploadPicInput.click());
+// Open file input
+changePicBtn.addEventListener('click', () => uploadPicInput.click());
 
-  // Show cropper modal on image selection
-  uploadPicInput.addEventListener('change', (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = document.createElement('img');
-        img.src = e.target.result;
-        img.id = 'crop-image';
-        cropperContainer.innerHTML = ''; // Clear previous image
-        cropperContainer.appendChild(img);
-        cropperModal.classList.add('show'); // Show the cropper modal
+// Show cropper modal on image selection
+uploadPicInput.addEventListener('change', (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      img.id = 'crop-image';
+      cropperContainer.innerHTML = ''; // Clear previous image
+      cropperContainer.appendChild(img);
+      cropperModal.classList.add('show'); // Show the cropper modal
 
-        cropper = new Cropper(img, {
-          aspectRatio: 1,
-          viewMode: 1,
-          movable: true,
-          zoomable: true,
-          scalable: true,
-          cropBoxResizable: true,
-        });
-      };
-      reader.readAsDataURL(file);
-    }
-  });
+      cropper = new Cropper(img, {
+        aspectRatio: 1,
+        viewMode: 1,
+        movable: true,
+        zoomable: true,
+        scalable: true,
+        cropBoxResizable: true,
+      });
+    };
+    reader.readAsDataURL(file);
+  }
+});
 
-  // Crop and update profile picture
-  cropBtn.addEventListener('click', () => {
-    const canvas = cropper.getCroppedCanvas({ width: 200, height: 200 });
-    profilePic.src = canvas.toDataURL();
-    cropperModal.classList.remove('show');
-    savePicBtn.classList.remove('hidden');
-  });
+// Crop and update profile picture
+cropBtn.addEventListener('click', () => {
+  const canvas = cropper.getCroppedCanvas({ width: 200, height: 200 });
+  profilePic.src = canvas.toDataURL();
+  cropperModal.classList.remove('show');
+  savePicBtn.classList.remove('hidden');
+});
 
-  // Close cropper modal
-  closeCropperBtn.addEventListener('click', () => {
-    cropperModal.classList.remove('show');
-  });
+// Close cropper modal
+closeCropperBtn.addEventListener('click', () => {
+  cropperModal.classList.remove('show');
+});
 
-  // Save profile picture
-  savePicBtn.addEventListener('click', () => {
-    alert('Profile picture saved!');
-    savePicBtn.classList.add('hidden');
-  });
-
+// Save profile picture
+savePicBtn.addEventListener('click', () => {
+  alert('Profile picture saved!');
+  savePicBtn.classList.add('hidden');
 });
 
 
 
 
-document.addEventListener('DOMContentLoaded', function() {
+
 // Variables for Notification Interaction
-  const notificationPanel = document.querySelector('.notification-list');
-  const viewNotificationDetails = (notificationText) => {
-    alert(`Notification Details: ${notificationText}`);
-  };
+const notificationPanel = document.querySelector('.notification-list');
+const viewNotificationDetails = (notificationText) => {
+  alert(`Notification Details: ${notificationText}`);
+};
 
-  // Toggle Tabs on Mobile
-  const toggleTabsBtn = document.getElementById('toggle-tabs-btn');
-  const bookingsTabs = document.getElementById('bookings-tabs');
-  const bookingTabBtns = document.querySelectorAll('.booking-tab-btn');
-  const bookingCategories = document.querySelectorAll('.booking-category');
 
-  // Toggle tabs visibility on small screens
-  toggleTabsBtn.addEventListener('click', () => {
-    bookingsTabs.classList.toggle('hidden');
-    toggleTabsBtn.textContent = bookingsTabs.classList.contains('hidden') ? 'Show Tabs' : 'Hide Tabs';
+
+// Get elements
+const toggleTabsBtn = document.getElementById('toggle-tabs-btn');
+const bookingsTabs = document.getElementById('bookings-tabs');
+const bookingTabBtns = document.querySelectorAll('.booking-tab-btn');
+const bookingCategories = document.querySelectorAll('.booking-category');
+
+// Check screen size and adjust visibility
+function adjustTabsForScreenSize() {
+  if (window.innerWidth > 768) {
+    // Show tabs and hide the toggle button on larger screens
+    bookingsTabs.classList.remove('hidden');
+    toggleTabsBtn.style.display = 'none';
+  } else {
+    // Hide tabs and show the toggle button on mobile screens
+    bookingsTabs.classList.add('hidden');
+    toggleTabsBtn.style.display = 'block';
+  }
+}
+
+// Toggle tabs visibility on mobile screens
+toggleTabsBtn.addEventListener('click', () => {
+  bookingsTabs.classList.toggle('hidden');
+  toggleTabsBtn.textContent = bookingsTabs.classList.contains('hidden') ? 'Show Tabs' : 'Hide Tabs';
+});
+
+// Handle tab selection and auto-collapse on mobile
+bookingTabBtns.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    // Set active tab
+    bookingTabBtns.forEach((btn) => btn.classList.remove('active'));
+    btn.classList.add('active');
+
+    const status = btn.dataset.status;
+
+    // Show/Hide booking categories based on tab selection
+    bookingCategories.forEach((category) => {
+      const categoryStatus = category.dataset.status;
+      category.style.display = status === 'all' || categoryStatus === status ? 'block' : 'none';
+    });
+
+    // Collapse the tabs if on mobile
+    if (window.innerWidth <= 768) {
+      bookingsTabs.classList.add('hidden');
+      toggleTabsBtn.textContent = 'Show Tabs'; // Reset button text
+    }
+  });
+});
+
+// Initial check and add event listener to adjust on window resize
+adjustTabsForScreenSize();
+window.addEventListener('resize', adjustTabsForScreenSize);
+
+
+
+
+// Booking Details Modal Logic
+const bookingModal = document.getElementById('booking-modal');
+const bookingInfo = document.getElementById('booking-info');
+const closeBookingModal = document.getElementById('close-booking-modal');
+
+function openBookingDetails(details) {
+  bookingInfo.textContent = details;
+  bookingModal.classList.add('show');
+}
+
+closeBookingModal.addEventListener('click', () => {
+  bookingModal.classList.remove('show');
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  const calendarEl = document.getElementById('availability-calendar');
+  const editAvailabilityBtn = document.getElementById('edit-availability');
+  const markAvailableBtn = document.getElementById('mark-available');
+  const markUnavailableBtn = document.getElementById('mark-unavailable');
+  const resetCalendarBtn = document.getElementById('reset-calendar');
+  const saveAvailabilityBtn = document.getElementById('save-availability');
+
+  let isEditing = false;
+  let selectedDate = null;
+
+  const calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    selectable: true,
+    selectOverlap: false,
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek,timeGridDay',
+    },
+    events: [],
+
+    // Allow date selection only if it's not already marked
+    select: function (info) {
+      if (isEditing) {
+        const existingEvent = findEventByDate(info.startStr);
+        if (existingEvent) {
+          alert('This date already has a status. Please remove it first.');
+          calendar.unselect(); // Unselect if already marked
+        } else {
+          selectedDate = info.startStr;
+        }
+      } else {
+        alert('You need to enable edit mode to mark availability.');
+        calendar.unselect();
+      }
+    },
+
+    eventClick: function (info) {
+      if (isEditing && info.event.extendedProps.status !== 'booked') {
+        info.event.remove(); // Allow removal only if not booked
+      } else if (info.event.extendedProps.status === 'booked') {
+        alert('This date is booked and cannot be changed.');
+      }
+    },
   });
 
-  // Handle tab selection and auto-collapse on mobile
-  bookingTabBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      // Set active tab
-      bookingTabBtns.forEach((btn) => btn.classList.remove('active'));
-      btn.classList.add('active');
+  calendar.render();
 
-      const status = btn.dataset.status;
+  // Helper to find event by date
+  function findEventByDate(date) {
+    return calendar.getEvents().find((event) => event.startStr === date);
+  }
 
-      // Show/Hide booking categories based on tab selection
-      bookingCategories.forEach((category) => {
-        const categoryStatus = category.dataset.status;
-        category.style.display =
-          status === 'all' || categoryStatus === status ? 'block' : 'none';
+  // Toggle Edit Mode
+  editAvailabilityBtn.addEventListener('click', () => {
+    isEditing = !isEditing;
+    toggleEditButtons(isEditing);
+  });
+
+  function toggleEditButtons(isEditing) {
+    markAvailableBtn.classList.toggle('hidden', !isEditing);
+    markUnavailableBtn.classList.toggle('hidden', !isEditing);
+    resetCalendarBtn.classList.toggle('hidden', !isEditing);
+    saveAvailabilityBtn.classList.toggle('hidden', !isEditing);
+    editAvailabilityBtn.textContent = isEditing ? 'Exit Edit Mode' : 'Edit Availability';
+  }
+
+  // Mark Available
+  markAvailableBtn.addEventListener('click', () => {
+    if (selectedDate) {
+      addEvent('Available', selectedDate, '#4ecdc4', 'available');
+      selectedDate = null; // Clear the selection
+    }
+  });
+
+  // Mark Unavailable
+  markUnavailableBtn.addEventListener('click', () => {
+    if (selectedDate) {
+      addEvent('Unavailable', selectedDate, '#e63946', 'unavailable');
+      selectedDate = null; // Clear the selection
+    }
+  });
+
+  // Add an event to the calendar
+  function addEvent(title, date, color, status) {
+    if (!findEventByDate(date)) {
+      calendar.addEvent({
+        title: title,
+        start: date,
+        allDay: true,
+        backgroundColor: color,
+        textColor: 'white',
+        extendedProps: { status: status },
       });
+    } else {
+      alert('This date already has a status.');
+    }
+  }
 
-      // Collapse the tabs if on mobile
-      if (window.innerWidth <= 768) {
-        bookingsTabs.classList.add('hidden');
-        toggleTabsBtn.textContent = 'Show Tabs'; // Reset button text
-      }
+  // Reset Calendar (Excluding Booked Dates)
+  resetCalendarBtn.addEventListener('click', () => {
+    calendar.getEvents().forEach((event) => {
+      if (event.extendedProps.status !== 'booked') event.remove();
     });
   });
 
+  // Save Availability
+  saveAvailabilityBtn.addEventListener('click', () => {
+    const savedAvailability = calendar.getEvents().map((event) => ({
+      title: event.title,
+      start: event.startStr,
+      status: event.extendedProps.status,
+    }));
+    console.log('Saved Availability:', savedAvailability);
+  });
 
-
-  // Booking Details Modal Logic
-  const bookingModal = document.getElementById('booking-modal');
-  const bookingInfo = document.getElementById('booking-info');
-  const closeBookingModal = document.getElementById('close-booking-modal');
-
-  function openBookingDetails(details) {
-    bookingInfo.textContent = details;
-    bookingModal.classList.add('show');
-  }
-
-  closeBookingModal.addEventListener('click', () => {
-    bookingModal.classList.remove('show');
+  // Example Booked Event (Non-Removable)
+  calendar.addEvent({
+    title: 'Booked',
+    start: '2024-10-28',
+    allDay: true,
+    backgroundColor: '#1a535c',
+    textColor: 'white',
+    extendedProps: { status: 'booked' },
   });
 });
 
@@ -655,41 +489,192 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-document.addEventListener('DOMContentLoaded', function() {
-  function saveProfileData() {
-      const firstName = document.getElementById('first-name').value;
-      const lastName = document.getElementById('last-name').value;
-      const email = document.getElementById('email-input').value;
-      const contactNumber = document.getElementById('contact-number-input').value;
+// Elements
+const guideEditEmailBtn = document.getElementById('guide-edit-email-btn');
+const guideEditPasswordBtn = document.getElementById('guide-edit-password-btn');
+const guidePasswordConfirmModal = document.getElementById('guide-password-confirm-modal');
+const guideConfirmPasswordInput = document.getElementById('guide-confirm-password-input');
+const guidePasswordConfirmBtn = document.getElementById('guide-password-confirm-btn');
+const guidePasswordCancelBtn = document.getElementById('guide-password-cancel-btn');
+const guideChangeEmailModal = document.getElementById('guide-change-email-modal');
+const guideChangePasswordModal = document.getElementById('guide-change-password-modal');
+const guideSaveEmailBtn = document.getElementById('guide-save-email-btn');
+const guideCancelEmailBtn = document.getElementById('guide-cancel-email-btn');
+const guideSavePasswordBtn = document.getElementById('guide-save-password-btn');
+const guideCancelPasswordBtn = document.getElementById('guide-cancel-password-btn');
+const modalOverlay = document.getElementById('modal-overlay');
 
-      fetch('/tourguide/save-profile', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-              first_name: firstName,
-              last_name: lastName,
-              email: email,
-              contact_number: contactNumber
-          })
-      })
-      .then(response => response.json())
-      .then(data => {
-          if (data.success) {
-              alert('Profile updated successfully!');
-          } else {
-              alert('Error: ' + data.error);
-          }
-      })
-      .catch(error => {
-          console.error('Error:', error);
-      });
-  }
+let guideActiveAction = ''; // To track action
 
-  // Attach event listeners to buttons
-  document.getElementById('save-name-btn').addEventListener('click', saveProfileData);
-  document.getElementById('save-email-btn').addEventListener('click', saveProfileData);
-  document.getElementById('save-contact-btn').addEventListener('click', saveProfileData);
+// Open password confirmation modal
+guideEditEmailBtn.addEventListener('click', () => {
+    guideActiveAction = 'email';
+    openGuidePasswordModal();
 });
+
+guideEditPasswordBtn.addEventListener('click', () => {
+    guideActiveAction = 'password';
+    openGuidePasswordModal();
+});
+
+
+
+
+
+
+
+
+// Elements for Contact Number
+console.log('TourGuide.js loaded successfully!');
+
+// Ensure everything runs after DOM is fully loaded
+window.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM fully loaded.');
+
+    // Elements for Contact Number
+    const guideEditContactBtn = document.getElementById('guide-edit-contact-btn');
+    const guidePasswordConfirmModal = document.getElementById('guide-password-confirm-modal');
+    const guideConfirmPasswordInput = document.getElementById('guide-confirm-password-input');
+    const guidePasswordConfirmBtn = document.getElementById('guide-password-confirm-btn');
+    const contactInput = document.getElementById('contact-number');
+    const guideChangeContactModal = document.getElementById('guide-change-contact-modal');
+    const guideSaveContactBtn = document.getElementById('guide-save-contact-btn');
+    const newContactInput = document.getElementById('guide-new-contact-input'); // Assuming this is in your modal
+
+    // Open password confirmation modal for contact number
+    guideEditContactBtn.addEventListener('click', () => {
+        console.log('Pencil button clicked for contact number!');
+        guidePasswordConfirmModal.classList.remove('hidden'); // Show the password confirmation modal
+    });
+
+    // Confirm password and handle access to change contact number
+    guidePasswordConfirmBtn.addEventListener('click', async () => {
+        const password = guideConfirmPasswordInput.value;
+        try {
+            const response = await fetch('/confirm-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password }),
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                guidePasswordConfirmModal.classList.add('hidden'); // Hide password modal
+                guideChangeContactModal.classList.remove('hidden'); // Show change contact modal
+                newContactInput.value = contactInput.value; // Pre-fill the input with the current contact number
+                newContactInput.focus(); // Focus on the new contact input
+            } else {
+                alert('Incorrect password. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error confirming password:', error);
+        }
+    });
+
+    // Save new contact number
+    guideSaveContactBtn.addEventListener('click', async () => {
+        const newContact = newContactInput.value;
+        try {
+            const response = await fetch('/save-contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contact_number: newContact }),
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                contactInput.value = newContact; // Update displayed contact number
+                contactInput.disabled = true; // Disable input after saving
+                guideChangeContactModal.classList.add('hidden'); // Close change contact modal
+            } else {
+                alert('Error updating contact number.');
+            }
+        } catch (error) {
+            console.error('Error saving contact number:', error);
+        }
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Confirm password and open the appropriate modal for editing
+guidePasswordConfirmBtn.addEventListener('click', () => {
+    if (guideConfirmPasswordInput.value === 'password123') {
+        closeGuideModal();
+        if (guideActiveAction === 'email') {
+            openGuideChangeEmailModal();
+        } else if (guideActiveAction === 'password') {
+            openGuideChangePasswordModal();
+        } else if (guideActiveAction === 'contact') {
+            openGuideChangeContactModal();
+        }
+    } else {
+        alert('Incorrect password. Please try again.');
+    }
+});
+
+// Save new email
+guideSaveEmailBtn.addEventListener('click', () => {
+    alert(`New email saved: ${document.getElementById('guide-new-email-input').value}`);
+    closeGuideModal();
+});
+
+// Save new password
+guideSavePasswordBtn.addEventListener('click', () => {
+    if (document.getElementById('guide-new-password').value === document.getElementById('guide-confirm-new-password').value) {
+        alert('Password changed successfully!');
+        closeGuideModal();
+    } else {
+        alert('Passwords do not match.');
+    }
+});
+
+// Save new contact number
+
+
+// Cancel and close modal actions
+guidePasswordCancelBtn.addEventListener('click', closeGuideModal);
+guideCancelEmailBtn.addEventListener('click', closeGuideModal);
+guideCancelPasswordBtn.addEventListener('click', closeGuideModal);
+//guideCancelContactBtn.addEventListener('click', closeGuideModal);
+
+// Open specific modals
+function openGuidePasswordModal() {
+    guidePasswordConfirmModal.classList.add('show');
+    modalOverlay.classList.add('show');
+}
+
+function openGuideChangeEmailModal() {
+    guideChangeEmailModal.classList.add('show');
+    modalOverlay.classList.add('show');
+}
+
+function openGuideChangePasswordModal() {
+    guideChangePasswordModal.classList.add('show');
+    modalOverlay.classList.add('show');
+}
+
+function openGuideChangeContactModal() {
+    guideChangeContactModal.classList.add('show');
+    modalOverlay.classList.add('show');
+}
+
+// Close all modals and overlay
+function closeGuideModal() {
+    document.querySelectorAll('.modal.show').forEach(modal => modal.classList.remove('show'));
+    modalOverlay.classList.remove('show');
+    guideConfirmPasswordInput.value = ''; // Reset password input
+}
+
+
 
