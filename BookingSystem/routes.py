@@ -3,9 +3,9 @@ import os
 from flask import current_app, session
 from flask import Blueprint, render_template, url_for, flash, redirect, request
 from BookingSystem import db, bcrypt, mail
-from BookingSystem.forms import TravelerLoginForm, TravelerRegistrationForm, TravelerRequestResetForm, TravelerResetPasswordForm, UpdateAccountForm, UserTourOperator
-from BookingSystem.models import UserTraveler, UserAdmin, send_confirmation_traveler_email, UserTourGuide
-from flask_login import login_user, current_user, logout_user, login_required
+from BookingSystem.forms import TravelerLoginForm, TravelerRegistrationForm, TravelerRequestResetForm, TravelerResetPasswordForm, UpdateAccountForm
+from BookingSystem.models import User, TourOperator , send_confirmation_email
+from flask_login import login_user, current_user, logout_user, login_required 
 
 
 #from flask_mail import Message
@@ -67,14 +67,32 @@ def traveler_login():
         logout_user()
         print(f"Previous user logged out. Current user (should be anonymous): {current_user}")
 
+    # form = TravelerLoginForm()
+    # if form.validate_on_submit():
+    #     user = (
+    #         UserAdmin.query.filter_by(email=form.email.data).first() or
+    #         UserTourOperator.query.filter_by(email=form.email.data).first() or
+    #         UserTraveler.query.filter_by(email=form.email.data).first() or
+    #         UserTourGuide.query.filter_by(email=form.email.data).first()
+    #     )
+        
     form = TravelerLoginForm()
     if form.validate_on_submit():
-        user = (
-            UserAdmin.query.filter_by(email=form.email.data).first() or
-            UserTourOperator.query.filter_by(email=form.email.data).first() or
-            UserTraveler.query.filter_by(email=form.email.data).first() or
-            UserTourGuide.query.filter_by(email=form.email.data).first()
-        )
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            if user.role == 'Admin':
+            # Process as Admin
+                pass  # Replace with actual logic
+            elif user.role == 'TourOperator':
+            # Process as Tour Operator
+                pass  # Replace with actual logic
+            elif user.role == 'Traveler':
+            # Process as Traveler
+                pass  # Replace with actual logic
+            elif user.role == 'TourGuide':
+            # Process as Tour Guide
+                pass  # Replace with actual logic
+        
 
         if user:
             print(f"User found: {user.email}, Role: {user.role}")
@@ -85,7 +103,7 @@ def traveler_login():
                 print(f"Logged out previous user. Current user: {current_user}")
                 
                 # Log in the current user
-                login_user(user, remember=True)
+                login_user(user)
                 print(f"Logged in user: {user.email}, Role: {user.role}, Session: {session}")
 
                 # Handle role-based redirection
@@ -131,19 +149,19 @@ def traveler_register():
     form = TravelerRegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        new_traveler = UserTraveler(
+        new_traveler = User(
             first_name=form.first_name.data,
             last_name=form.last_name.data,
             nationality=form.nationality.data,
             email=form.email_address.data,
             password=hashed_password,
-            image_file='default.jpg',
-            role='traveler',  
-            confirmed=False  
+            profile_img='default.jpg',
+            role='traveler',
+             
         )
         db.session.add(new_traveler)
         db.session.commit()
-        send_confirmation_traveler_email(new_traveler)
+        send_confirmation_email(new_traveler)
         flash('Registration successful! Please confirm your email to complete the process.', 'info')
         return redirect(url_for('main.pending_confirmation'))
     else:
@@ -164,16 +182,16 @@ def pending_confirmation():
 #CONFIRMATION EMAIL FOR TRAVELER
 @main.route('/confirm_email/<token>')
 def confirm_email(token):
-    user = UserTraveler.verify_confirmation_token(token)
+    user = User.verify_confirmation_token(token)
     if not user:
-        user = UserTourGuide.verify_confirmation_token(token)
+        user = User.verify_confirmation_token(token)
     if user is None:
         flash('The confirmation link is invalid or has expired.', 'warning')
         return redirect(url_for('main.home'))
     user.confirmed = True
     db.session.commit()
     flash('Your email has been confirmed! You can now log in.', 'success')
-    if isinstance(user, UserTraveler):
+    if isinstance(user, User):
         return redirect(url_for('main.traveler_login'))
     else:
         return redirect(url_for('main.tourguide_login'))
@@ -188,7 +206,7 @@ def traveler_reset_request():
     form = TravelerRequestResetForm()
     
     if form.validate_on_submit():
-        traveler = UserTraveler.query.filter_by(email=form.email.data).first()
+        traveler = User.query.filter_by(email=form.email.data).first()
         if traveler:
             traveler.send_reset_email()
             flash('An email has been sent with instructions to reset your password.', 'info')
@@ -203,7 +221,7 @@ def traveler_reset_request():
 
 @main.route('/traveler_reset_password/<token>', methods=['GET', 'POST'])
 def traveler_reset_token(token):
-    traveler = UserTraveler.verify_reset_token(token)  # Verify the token first
+    traveler = User.verify_reset_token(token)  # Verify the token first
     if traveler is None:
         flash('That is an invalid or expired token', 'warning')
         return redirect(url_for('main.traveler_reset_request')) 
@@ -249,16 +267,16 @@ def logout():
 def account():
     form = UpdateAccountForm()
     if form.picture.data:
-        picture_file = save_picture(form.picture.data)
-        current_user.image_file = picture_file
+        profile_img = save_picture(form.picture.data)
+        current_user.profile_img = picture_file
         db.session.commit()  # Save the new image file name to the database
     
     # Use a default image if no image file is set
-    image_file_name = current_user.image_file if current_user.image_file else 'default.jpg'
-    print(f"Current image file: {image_file_name}")  # Debugging print statement
-    image_file = url_for('static', filename='profile_pics/' + image_file_name)
+    profile_img_name = current_user.profile_img if current_user.profile_img else 'default.jpg'
+    print(f"Current image file: {profile_img_name}")  # Debugging print statement
+    profile_img = url_for('static', filename='profile_pics/' + profile_img_name)
     
-    return render_template('account.html', title='Account', image_file=image_file, form=form)
+    return render_template('account.html', title='Account', profile_img=profile_img, form=form)
 
 
 

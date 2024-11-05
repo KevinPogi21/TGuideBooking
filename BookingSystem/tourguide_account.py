@@ -1,17 +1,16 @@
 from BookingSystem import create_app, db, bcrypt
-from BookingSystem.models import TourGuide  
+from BookingSystem.models import User 
 
 def create_admin():
     hashed_password = bcrypt.generate_password_hash('kevs').decode('utf-8')
-    tourguide = TourGuide(
+    tourguide = User(
         email='admin3@example.com',
         password=hashed_password,
         role='admin',
-        confirmed=True  # Ensure 'confirmed' is an attribute in your UserAdmin model
     )
     
     try:
-        db.session.add(admin)
+        db.session.add(tourguide)
         db.session.commit()
         print("Admin user created successfully!")
     except Exception as e:

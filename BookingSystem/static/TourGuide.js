@@ -525,75 +525,115 @@ guideEditPasswordBtn.addEventListener('click', () => {
 
 
 // Elements for Contact Number
-console.log('TourGuide.js loaded successfully!');
 
-// Ensure everything runs after DOM is fully loaded
-window.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM fully loaded.');
+// Elements
+document.addEventListener('DOMContentLoaded', function () {
+  // Elements
+  const guideEditContactBtn = document.getElementById('guide-edit-contact-btn');
+  const guidePasswordModal = document.getElementById('guide-password-confirm-modal');
+  const guidePasswordCancelBtn = document.getElementById('guide-password-cancel-btn');
+  const guidePasswordConfirmBtn = document.getElementById('guide-password-confirm-btn');
+  const passwordInput = document.getElementById('guide-confirm-password-input');
+  const contactNumberInput = document.getElementById('contact-number');
 
-    // Elements for Contact Number
-    const guideEditContactBtn = document.getElementById('guide-edit-contact-btn');
-    const guidePasswordConfirmModal = document.getElementById('guide-password-confirm-modal');
-    const guideConfirmPasswordInput = document.getElementById('guide-confirm-password-input');
-    const guidePasswordConfirmBtn = document.getElementById('guide-password-confirm-btn');
-    const contactInput = document.getElementById('contact-number');
-    const guideChangeContactModal = document.getElementById('guide-change-contact-modal');
-    const guideSaveContactBtn = document.getElementById('guide-save-contact-btn');
-    const newContactInput = document.getElementById('guide-new-contact-input'); // Assuming this is in your modal
+  // Check if elements exist before adding event listeners
+  if (!guideEditContactBtn || !guidePasswordModal || !guidePasswordCancelBtn || !guidePasswordConfirmBtn || !passwordInput || !contactNumberInput) {
+    console.error('One or more elements are missing from the DOM');
+    return;
+  }
 
-    // Open password confirmation modal for contact number
-    guideEditContactBtn.addEventListener('click', () => {
-        console.log('Pencil button clicked for contact number!');
-        guidePasswordConfirmModal.classList.remove('hidden'); // Show the password confirmation modal
-    });
+  // Function to show password modal
+  function openGuidePasswordModal() {
+      guidePasswordModal.classList.remove('hidden');
+      guidePasswordModal.style.display = 'flex';
+  }
 
-    // Confirm password and handle access to change contact number
-    guidePasswordConfirmBtn.addEventListener('click', async () => {
-        const password = guideConfirmPasswordInput.value;
-        try {
-            const response = await fetch('/confirm-password', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password }),
-            });
+  // Function to hide password modal
+  function closeGuidePasswordModal() {
+      guidePasswordModal.classList.add('hidden');
+      guidePasswordModal.style.display = 'none';
+      passwordInput.value = '';  // Clear password input field
+  }
 
-            const data = await response.json();
-            if (data.success) {
-                guidePasswordConfirmModal.classList.add('hidden'); // Hide password modal
-                guideChangeContactModal.classList.remove('hidden'); // Show change contact modal
-                newContactInput.value = contactInput.value; // Pre-fill the input with the current contact number
-                newContactInput.focus(); // Focus on the new contact input
-            } else {
-                alert('Incorrect password. Please try again.');
+  // Event listener to open modal on edit button click
+  guideEditContactBtn.addEventListener('click', openGuidePasswordModal);
+
+  // Event listener to close modal on cancel button click
+  guidePasswordCancelBtn.addEventListener('click', closeGuidePasswordModal);
+
+  // Event listener for the confirm button in the password modal
+  guidePasswordConfirmBtn.addEventListener('click', async () => {
+    const password = passwordInput.value.trim();
+
+    try {
+      // Step 1: Send request to verify the password only (without changing the contact number yet)
+      const response = await fetch('/tourguide/verify_password', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ password: password })
+      });
+
+      const result = await response.json();
+
+      console.log('Password verification response:', result);
+
+      // Step 2: Check if the password verification was successful
+      if (result.success) {
+          alert("Password verified! You can now edit your contact number.");
+          closeGuidePasswordModal();
+          
+          // Enable the contact number input for editing
+          contactNumberInput.readOnly = false;
+          console.log("Is contact number input readonly? ", contactNumberInput.readOnly); 
+
+          console.log("Contact number input is now enabled for editing.");  // Debugging log
+
+          // Optional: Add an event listener to save the updated contact number
+          contactNumberInput.addEventListener('blur', async () => {
+            const newContactNumber = contactNumberInput.value;
+            try {
+              const updateResponse = await fetch('/tourguide/update_contact', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({ contact_number: newContactNumber })
+              });
+
+              const updateResult = await updateResponse.json();
+              if (updateResult.success) {
+                  alert("Contact number updated successfully!");
+                  contactNumberInput.disabled = true; // Disable editing again
+              } else {
+                  alert("Failed to update contact number: " + updateResult.message);
+              }
+            } catch (updateError) {
+              console.error('Error updating contact number:', updateError);
+              alert('There was an error processing your request. Please try again.');
             }
-        } catch (error) {
-            console.error('Error confirming password:', error);
-        }
-    });
+          }, { once: true }); // Add this listener only once
 
-    // Save new contact number
-    guideSaveContactBtn.addEventListener('click', async () => {
-        const newContact = newContactInput.value;
-        try {
-            const response = await fetch('/save-contact', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contact_number: newContact }),
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                contactInput.value = newContact; // Update displayed contact number
-                contactInput.disabled = true; // Disable input after saving
-                guideChangeContactModal.classList.add('hidden'); // Close change contact modal
-            } else {
-                alert('Error updating contact number.');
-            }
-        } catch (error) {
-            console.error('Error saving contact number:', error);
-        }
-    });
+      } else {
+          // Only show this error if password verification fails
+          alert(result.message);  // Show error message if password is incorrect
+      }
+    } catch (error) {
+      console.error('Error verifying password:', error);
+      alert('There was an error verifying your password. Please try again.');
+    }
+  });
 });
+
+
+
+
+
+
+
+
+
 
 
 

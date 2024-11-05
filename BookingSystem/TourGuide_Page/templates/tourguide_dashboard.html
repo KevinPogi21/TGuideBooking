@@ -40,7 +40,7 @@
           <div class="profile-overview">
             <img src="{{ url_for('static', filename='vincenzo.jpg') }}" alt="Tour Guide Picture" class="profile-pic" />
             <div class="profile-details">
-              <h2 class="h2-guide-name">Mabuhay! I Am <span>{{ current_user.fname }} {{ current_user.lname }}</span>, Your Friendly Tour Guide</h2>
+              <h2 class="h2-guide-name">Mabuhay! I Am <span>{{ current_user.first_name }} {{ current_user.last_name }}</span>, Your Friendly Tour Guide</h2>
             </div>
           </div>
 
@@ -304,7 +304,7 @@
             <!-- Profile Picture Upload -->
             <div class="profile-overview">
               <img src="{{ url_for('static', filename='doonaaaaa.jpg') }}" alt="Profile Picture" class="profile-pic" id="profile-pic" />
-              <input type="file" id="upload-pic" class="hidden" accept="image/*" />
+              <input type="file" id="upload-pic" class="hidden"/>
               <button class="primary-btn" id="change-pic-btn">Change Profile Picture</button>
               <button class="primary-btn hidden" id="save-pic-btn">Save</button>
                 
@@ -319,7 +319,7 @@
               </div>
 
               <!-- Name Section -->
-                <h1 class="h2-guide-name" > <span id="full-name">{{ current_user.fname }} {{ current_user.lname }}</span> </h1>
+                <h1 class="h2-guide-name" > <span id="full-name">{{ current_user.first_name }} {{ current_user.last_name }}</span> </h1>
 
               <!-- Price Section -->
               <div class="input-group price-group">
@@ -350,7 +350,7 @@
                   Contact Number
                   <button class="edit-btn" id="guide-edit-contact-btn">&#9998;</button>
                 </label>
-                <input type="text" id="contact-number" value="{{ current_user.contact_number }}" disabled />
+                <input type="text" id="contact-number" value="{{current_user.tour_guide.contact_num }}" readonly />
               </div>
                   
               <!-- Password Section -->

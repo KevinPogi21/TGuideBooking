@@ -6,12 +6,16 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from datetime import timedelta
 from flask_cors import CORS
+from flask_migrate import Migrate
+
 
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()
 login_manager = LoginManager()
 mail = Mail()
+migrate = Migrate()
+
 
 def create_app():
     app = Flask(__name__)
@@ -41,6 +45,9 @@ def create_app():
     bcrypt.init_app(app)
     mail.init_app(app)
     login_manager.init_app(app)
+    migrate.init_app(app, db)
+
+
 
     login_manager.login_view = 'main.traveler_login'
     login_manager.login_message_category = 'info'

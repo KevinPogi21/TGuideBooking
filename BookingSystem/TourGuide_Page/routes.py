@@ -5,14 +5,15 @@ from . import tourguide
 from BookingSystem.TourOperator_Page.form import UserTourGuideForm
 from BookingSystem import bcrypt, db
 from werkzeug.security import check_password_hash, generate_password_hash
-
+from BookingSystem.models import User, Characteristic, Skill, Availability, TourGuide
+from .form import PasswordConfirmationForm
 
 
 # Route to view the profile of a specific tour guide
 @tourguide.route('/view_tourguide/<int:guide_id>', methods=['GET'])
 @login_required
 def view_tourguide(guide_id):
-    guide = UserTourGuide.query.get_or_404(guide_id)
+    guide = User.query.get_or_404(guide_id)
     return render_template('tourguide_dashboard.html', guide=guide)
 
 # Route to save profile changes made by the tour guide
@@ -25,10 +26,13 @@ def save_profile():
             return jsonify({'success': False, 'error': 'No data received.'}), 400
 
         # Update the current user's profile fields
-        current_user.fname = data.get('first_name') or current_user.fname
-        current_user.lname = data.get('last_name') or current_user.lname
+        current_user.first_name = data.get('first_name') or current_user.first_name
+        current_user.last_name = data.get('last_name') or current_user.last_name
         current_user.email = data.get('email') or current_user.email
-        current_user.contact_number = data.get('contact_number') or current_user.contact_number
+        
+         # Update the contact number in the TourGuide model
+        if current_user.tour_guide:
+            current_user.tour_guide.contact_num = data.get('contact_number') or current_user.tour_guide.contact_num
 
         # Commit changes to the database
         db.session.commit()
@@ -64,40 +68,6 @@ def confirm_password():
 
 
 
-@tourguide.route('/save-contact', methods=['POST'])
-@login_required
-def save_contact():
-    data = request.get_json()
-    new_contact_number = data.get('contact_number')
-
-    if new_contact_number:
-        try:
-            current_user.contact_number = new_contact_number
-            db.session.commit()
-            return jsonify({'success': True}), 200
-        except Exception as e:
-            db.session.rollback()
-            print(f"Error saving contact number: {e}")
-            return jsonify({'success': False, 'error': 'Could not update contact number'}), 500
-    return jsonify({'success': False, 'error': 'Invalid contact number'}), 400
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Logout route
 @tourguide.route('/logout')
 @login_required
@@ -106,6 +76,52 @@ def logout():
     session.clear()
     flash('Logged out successfully.', 'success')
     return redirect(url_for('main.home'))
+
+
+
+
+
+
+
+@tourguide.route('/verify_password', methods=['POST'])
+@login_required
+def verify_password():
+    data = request.get_json()
+    password = data.get('password')
+
+    # Check if password is provided
+    if not password:
+        return jsonify({"success": False, "message": "Password is required for verification."}), 400
+
+    # Verify the password
+    password_is_correct = current_user.check_password(password) if hasattr(current_user, 'check_password') else check_password_hash(current_user.password, password)
+    
+    if password_is_correct:
+        return jsonify({"success": True, "message": "Password verified successfully."}), 200
+    else:
+        return jsonify({"success": False, "message": "Incorrect password. Please try again."}), 401
+
+
+
+@tourguide.route('/update_contact', methods=['POST'])
+@login_required
+def update_contact():
+    data = request.get_json()
+    new_contact = data.get('contact_number')
+
+    # Check if new contact number is provided
+    if not new_contact:
+        return jsonify({"success": False, "message": "Contact number is required."}), 400
+
+    # Update the contact number
+    try:
+        current_user.tour_guide.contact_num = new_contact
+        db.session.commit()
+        return jsonify({"success": True, "message": "Contact number updated successfully."}), 200
+    except Exception as e:
+        db.session.rollback()
+        print("Database error:", e)
+        return jsonify({"success": False, "message": "Failed to update contact number due to a database error."}), 500
 
 
 
