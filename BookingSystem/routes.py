@@ -233,13 +233,18 @@ def save_picture(form_picture):
     return picture_fn
 
 @main.route('/logout')
+@login_required
 def logout():
     logout_user()
+    # Clear all session data
+    session.clear()
+    flash('You have been logged out successfully.', 'success')
     return redirect(url_for('main.home'))
 
 
+
     
-@main.route('/account/', methods=['GET', 'POST'])
+@main.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
     form = UpdateAccountForm()
@@ -248,9 +253,13 @@ def account():
         current_user.image_file = picture_file
         db.session.commit()  # Save the new image file name to the database
     
-    print(f"Current image file: {current_user.image_file}")  # Debugging print statement
-    image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
+    # Use a default image if no image file is set
+    image_file_name = current_user.image_file if current_user.image_file else 'default.jpg'
+    print(f"Current image file: {image_file_name}")  # Debugging print statement
+    image_file = url_for('static', filename='profile_pics/' + image_file_name)
+    
     return render_template('account.html', title='Account', image_file=image_file, form=form)
+
 
 
 @main.route('/booking')

@@ -54,12 +54,13 @@
               {{ form.password(class="form-control") }}
           {% endif %}
         </div>
-
+        <p style="margin-bottom: 20px;"><a href="{{ url_for('main.traveler_reset_request') }}" id="forgot-password-link">Forgot Password?</a></p>
         <div class="button-container">
           <button type="submit" class="primary-btn">Log In</button>
         </div>
-      </form>
 
+      </form>
+      
       <div class="form-footer">
         <p>Don't have an account? <a href="{{ url_for('main.traveler_register') }}">Sign Up</a></p>  <!-- Link to Sign-Up Page -->
       </div>
@@ -84,3 +85,5 @@
       </script>
 </body>
 </html>
+
+

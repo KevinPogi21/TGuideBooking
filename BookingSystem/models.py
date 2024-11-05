@@ -39,9 +39,9 @@ def load_user(user_id):
 # USERTRAVELER DATABASE
 class UserTraveler(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(50))
-    last_name = db.Column(db.String(50))
-    nationality = db.Column(db.String(50))
+    first_name = db.Column(db.String(50),nullable=False)
+    last_name = db.Column(db.String(50),nullable=False)
+    nationality = db.Column(db.String(50),nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     
     password = db.Column(db.String(150), nullable=False)
@@ -139,6 +139,7 @@ class UserTourOperator(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(250), nullable=False)
     role = db.Column(db.String(30), nullable=False, default='touroperator')
+    image_file = db.Column(db.String(50), nullable=False, default='default.jpg')
     confirmed = db.Column(db.Boolean, default=True)
     
     def __repr__(self):

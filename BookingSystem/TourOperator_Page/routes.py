@@ -31,11 +31,11 @@ def create_tourguide():
             db.session.add(new_tourguide)
             db.session.commit()
             flash('Tour Guide account created successfully!', 'success')
-            return redirect(url_for('touroperator.touroperator_dashboard'))  # Redirect to the tour guide dashboard
+            return redirect(url_for('touroperator.touroperator_dashboard',guide_id=new_tourguide.id))  # Redirect to the tour guide dashboard
 
         except Exception as e:
             # Handle errors gracefully
-            db.session.rollback()
+            db.session.rollback()   
             flash('An error occurred while creating the account. Please try again.', 'danger')
             print(f"Database error: {e}")  # Debugging information
 
@@ -71,15 +71,15 @@ def logout():
 
 
 
-@touroperator.route('/tourguide_dashboard/<int:id>', methods=['GET'])
+@touroperator.route('/tourguide_profile/<int:guide_id>', methods=['GET'])
 @login_required
-def tourguide_profile(id):
-    print(f"Received Tour Guide ID: {id}")  # Debug
+def tourguide_profile(guide_id):
+    # Retrieve the tour guide by ID
+    tourguide = UserTourGuide.query.get_or_404(guide_id)
+    
+    # Pass the tour guide data to the profile template
+    return render_template('tourguide_profile.html', tourguide=tourguide)
 
-    tourguide = UserTourGuide.query.get_or_404(id)
-    print(f"Tour Guide: {tourguide.email}, ID: {tourguide.id}")  # Debug
-
-    return render_template('tourguide_dashboard.html', tourguide=tourguide)
 
 
 
