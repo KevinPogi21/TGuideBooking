@@ -131,11 +131,171 @@
       </div>
   
       <!-- Manage Municipality Tab -->
-      <div class="tab-pane" id="manage-municipality">
-        <h2>Manage Municipality</h2>
-        <button class="primary-btn">Add/Edit Page Content</button>
-        <button class="primary-btn">CRUD Tour Packages</button>
-      </div>
+        <!-- Manage Municipality Tab -->
+        <div class="tab-pane" id="manage-municipality">
+          <h2>Manage Municipality</h2>
+          <!-- Button to Open Form Modal -->
+          <button id="open-form-btn" class="primary-btn">Add New Tour Package</button>
+
+          <!-- Form Modal for Creating/Editing Tour Packages -->
+          <div id="form-modal" class="modal hidden">
+            <div class="modal-content">
+              <h3>Create/Edit Tour Package</h3>
+              <form id="tour-package-form" class="form-layout">
+                <div class="form-section">
+                  <label for="package-name">Tour Package Name</label>
+                  <input type="text" id="package-name" placeholder="Enter package name" required />
+                </div>
+              
+                <div class="form-section">
+                  <label for="description">Description</label>
+                  <textarea id="description" placeholder="Enter package description" required></textarea>
+                </div>
+              
+                <div class="form-section">
+                  <label for="estimated-price">Estimated Price</label>
+                  <input type="text" id="estimated-price" placeholder="Enter estimated starting price" required />
+                </div>
+              
+                <div class="form-section inclusion-exclusion">
+                  <label for="inclusions">Inclusions</label>
+                  <div>
+                    <ul id="inclusions-list" class="editable-list">
+                      <li>
+                        <input type="text" placeholder="Add inclusion" class="editable-item" />
+                        <button type="button" class="remove-btn">Remove</button>
+                      </li>
+                    </ul>
+                    <button type="button" id="add-inclusion-btn" class="secondary-btn">Add Inclusion</button>
+                  </div>
+                </div>
+              
+                <div class="form-section inclusion-exclusion">
+                  <label for="exclusions">Exclusions</label>
+                  <div>
+                    <ul id="exclusions-list" class="editable-list">
+                      <li>
+                        <input type="text" placeholder="Add exclusion" class="editable-item" />
+                        <button type="button" class="remove-btn">Remove</button>
+                      </li>
+                    </ul>
+                    <button type="button" id="add-exclusion-btn" class="secondary-btn">Add Exclusion</button>
+                  </div>
+                </div>
+              
+                <div class="form-section">
+                  <label for="itinerary">Itinerary Details</label>
+                  <textarea id="itinerary" placeholder="Enter itinerary details" required></textarea>
+                </div>
+              
+                <div class="form-section">
+                  <label for="image-upload">Image Upload</label>
+                  <input type="file" id="image-upload" accept="image/*" required />
+                </div>
+              
+                <div class="button-container">
+                  <button type="submit" class="primary-btn">Create</button>
+                  <button type="button" id="close-form-modal" class="secondary-btn">Cancel</button>
+                </div>
+              </form>
+              
+            </div>
+          </div>
+
+          <!-- Display Cards for Existing Tour Packages -->
+          <div id="tour-packages-display" class="card-container">
+            <!-- Sample Tour Package Card -->
+            <div class="package-card" data-name="Island Hopping Adventure" data-description="Experience beautiful islands..." data-price="$200" data-itinerary="Day 1: Arrival and Welcome; Day 2: Island Hopping;">
+              <img src="sample-image.jpg" alt="Tour Image" class="tour-image" />
+              <h4>Island Hopping Adventure</h4>
+              <p>Starting at $200</p>
+              <button class="view-details-btn">See Details</button>
+            </div>
+
+
+            <!-- Sample Tour Package Card -->
+            <div class="package-card" data-name="Island Hopping Adventure" data-description="Experience the beautiful islands with guided tours, beach activities, and cultural insights." data-price="$200" data-itinerary="Day 1: Arrival and Welcome; Day 2: Island Hopping and Snorkeling; Day 3: Cultural Exploration and Departure">
+              <div class="package-image">
+                <img src="Image/download (1).jpeg" alt="Tour Image"  />
+              </div>
+              <h4>Island Hopping Adventure</h4>
+              <p>Starting at $200</p>
+              <button class="view-details-btn">See Details</button>
+            </div>
+            <!-- Repeat for more tour cards as needed -->
+          </div>
+
+          <!-- Details Modal for Viewing Tour Packages -->
+          <div id="details-modal" class="modal hidden">
+            <div class="modal-content">
+              <h3>Tour Package Details</h3>
+              <div id="details-content">
+                <!-- Tour Package Details Container -->
+                <div class="container-section tour-package-details expanded">
+                  <h4 class="container-header">Tour Package Details</h4>
+                  <br>
+
+                  <!-- Package Overview -->
+                  <div class="package-overview">
+                    <strong>Tour Name:</strong> <span>Island Hopping Adventure</span>
+                    <p class="package-description">Experience the beautiful islands with guided tours, beach activities, and cultural insights.</p>
+                  </div>
+                  <br>
+
+                  <!-- Itinerary Section -->
+                  <div class="section itinerary-section">
+                    <h4 class="subsection-title">Itinerary</h4>
+                    <ul class="timeline">
+                      <li>
+                        <span class="timeline-dot"></span>
+                        <div class="timeline-content">
+                          <strong>Day 1:</strong> Arrival and Welcome Tour
+                        </div>
+                      </li>
+                      <li>
+                        <span class="timeline-dot"></span>
+                        <div class="timeline-content">
+                          <strong>Day 2:</strong> Island Hopping and Snorkeling
+                        </div>
+                      </li>
+                      <li>
+                        <span class="timeline-dot"></span>
+                        <div class="timeline-content">
+                          <strong>Day 3:</strong> Cultural Exploration and Departure
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                  <br>
+
+                  <!-- Inclusion/Exclusion Section -->
+                  <div class="section inclusion-exclusion">
+                    <h4 class="subsection-title">What's Included</h4>
+                    <ul class="checklist">
+                      <li><span class="checkmark">&#10003;</span> Guided tours</li>
+                      <li><span class="checkmark">&#10003;</span> Meals (breakfast and lunch)</li>
+                      <li><span class="checkmark">&#10003;</span> Snorkeling gear</li>
+                    </ul>
+                    <br>
+
+                    <h4 class="subsection-title">What's Not Included</h4>
+                    <ul class="checklist exclusion">
+                      <li><span class="crossmark">&#10007;</span> Dinner</li>
+                      <li><span class="crossmark">&#10007;</span> Personal expenses</li>
+                      <li><span class="crossmark">&#10007;</span> Travel insurance</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <button id="edit-package-btn" class="primary-btn">Edit</button>
+              <button id="delete-package-btn" class="danger-btn">Delete</button>
+              <button id="close-details-modal" class="secondary-btn">Close</button>
+            </div>
+          </div>
+
+          <!-- Modal Overlay -->
+          <div id="modal-overlay" class="modal-overlay hidden"></div>
+        </div>
   
       <!-- Tour Guide Management Tab -->
           <!-- Tour Guide Management Tab -->
@@ -211,6 +371,32 @@
 
             </div>
           </div>
+
+          <div class="container">
+            <h1 class="page-title">My Tour Guides</h1>
+            <div class="tour-guide-list">
+                {% for guide in tour_guides %}
+                    <div class="tour-guide-card">
+                      <div class="profile-picture">
+                        <img src="Image/doonaaaaa.jpg" alt="Tour Guide Profile Picture">
+                      </div>
+                        <div class="guide-info">
+                            <h3 class="guide-name">{{ guide.user.first_name }} {{ guide.user.last_name }}</h3>
+                            <p class="price">₱1,500 per tour</p>
+                            <div class="ratings">4.5 ★★★★☆</div>
+                            <p class="status active">Status: Active</p>
+                            <button class="view-btn" onclick="redirectToProfile()">View Profile</button>
+                        </div>
+                    </div>
+                {% else %}
+                    <p>No tour guides available.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+
+
+
             </div>
 
   

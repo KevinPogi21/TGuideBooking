@@ -65,19 +65,20 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Booking Details Modal Logic
-    const bookingModal = document.getElementById('booking-modal');
-    const bookingInfo = document.getElementById('booking-info');
-    const closeBookingModal = document.getElementById('close-booking-modal');
+// Booking Details Modal Logic
+const bookingModal = document.getElementById('booking-modal');
+const bookingInfo = document.getElementById('booking-info');
+const closeBookingModal = document.getElementById('close-booking-modal');
 
-    function openBookingDetails(details) {
-        bookingInfo.textContent = details;
-        bookingModal.classList.add('show');
-    }
+function openBookingDetails(details) {
+  bookingInfo.textContent = details;
+  bookingModal.classList.add('show');
+}
 
-    closeBookingModal?.addEventListener('click', () => {
-        bookingModal.classList.remove('show');
-    });
+closeBookingModal.addEventListener('click', () => {
+  bookingModal.classList.remove('show');
+});
+
 
     // Profile Picture Upload and Cropper Logic
     const changePicBtn = document.getElementById('change-pic-btn');
@@ -197,3 +198,62 @@ window.addEventListener('DOMContentLoaded', () => {
   closeTourGuideModal?.addEventListener('click', () => {
     tourGuideModal.classList.remove('show');
   });
+
+
+
+
+  
+  
+// Open and Close Create Tour Package Modals
+document.getElementById('open-form-btn').addEventListener('click', () => {
+    document.getElementById('form-modal').classList.add('show');
+    document.getElementById('modal-overlay').classList.add('show');
+  });
+  
+  document.getElementById('close-form-modal').addEventListener('click', () => {
+    document.getElementById('form-modal').classList.remove('show');
+    document.getElementById('modal-overlay').classList.remove('show');
+  });
+  
+  // Open the Details Modal
+  document.getElementById('tour-packages-display').addEventListener('click', (e) => {
+    if (e.target && e.target.classList.contains('view-details-btn')) {
+      document.getElementById('details-modal').classList.add('show');
+      document.getElementById('modal-overlay').classList.add('show');
+    }
+  });
+  
+  // Close the Details Modal
+  document.getElementById('close-details-modal').addEventListener('click', () => {
+    document.getElementById('details-modal').classList.remove('show');
+    document.getElementById('modal-overlay').classList.remove('show');
+  });
+  
+  // Close any open modal when clicking on the overlay
+  document.getElementById('modal-overlay').addEventListener('click', () => {
+    document.querySelectorAll('.modal').forEach(modal => modal.classList.remove('show'));
+    document.getElementById('modal-overlay').classList.remove('show');
+  });
+  
+  // Add and Remove Inclusions/Exclusions
+  document.getElementById('add-inclusion-btn').addEventListener('click', () => {
+    const newInclusion = document.createElement('li');
+    newInclusion.innerHTML = `<input type="text" placeholder="Add inclusion" class="editable-item" />
+                              <button type="button" class="remove-btn">Remove</button>`;
+    document.getElementById('inclusions-list').appendChild(newInclusion);
+  });
+  
+  document.getElementById('add-exclusion-btn').addEventListener('click', () => {
+    const newExclusion = document.createElement('li');
+    newExclusion.innerHTML = `<input type="text" placeholder="Add exclusion" class="editable-item" />
+                              <button type="button" class="remove-btn">Remove</button>`;
+    document.getElementById('exclusions-list').appendChild(newExclusion);
+  });
+  
+  // Remove an inclusion or exclusion item
+  document.addEventListener('click', (e) => {
+    if (e.target && e.target.classList.contains('remove-btn')) {
+      e.target.parentElement.remove();
+    }
+  });
+  

@@ -6,12 +6,7 @@ from BookingSystem import bcrypt, db
 from BookingSystem.TourOperator_Page.form import UserTourGuideForm
 from BookingSystem.models import User, TourOperator, TourGuide 
 
-from flask import render_template, redirect, url_for, flash, request
-from flask_login import login_required, current_user
-from . import touroperator
-from BookingSystem import db
-from BookingSystem.TourOperator_Page.form import UserTourGuideForm
-from BookingSystem.models import User, TourOperator, TourGuide
+
 
 @touroperator.route('/create_tourguide', methods=['GET', 'POST'])
 @login_required
@@ -77,7 +72,10 @@ def touroperator_dashboard():
         return redirect(url_for('main.home'))
     
     form = UserTourGuideForm()  # Instantiate the form for the dashboard
-    return render_template('touroperator_dashboard.html', title='TourOperator Dashboard', form=form)
+    
+    tour_guides = TourGuide.query.filter_by(toperator_id=current_user.tour_operator.id).all()
+    
+    return render_template('touroperator_dashboard.html', title='TourOperator Dashboard', form=form, tour_guides=tour_guides)
 
 
 

@@ -6,9 +6,11 @@ from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Le
 from BookingSystem.models import User  # Assuming UserTraveler is the model for your users
 
 class UserTourOperatorForm(FlaskForm):
+    name= StringField('Name', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired(),Length(min=6, message="Password must be at least 6 characters long.")])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message="Passwords must match.")])
+    contact_number = StringField('Contact Number', validators=[DataRequired()])
     submit = SubmitField('Create Account')
     
     def validate_email(self, email):

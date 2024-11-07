@@ -166,12 +166,29 @@ body {
 .form-section {
   display: block;
   align-items: center;
-  text-align: center;
+  text-align: left;
+}
+
+.form {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 15px 20px;
+}
+
+.form {
+  display: contents;
 }
 
 .input-container {
   width: 100%;
   margin-bottom: 20px;
+  margin-top: 30px;
 }
 
 input {
@@ -186,6 +203,15 @@ input {
 input:focus {
   border-color: #4ecdc4;
   outline: none;
+}
+
+.input-group label {
+  display: flex;
+  font-size: 20px;
+  margin-bottom: 5px;
+  color: #2b2d42;
+  font-weight: bold;
+  text-align: left;
 }
 
 .primary-btn {

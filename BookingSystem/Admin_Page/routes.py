@@ -17,6 +17,7 @@ def create_operator():
         
         # Create a new UserTourOperator instance
         new_operator = User(
+            first_name=form.name.data,
             email=form.email.data,
             password=hashed_password,
             role='touroperator',  # Set role as tour operator
@@ -26,7 +27,11 @@ def create_operator():
         try:
             db.session.add(new_operator)
             db.session.commit()
-            new_operator = TourOperator(user_id=new_operator.id)
+              # Commit both the User and TourGuide entrie
+            new_operator = TourOperator(
+                user_id=new_operator.id,
+                contact_num=form.contact_number.data,
+                )
             db.session.add(new_operator)
             db.session.commit()
             flash('Tour Operator account created successfully!', 'success')
@@ -47,7 +52,10 @@ def admin_dashboard():
         return redirect(url_for('main.home'))  # Redirect to the main home page
 
     form = UserTourOperatorForm()  # Create an instance of the OperatorForm
-    return render_template('admin_dashboard.html', title='Admin Dashboard', form=form)  # Render the dashboard with the form
+    
+    tour_operators = User.query.filter_by(role='touroperator').all()
+
+    return render_template('admin_dashboard.html', title='Admin Dashboard', form=form, tour_operators=tour_operators)  # Render the dashboard with the form
 
 
 @admin.route('/logout')

@@ -58,6 +58,14 @@
             
                             <form method="POST" id="operator-form" action="{{ url_for('admin.create_operator') }}">
                               {{ form.hidden_tag() }}  <!-- CSRF token if using Flask-WTF -->
+
+                              <div class="input-container">
+                                <label for="name">Name</label>
+                                {{ form.name(class="input", placeholder="Enter Operator Name") }}
+                                {% if form.name.errors %}
+                                    <span class="error">{{ form.email.errors[0] }}</span>
+                                {% endif %}
+                              </div>
                               
                               <div class="input-container">
                                 <label for="email">Email</label>
@@ -82,10 +90,40 @@
                                     <span class="error">{{ form.confirm_password.errors[0] }}</span>
                                 {% endif %}
                               </div>
+                              <div class="input-container">
+                                <label for="contact_number">Contact Number</label>
+                                {{ form.contact_number(class="input", placeholder="Enter Contact Number") }}
+                                {% if form.contact_number.errors %}
+                                    <span class="error">{{ form.contact_number.errors[0] }}</span>
+                                {% endif %}
+                            </div>
                                 <button type="submit" class="primary-btn">{{ form.submit.label }}</button>
                             </form>
                             </div>
                         </div>
+                        <div class="container">
+                          <h1 class="page-title">My Tour Guides</h1>
+                          <div class="tour-guide-list">
+                              {% for guide in tour_guides %}
+                                  <div class="tour-guide-card">
+                                    <div class="profile-picture">
+                                      <img src="Image/doonaaaaa.jpg" alt="Tour Guide Profile Picture">
+                                    </div>
+                                      <div class="guide-info">
+                                          <h3 class="guide-name">{{ user.first_name }} {{ user.last_name }}</h3>
+                                          <p class="price">₱1,500 per tour</p>
+                                          <div class="ratings">4.5 ★★★★☆</div>
+                                          <p class="status active">Status: Active</p>
+                                          <button class="view-btn" onclick="redirectToProfile()">View Profile</button>
+                                      </div>
+                                  </div>
+                              {% else %}
+                                  <p>No Tour Operators available.</p>
+                              {% endfor %}
+                          </div>
+                      </div>
+
+
                         </div>
                       </div>
       

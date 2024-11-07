@@ -13,7 +13,7 @@
     <!-- Navbar -->
     <nav class="navbar">
       <div class="navbar-container">
-        <a href="Traveler - TGList.html" class="navbar-brand">PinoyGabay</a>
+        <a href="{{ url_for('main.traveler_dashboard') }}" class="navbar-brand">PinoyGabay</a>
           <div class="navbar-links">
             
             <a href="{{ url_for('main.booking') }}" class="nav-link">My Bookings</a>
@@ -32,50 +32,44 @@
     <div class="form_container">
 
       <!-- Left Section: Tour Guide Details -->
-      <div class="left-column">
-        
-        <!-- Tour Guide Details -->
-        <div class="profile-overview">
-          <img src= "{{ url_for('static', filename='doonaaaaa.jpg') }}" alt="Tour Guide Picture" class="profile-pic" />
-          <div class="profile-details">
-            <h2 class="h2-guide-name">Mabuhay! I Am <span>Vincenzo Cassano</span>, Your Friendly Tour Guide</h2>
-            <p class="ratings">★★★★☆ (21 Reviews)</p>
-          </div>
-        </div>
-
-        <!-- About Me -->
-        <div class="about-me">
-          <h2>About Me</h2>
-          <p>
-            Welcome! I am excited to show you around. I specialize in guiding through local attractions, 
-            ensuring you have an authentic and enjoyable experience. Whether it’s island hopping, historical tours, 
-            or local culture immersion, I'm here to make your trip unforgettable.
-          </p>
-        </div>
-
-        <!-- Why Choose Me Section -->
-        <section class="why-choose-me-row">
-
-          <div class="characteristics-box">
-            <h3>Characteristics</h3>
-            <ul class="checklist">
-              <li><span class="checkmark">&#10003;</span> Friendly and Professional</li>
-              <li><span class="checkmark">&#10003;</span> Punctual and Reliable</li>
-              <li><span class="checkmark">&#10003;</span> Excellent Communicator</li>
-              <li><span class="checkmark">&#10003;</span> Passionate about Local Culture</li>
-            </ul>
+        <div class="left-column">
+          
+          <!-- Tour Guide Details -->
+          <div class="profile-overview">
+            <img src="{{ profile.profile_picture }}" alt="Tour Guide Picture" class="profile-pic" />
+            <div class="profile-details">
+              <h2 class="h2-guide-name">Mabuhay! I Am <span>{{ profile.name }}</span>, Your Friendly Tour Guide</h2>
+              <p class="ratings">★★★★☆ (21 Reviews)</p>
+            </div>
           </div>
 
-          <div class="skills-box">
-            <h3>Skills</h3>
-            <ul class="checklist">
-              <li><span class="checkmark">&#10003;</span> Island and Nature Tours</li>
-              <li><span class="checkmark">&#10003;</span> Historical Insights</li>
-              <li><span class="checkmark">&#10003;</span> Fluent in English and Tagalog</li>
-              <li><span class="checkmark">&#10003;</span> First Aid Certified</li>
-            </ul>
+          <!-- About Me -->
+          <div class="about-me">
+            <h2>About Me</h2>
+            <p>{{ profile.bio }}</p>
           </div>
-        </section>
+
+          <!-- Why Choose Me Section -->
+          <section class="why-choose-me-row">
+
+            <div class="characteristics-box">
+              <h3>Characteristics</h3>
+              <ul class="checklist">
+                {% for characteristic in profile.characteristics %}
+                  <li><span class="checkmark">&#10003;</span> {{ characteristic }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+
+            <div class="skills-box">
+              <h3>Skills</h3>
+              <ul class="checklist">
+                {% for skill in profile.skills %}
+                  <li><span class="checkmark">&#10003;</span> {{ skill }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </section>
 
         <!-- Reviews Section -->
         <div class="container">
@@ -141,7 +135,7 @@
       <!-- Right Section: Sticky Booking Form -->
       <div class="right-column">
         <div class="booking-form">
-          <h2 class="guide-name">Have a Wonderful Travel with <span id="full-name">Vincenzo Cassano</span></h2>
+          <h2 class="guide-name">Have a Wonderful Travel with <span id="full-name">{{ profile.name }}</span></h2>
           <form>
             <label for="date">Select Date</label>
             <input type="date" id="date" required />
@@ -165,7 +159,7 @@
 
             <!-- Price and Button Row -->
             <div class="price-button-row">
-              <span class="price-label">₱1,200</span>
+              <span class="price-label">₱{{ profile.price }}</span>
               <button type="button" class="confirm-btn" onclick="openModal()">Confirm Booking</button>
             </div>
           </form>
@@ -191,12 +185,12 @@
         </div>
 
         <div class="booking-details">
-          <p><strong>Tour Guide:</strong> Tour Guide 1</p>
-          <p><strong>Tour Date:</strong> October 21, 2024</p>
-          <p><strong>Tour Type:</strong> Island Tour</p>
-          <p><strong>Traveler:</strong> Traveler Name</p>
-          <p><strong>Quantity of Traveler:</strong> QTY</p>
-          <p><strong>Price:</strong> ₱1,500</p>
+          <p><strong>Tour Guide:</strong> <span id="modal-tour-guide">{{ profile.name }}</span></p>
+          <p><strong>Tour Date:</strong> <span id="modal-tour-date">Selected Date</span></p>
+          <p><strong>Tour Type:</strong> <span id="modal-tour-type">Selected Tour Type</span></p>
+          <p><strong>Number of Travelers:</strong> <span id="modal-traveler-quantity">Quantity</span></p>
+          <p><strong>Personalized Tour:</strong> <span id="modal-personalized-notes">Personalized Notes</span></p>
+          <p><strong>Price:</strong> ₱<span id="modal-price">{{ profile.price }}</span></p>
 
           <!-- Special Note Section -->
           <div class="note-section">
@@ -282,6 +276,7 @@
       };
 
     </script>
+    <script src="{{ url_for('static', filename='TravelerBooking.js') }}"></script>
   </body>
 </html>
 

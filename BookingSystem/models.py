@@ -8,7 +8,7 @@ from flask import current_app
 from . import db 
 from itsdangerous import URLSafeTimedSerializer as Serializer
 from datetime import datetime
-
+from enum import Enum
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -27,7 +27,7 @@ class User(db.Model, UserMixin):
     role = db.Column(db.String(15), nullable=False)
     last_name = db.Column(db.String(50))
     first_name = db.Column(db.String(50))
-    profile_img = db.Column(db.String(255))
+    profile_img = db.Column(db.String(225), default='default.jpg')
     nationality = db.Column(db.String(100))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -89,7 +89,7 @@ class User(db.Model, UserMixin):
                     sender=os.environ.get('MAIL_DEFAULT_SENDER'), 
                     recipients=[self.email])
         msg.body = f'''To reset your password, visit the following link:
-        {url_for('main.reset_token', token=token, _external=True)}
+        {url_for('main.traveler_reset_token', token=token, _external=True)}
 
         If you did not make this request, simply ignore this email and no changes will be made.
         '''
@@ -126,6 +126,7 @@ class TourOperator(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('Users.id'), unique=True, nullable=False)
     municipal = db.Column(db.String(100))
+    contact_num = db.Column(db.String(15))
 
 
 class TourGuide(db.Model, UserMixin):
@@ -141,7 +142,7 @@ class TourGuide(db.Model, UserMixin):
     toperator_id = db.Column(db.Integer, db.ForeignKey('Tour_Operator.id'), nullable=False)
     accredited_num = db.Column(db.String(50))
     bio = db.Column(db.Text)
-    price = db.Column(db.Numeric(10, 2))
+    price = db.Column(db.Numeric(10, 2), default=1200)
     specialization = db.Column(db.String(255))
     contact_num = db.Column(db.String(15))
     active = db.Column(db.Boolean, default=False)
@@ -177,17 +178,26 @@ class Skill(db.Model):
     skill = db.Column(db.String(100))
 
 
+class AvailabilityStatus(Enum):
+    AVAILABLE = "available"
+    UNAVAILABLE = "unavailable"
+    BOOKED = "booked"
+
 class Availability(db.Model):
     __tablename__ = 'Availability'
     __table_args__ = (
-        db.Index('idx_availability_tguide_id', 'tguide_id'),      # Index on tguide_id
-        db.Index('idx_availability_date', 'availability_date'),   # Index on availability_date
-        # {'schema': 'public'}, 
+        db.Index('idx_availability_tguide_id', 'tguide_id'),
+        db.Index('idx_availability_date', 'availability_date'),
     )
+
     id = db.Column(db.Integer, primary_key=True)
     tguide_id = db.Column(db.Integer, db.ForeignKey('Tour_Guide.id'), nullable=False)
     availability_date = db.Column(db.Date, nullable=False)
-    availability = db.Column(db.Boolean, default=True)
+    status = db.Column(db.String(20), nullable=False, default=AvailabilityStatus.AVAILABLE.value)
+
+    # Optional method to convert enum to string for consistency
+    def set_status(self, status: AvailabilityStatus):
+        self.status = status.value
 
 
 class TourPackage(db.Model):

@@ -38,75 +38,72 @@
           <hr>
 
           <div class="profile-overview">
-            <img src="{{ url_for('static', filename='vincenzo.jpg') }}" alt="Tour Guide Picture" class="profile-pic" />
+            <img src="{{ url_for('static', filename='profile_pics/' + (current_user.profile_img or 'default.jpg')) }}" alt="Profile Picture" class="profile-pic" id="profile-pic" />
             <div class="profile-details">
               <h2 class="h2-guide-name">Mabuhay! I Am <span>{{ current_user.first_name }} {{ current_user.last_name }}</span>, Your Friendly Tour Guide</h2>
             </div>
           </div>
 
           <!-- About Me Section -->
-          <div class="about-me">
-            <h2>
-              About Me
-              <button class="edit-btn" id="edit-about-btn">&#9998;</button>
-              <button class="save-btn hidden" id="save-about-btn">&#10003;</button>
-            </h2>
-            <textarea id="about-text" disabled>Welcome! I am excited to show you around...</textarea>
+        <!-- About Me Section -->
+        <div class="about-me">
+          <h2>
+            About Me
+            <button class="edit-btn" id="edit-about-btn">&#9998;</button>
+            <button class="save-btn hidden" id="save-about-btn">&#10003;</button>
+          </h2>
+          <textarea id="about-text" disabled>{{ bio }}</textarea>
+        </div>
+
+        <!-- Characteristics and Skills Section -->
+        <section class="why-choose-me-row">
+
+          <!-- Characteristics Box -->
+          <div class="characteristics-box">
+            <h3>
+              Characteristics 
+              <button class="edit-btn" id="edit-char-btn">&#9998;</button>
+              <button class="save-btn hidden" id="save-char-btn">&#10003;</button>
+            </h3>
+            <ul class="checklist" id="characteristics-list">
+              {% for characteristic in characteristics %}
+                <li>
+                  <span class="checkmark">&#10003;</span>
+                  <span class="editable" contenteditable="false">{{ characteristic }}</span>
+                  <button class="remove-btn hidden">&#8722;</button>
+                </li>
+              {% else %}
+                <li>No characteristics available</li>
+              {% endfor %}
+            </ul>      
+            <button class="add-btn hidden" id="add-char-btn">Add Characteristic</button>
           </div>
 
-          <!-- Characteristics and Skills Section -->
-          <section class="why-choose-me-row">
-
-            <!-- Characteristics Box -->
-            <div class="characteristics-box">
-              <h3>
-                Characteristics 
-                <button class="edit-btn" id="edit-char-btn">&#9998;</button>
-                <button class="save-btn hidden" id="save-char-btn">&#10003;</button>
-              </h3>
-              <ul class="checklist" id="characteristics-list">
-                <li>
-                    <span class="checkmark">&#10003;</span>
-                    <span class="editable"> Add Characteristics </span>
-                    <button class="remove-btn hidden">&#8722;</button>
-                </li>
-
-                <li>
-                    <span class="checkmark">&#10003;</span>
-                    <span class="editable"> Add Characteristics </span>
-                    <button class="remove-btn hidden">&#8722;</button>
-                </li>
-
-              </ul>      
-
-              <button class="add-btn hidden" id="add-char-btn">Add Characteristic</button>
-            </div>
-
-            <!-- Skills Box -->
-            <div class="skills-box">
-              <h3>
-                Skills 
-                <button class="edit-btn" id="edit-skills-btn">&#9998;</button>
-                <button class="save-btn hidden" id="save-skills-btn">&#10003;</button>
-              </h3>
-
-              <ul class="checklist" id="skills-list">
+          <!-- Skills Box -->
+          <div class="skills-box">
+            <h3>
+              Skills 
+              <button class="edit-btn" id="edit-skills-btn">&#9998;</button>
+              <button class="save-btn hidden" id="save-skills-btn">&#10003;</button>
+            </h3>
+            <ul class="checklist" id="skills-list">
+              {% for skill in skills %}
                 <li>
                   <span class="checkmark">&#10003;</span>
-                  <span class="editable"> Add Skills </span>
+                  <span class="editable" contenteditable="false">{{ skill }}</span>
                   <button class="remove-btn hidden">&#8722;</button>
                 </li>
+              {% else %}
+                <li>No skills available</li>
+              {% endfor %}
+            </ul>
+            <button class="add-btn hidden" id="add-skills-btn">Add Skill</button>
+          </div>
 
-                <li>
-                  <span class="checkmark">&#10003;</span>
-                  <span class="editable"> Add Skills </span>
-                  <button class="remove-btn hidden">&#8722;</button>
-                </li>
+        </section>
 
-              </ul>
-              <button class="add-btn hidden" id="add-skills-btn">Add Skill</button>
-            </div>
-          </section>
+
+
 
           <!-- Traveler Reviews Section -->
           <div class="container">
@@ -303,20 +300,27 @@
 
             <!-- Profile Picture Upload -->
             <div class="profile-overview">
-              <img src="{{ url_for('static', filename='doonaaaaa.jpg') }}" alt="Profile Picture" class="profile-pic" id="profile-pic" />
-              <input type="file" id="upload-pic" class="hidden"/>
+              <!-- Dynamically load profile picture from the backend -->
+              <img src="{{ url_for('static', filename='profile_pics/' + (current_user.profile_img or 'default.jpg')) }}" alt="Profile Picture" class="profile-pic" id="profile-pic" />
+
+            
+              <!-- Hidden file input for image upload -->
+              <input type="file" id="upload-pic" class="hidden" />
+            
+              <!-- Buttons for changing and saving the profile picture -->
               <button class="primary-btn" id="change-pic-btn">Change Profile Picture</button>
               <button class="primary-btn hidden" id="save-pic-btn">Save</button>
-                
-              <!-- Cropper Modal -->
+            
+              <!-- Cropper Modal for adjusting the profile picture -->
               <div id="cropper-modal" class="modal hidden">
                 <div class="modal-content">
                   <h3>Adjust Your Picture</h3>
                   <div id="cropper-container"></div>
-                  <button class="primary-btn" id="crop-btn">Crop and Save</button>
+                  <button class="primary-btn" id="crop-btn">Apply Crop</button>
                   <button class="primary-btn" id="close-cropper-modal">Close</button>
                 </div>
               </div>
+            </div>
 
               <!-- Name Section -->
                 <h1 class="h2-guide-name" > <span id="full-name">{{ current_user.first_name }} {{ current_user.last_name }}</span> </h1>
@@ -328,10 +332,18 @@
                   <button class="edit-btn" id="edit-price-btn">&#9998;</button>
                   <button class="save-btn hidden" id="save-price-btn">&#10003;</button>
                 </label>
-
-                <h2 class="price-display" id="tour-price" style="text-align: left;">₱1,200</h2>
+                
+                <!-- Display the current price from current_user.tour_guide -->
+                <h2 class="price-display" id="tour-price" 
+                    data-original-price="{{ '{:,.2f}'.format(current_user.tour_guide.price) if current_user.tour_guide.price else '1200.00' }}" 
+                    style="text-align: left;">
+                  ₱{{ '{:,.2f}'.format(current_user.tour_guide.price) if current_user.tour_guide.price else '1,200.00' }}
+                </h2>
+                
+                <!-- Editable input field for price -->
                 <input type="number" id="price-input" class="editable hidden" placeholder="Enter price" min="0" />
               </div>
+              
 
               <h2>Contact Information</h2>
 
@@ -379,15 +391,15 @@
 
               <!-- Change Email Modal -->
               <div id="guide-change-email-modal" class="modal hidden">
-                  <div class="modal-content">
-                      <h3>Change Email</h3>
-                      <label for="guide-new-email-input">New Email:</label>
-                      <input type="email" id="guide-new-email-input" placeholder="Enter new email" />
-                      <div class="modal-button-container">
-                          <button class="cancel-btn" id="guide-cancel-email-btn">Cancel</button>
-                          <button class="confirm-btn" id="guide-save-email-btn">Save Email</button>
-                      </div>
+                <div class="modal-content">
+                  <h3>Change Email</h3>
+                  <label for="guide-new-email-input">New Email:</label>
+                  <input type="email" id="guide-new-email-input" placeholder="Enter new email" />
+                  <div class="modal-button-container">
+                    <button class="cancel-btn" id="guide-cancel-email-btn">Cancel</button>
+                    <button class="confirm-btn" id="guide-save-email-btn">Save Email</button>
                   </div>
+                </div>
               </div>
 
               <!-- Change Password Modal -->
@@ -408,13 +420,13 @@
               <!-- Change Contact Modal -->
               <div id="guide-change-contact-modal" class="modal hidden">
                 <div class="modal-content">
-                    <h3>Change Contact Number</h3>
-                    <label for="guide-new-contact-input">New Contact Number:</label>
-                    <input type="text" id="guide-new-contact-input" placeholder="Enter new contact number" />
-                    <div class="modal-button-container">
-                        <button class="cancel-btn" id="guide-cancel-contact-btn">Cancel</button>
-                        <button class="confirm-btn" id="guide-save-contact-btn">Save Contact</button>
-                    </div>
+                  <h3>Change Contact Number</h3>
+                  <label for="guide-new-contact-input">New Contact Number:</label>
+                  <input type="text" id="guide-new-contact-input" placeholder="Enter new contact number" />
+                  <div class="modal-button-container">
+                    <button class="cancel-btn" id="guide-cancel-contact-btn">Cancel</button>
+                    <button class="confirm-btn" id="guide-save-contact-btn">Save Contact</button>
+                  </div>
                 </div>
               </div>
                           
