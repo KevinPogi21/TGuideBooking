@@ -17,7 +17,7 @@
         <!-- Profile Icon -->
         <div class="profile-container-nav">
           <a href="{{ url_for('main.account') }}">
-            <img src="{{ url_for('static', filename='doonaaaaa.jpg') }}" alt="Profile" class="profile-icon" />
+            <img id="profile-pic" src="{{ url_for('static', filename='profile_pics/' + current_user.profile_img) }}" alt="Profile Picture">
           </a>
         </div>
       </div>

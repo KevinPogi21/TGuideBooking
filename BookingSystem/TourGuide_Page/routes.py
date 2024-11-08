@@ -407,9 +407,8 @@ def get_availability():
         data = [{'date': a.availability_date.strftime('%Y-%m-%d'), 'status': a.status} for a in availabilities]
         return jsonify(data)
     except Exception as e:
-        print("Error in /get_availability route:", e)  # Or use logging.error("...")
+        print("Error in /get_availability route:", e)
         return jsonify({"error": "An error occurred"}), 500
-
 
 
 @tourguide.route('/set_availability', methods=['POST'])
@@ -420,42 +419,48 @@ def set_availability():
     # Ensure the tour guide entry exists for the current user
     tour_guide = TourGuide.query.filter_by(user_id=current_user.id).first()
     
-    # Create the tour guide if it does not exist, filling in required fields
     if not tour_guide:
-        tour_guide = TourGuide(
-            user_id=current_user.id,   # Link to the current user's ID
-            bio="Default Bio",         # Add a default bio or replace with a meaningful value
-            price=1200,                # Set a default price
-            active=False               # Set to False by default
-            # Include any other fields that are required by the model
-        )
-        db.session.add(tour_guide)
-        db.session.commit()  # Commit here to ensure the tour guide exists before setting availability
-
-    # Loop through each entry in the availability data and add or update records
-    for entry in data:
-        date = entry['start']
-        status = entry['status']
-        
-        # Find existing availability or create a new one
-        availability = Availability.query.filter_by(
-            tguide_id=tour_guide.id,
-            availability_date=date
-        ).first()
-        
-        if availability:
-            availability.status = status
-        else:
-            availability = Availability(
-                tguide_id=tour_guide.id,
-                availability_date=date,
-                status=status
+        try:
+            tour_guide = TourGuide(
+                user_id=current_user.id,
+                bio="Default Bio",
+                price=1200,
+                active=False
             )
-            db.session.add(availability)
+            db.session.add(tour_guide)
+            db.session.commit()  # Commit to ensure tour_guide exists
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"success": False, "message": f"Failed to create tour guide: {str(e)}"}), 500
 
-    # Commit after all operations
-    db.session.commit()
-    return jsonify({"success": True, "message": "Availability saved successfully."}), 200
+    try:
+        for entry in data:
+            date = entry['start']
+            status = entry['status']
+
+            # Find existing availability or create a new one
+            availability = Availability.query.filter_by(
+                tguide_id=tour_guide.id,
+                availability_date=date
+            ).first()
+
+            if availability:
+                availability.status = status
+            else:
+                availability = Availability(
+                    tguide_id=tour_guide.id,
+                    availability_date=date,
+                    status=status
+                )
+                db.session.add(availability)
+
+        db.session.commit()  # Commit all availability changes
+        return jsonify({"success": True, "message": "Availability saved successfully."}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "message": f"Error saving availability: {str(e)}"}), 500
+
+
 
 
 

@@ -5,7 +5,7 @@
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Traveler Profile</title>
-      <link rel="stylesheet" href="{{ url_for('static', filename='TravelerProfile.css') }}">
+      <link rel="stylesheet" href="{{ url_for('static', filename='TravelerProfile.css') }}"defer>
       <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
     </head>
@@ -21,7 +21,8 @@
                 <!-- Profile Icon -->
                 <div class="profile-container-nav">
                   <a href="{{ url_for('main.account') }}">
-                    <img src="{{ url_for('static', filename='doonaaaaa.jpg') }}" alt="Profile" class="profile-icon" />
+                    <img id="profile-pic" src="{{ url_for('static', filename='profile_pics/' + current_user.profile_img) }}" alt="Profile Picture">
+
                   </a>
                 </div>
               </div>
@@ -52,7 +53,8 @@
               <h2>Profile</h2>
               <div class="profile-overview">
                 <div class="profile-pic-container">
-                  <img src="Image/traveler.JPG" alt="Profile Picture" class="profile-pic" id="profile-pic">
+                  <img id="profile-pic" src="{{ url_for('static', filename='profile_pics/' + current_user.profile_img) }}" alt="Profile Picture">
+
                   <button class="edit-pic-btn" id="edit-pic-btn">&#9998;</button>
                 </div>
                 <h2 class="h2-guide-name"><span>{{ current_user.first_name }} {{ current_user.last_name }}</span></h2>
@@ -339,7 +341,7 @@
 
         </div>
 
-        <script src="{{ url_for('static', filename='TravelerProfile.js') }}"></script>
+        <script src="{{ url_for('static', filename='TravelerProfile.js') }}"defer></script>
       </body>
     </html>
 

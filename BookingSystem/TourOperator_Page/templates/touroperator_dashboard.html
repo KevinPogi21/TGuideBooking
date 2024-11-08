@@ -432,7 +432,7 @@
                         <button class="edit-btn" id="edit-name-btn">&#9998;</button>
                         <button class="save-btn hidden" id="save-name-btn">&#10003;</button>
                         </label>
-                        <input type="text" id="name" placeholder="Vincenzo Cassano" disabled />
+                        <input type="text" id="name" placeholder="{{ current_user.first_name }}" disabled />
                     </div>
                     
             
@@ -445,7 +445,7 @@
                     <button class="edit-btn" id="edit-email-btn">&#9998;</button>
                     <button class="save-btn hidden" id="save-email-btn">&#10003;</button>
                   </label>
-                  <input type="email" id="email" placeholder="vincenzo@example.com" disabled /> 
+                  <input type="email" id="email" placeholder="{{ current_user.email }}" disabled />
                 </div>
 
                 <!-- Contact Number Section -->
@@ -455,7 +455,7 @@
                     <button class="edit-btn" id="edit-contact-btn">&#9998;</button>
                     <button class="save-btn hidden" id="save-contact-btn">&#10003;</button>
                   </label>
-                  <input type="text" id="contact-number" placeholder="Enter contact number" disabled />
+                  <input type="text" id="contact-number" placeholder="{{ current_user.contact_number }}" disabled />
                 </div>
 
                 <!-- Password Section -->

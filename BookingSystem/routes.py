@@ -1,51 +1,20 @@
 import secrets
 import os
 from flask import current_app, session
-from flask import Blueprint, render_template, url_for, flash, redirect, request
+from flask import Blueprint, render_template, url_for, flash, redirect, request, jsonify
 from BookingSystem import db, bcrypt, mail
 from BookingSystem.forms import TravelerLoginForm, TravelerRegistrationForm, TravelerRequestResetForm, TravelerResetPasswordForm, UpdateAccountForm
 from BookingSystem.models import User, TourOperator , send_confirmation_email
 from flask_login import login_user, current_user, logout_user, login_required 
-
+from werkzeug.utils import secure_filename
 
 #from flask_mail import Message
 
-from flask_dance.contrib.google import make_google_blueprint, google
-from flask_dance.contrib.facebook import make_facebook_blueprint, facebook
+
 
 
 
 main = Blueprint('main', __name__)  # Ensure the 'main' blueprint is set
-
-
-facebook_bp = make_facebook_blueprint(client_id='your-facebook-client-id',
-                                      client_secret='your-facebook-client-secret',
-                                      redirect_to='main.home')
-
-google_bp = make_google_blueprint(client_id='your-client-id', client_secret='your-client-secret', redirect_to='main.home')
-main.register_blueprint(google_bp, url_prefix='/google_login')
-main.register_blueprint(facebook_bp, url_prefix='/facebook_login')
-
-
-@main.route('/google_login')
-def google_login():
-    if not google.authorized:
-        return redirect(url_for('main.google_login'))
-    resp = google.get("/plus/v1/people/me")
-    assert resp.ok, resp.text
-    # Process Google login data here
-    
-    
-@main.route('/facebook_login')
-def facebook_login():
-    if not facebook.authorized:
-        return redirect(url_for('main.facebook.login'))
-    resp = facebook.get("/me?fields=id,name,email")
-    assert resp.ok, resp.text
-    # Process Facebook login data here
-    return render_template('home.html')
-
-
 
 
 @main.route('/')
@@ -53,9 +22,6 @@ def facebook_login():
 def home():
     return render_template('home.html')
 
-@main.route('/register')
-def register():
-    return render_template('register.html')
 
 
 # TRAVELER LOGIN
@@ -124,19 +90,6 @@ def traveler_login():
             flash('No account found with that email.', 'danger')
 
     return render_template('traveler_login.html', title='Traveler Login', form=form)
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -295,7 +248,70 @@ def traveler_dashboard():
 
 
 
+
+
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    """Check if the uploaded file is allowed based on its extension."""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def save_picture(form_picture):
+    """Save the picture to the server and return the filename."""
+    filename = secure_filename(form_picture.filename)
+    filepath = os.path.join(current_app.root_path, 'static/profile_pics', filename)
+    form_picture.save(filepath)
+    return filename
+
+@main.route('/update_profile_picture', methods=['POST'])
+@login_required
+def update_profile_picture():
+    # Check if a file is part of the request
+    if 'profile_picture' not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+
+    file = request.files['profile_picture']
     
+    # Validate file type
+    if not allowed_file(file.filename):
+        return jsonify({"error": "File type not allowed"}), 400
+
+    # Save file and update database
+    try:
+        filename = save_picture(file)
+        current_user.profile_img = filename  # Update the user's profile image
+        db.session.commit()  # Save the change in the database
+        image_url = url_for('static', filename='profile_pics/' + filename)  # Generate the URL for the profile picture
+        return jsonify({"image_url": image_url})  # Return the URL as JSON response
+    except Exception as e:
+        print("Error saving profile picture:", e)
+        return jsonify({"error": "Failed to save profile picture"}), 500
+
+
+
+
+@main.route('/get_availability/<int:tour_guide_id>', methods=['GET'])
+def get_availability(tour_guide_id):
+    try:
+        # Fetch availability for a specific tour guide by their ID
+        availabilities = Availability.query.filter_by(tguide_id=tour_guide_id).all()
+        
+        # Format the data based on your table structure
+        data = [
+            {
+                'date': a.availability_date.strftime('%Y-%m-%d'),
+                'status': 'available' if a.availability else 'unavailable'
+            } for a in availabilities
+        ]
+        
+        return jsonify(data)
+    except Exception as e:
+        print("Error in /get_availability route:", e)
+        return jsonify({"error": "An error occurred"}), 500
+
+
+   
 
     
     

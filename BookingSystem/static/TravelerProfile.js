@@ -16,6 +16,10 @@ tabLinks.forEach(link => {
   });
 });
 
+
+
+
+
 // Change Profile
 const profilePic = document.getElementById('profile-pic');
 const editPicBtn = document.getElementById('edit-pic-btn');
@@ -38,7 +42,7 @@ function openConfirmModal() {
   confirmModal.classList.add('show');
 }
 
-// Handle confirmation
+// Handle confirmation for opening file picker
 confirmChangeBtn.addEventListener('click', () => {
   confirmModal.classList.remove('show');
   uploadPicInput.click();
@@ -62,6 +66,7 @@ uploadPicInput.addEventListener('change', (event) => {
       cropperContainer.appendChild(img);
       cropperModal.classList.add('show');
 
+      // Initialize cropper
       cropper = new Cropper(img, {
         aspectRatio: 1,
         viewMode: 1,
@@ -75,20 +80,54 @@ uploadPicInput.addEventListener('change', (event) => {
   }
 });
 
-// Crop and save the image
-cropBtn.addEventListener('click', () => {
+// Crop and upload the image to the backend
+cropBtn.addEventListener('click', async () => {
   const canvas = cropper.getCroppedCanvas({
     width: 150,
     height: 150,
   });
-  profilePic.src = canvas.toDataURL();
-  cropperModal.classList.remove('show');
+
+  // Convert the canvas to a blob and send it to the backend
+  canvas.toBlob(async (blob) => {
+    const formData = new FormData();
+    formData.append('profile_picture', blob, 'profile.jpg');
+
+    try {
+      const response = await fetch('/update_profile_picture', {
+          method: 'POST',
+          body: formData,
+      });
+  
+      if (!response.ok) {
+          console.error(`Failed to update profile picture. Status: ${response.status} ${response.statusText}`);
+          const errorData = await response.json();
+          console.error("Error message from server:", errorData);
+      } else {
+          const data = await response.json();
+          
+          // Append a timestamp to prevent caching issues
+          profilePic.src = `${data.image_url}?timestamp=${new Date().getTime()}`; // Update the profile picture in the UI
+      }
+    } catch (error) {
+      console.error("Error uploading profile picture:", error);
+    }
+
+    cropperModal.classList.remove('show');
+  });
 });
 
 // Close cropper modal
 closeCropperModal.addEventListener('click', () => {
   cropperModal.classList.remove('show');
 });
+
+
+
+
+
+
+
+
 
 
 
@@ -118,6 +157,12 @@ toggleButtons.forEach((button) => {
     });
   });
 });
+
+
+
+
+
+
 
 
 

@@ -62,25 +62,25 @@ document.addEventListener('DOMContentLoaded', function () {
     const thankYouPopup = document.getElementById("thank-you-popup");
     const closeModalButton = document.getElementById("close-modal");
     const confirmBookingButton = document.querySelector('.confirm-btn');
-    
+  
     // Form input fields
     const dateInput = document.getElementById('date');
     const tourTypeInput = document.getElementById('tour-type');
     const travelerQuantityInput = document.getElementById('traveler-quantity');
     const personalizedTourInput = document.getElementById('personalized');
-    
+  
     // Modal display fields
-    const modalTourDate = document.querySelector('.booking-details p strong:nth-child(2)');
-    const modalTourType = document.querySelector('.booking-details p strong:nth-child(4)');
-    const modalTravelerQuantity = document.querySelector('.booking-details p strong:nth-child(6)');
-    const modalPersonalizedNotes = document.querySelector('.note-section p strong');
+    const modalTourDate = document.getElementById('modal-tour-date');
+    const modalTourType = document.getElementById('modal-tour-type');
+    const modalTravelerQuantity = document.getElementById('modal-traveler-quantity');
+    const modalPersonalizedNotes = document.getElementById('modal-personalized-notes');
   
     // Open the modal with form values
     function openModal() {
       // Set modal content based on input values
-      modalTourDate.textContent = dateInput.value;
-      modalTourType.textContent = tourTypeInput.options[tourTypeInput.selectedIndex].text;
-      modalTravelerQuantity.textContent = travelerQuantityInput.value;
+      modalTourDate.textContent = dateInput.value || "Not selected";
+      modalTourType.textContent = tourTypeInput.options[tourTypeInput.selectedIndex].text || "Not selected";
+      modalTravelerQuantity.textContent = travelerQuantityInput.value || "1";
       modalPersonalizedNotes.textContent = personalizedTourInput.value || "N/A";
   
       bookingModal.style.display = "flex";
@@ -116,4 +116,61 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     };
   });
-  
+
+
+
+
+
+
+  document.addEventListener('DOMContentLoaded', async function () {
+    console.log("DOM fully loaded and parsed");
+    const tourGuideId = 1;  // Use the appropriate tour guide ID
+    console.log(`Using tourGuideId: ${tourGuideId}`);
+
+    const dateInput = document.getElementById('date');
+    if (!dateInput) {
+        console.error("Date input field not found for Flatpickr initialization.");
+        return;
+    }
+
+    console.log(`Fetching from URL: /main/get_availability/${tourGuideId}`);
+    try {
+        const response = await fetch(`/main/get_availability/${tourGuideId}`);
+        console.log("Response status:", response.status);
+        console.log("Response status text:", response.statusText);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const availabilityData = await response.json();
+        console.log("Fetched availability data:", availabilityData);
+
+        if (!Array.isArray(availabilityData)) {
+            throw new Error("Unexpected data format. Expected an array.");
+        }
+
+        let unavailableDates = [];
+        availabilityData.forEach(entry => {
+            if (entry.status === 'unavailable') {
+                unavailableDates.push(entry.date);
+            }
+        });
+        
+        console.log("Unavailable dates:", unavailableDates);
+
+        // Initialize flatpickr with disabled dates
+        flatpickr(dateInput, {
+            dateFormat: 'Y-m-d',
+            minDate: "today",
+            disable: unavailableDates
+        });
+
+    } catch (error) {
+        console.error('Error fetching availability:', error);
+    }
+});
+
+
+
+

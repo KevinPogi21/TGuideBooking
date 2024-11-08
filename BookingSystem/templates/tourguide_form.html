@@ -7,7 +7,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tour Guide Profile - PinoyGabay</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='Traveler.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='Traveler.css') }}"defer>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.js"></script>
+  
+
 </head>
   <body>
     <!-- Navbar -->
@@ -21,7 +25,7 @@
             <!-- Profile Icon -->
             <div class="profile-container-nav">
               <a href="{{ url_for('main.account') }}">
-                <img src="{{ url_for('static', filename='doonaaaaa.jpg') }}" alt="Profile" class="profile-icon" />
+                <img id="profile-pic" src="{{ url_for('static', filename='profile_pics/' + current_user.profile_img) }}" alt="Profile Picture">
               </a>
             </div>
 
@@ -138,7 +142,7 @@
           <h2 class="guide-name">Have a Wonderful Travel with <span id="full-name">{{ profile.name }}</span></h2>
           <form>
             <label for="date">Select Date</label>
-            <input type="date" id="date" required />
+            <input type="text" id="date" required />
 
             <label for="tour-type">Tour Type</label>
             <select id="tour-type" required>
@@ -276,7 +280,7 @@
       };
 
     </script>
-    <script src="{{ url_for('static', filename='TravelerBooking.js') }}"></script>
+    <script src="{{ url_for('static', filename='TravelerBooking.js') }}"defer></script>
   </body>
 </html>
 

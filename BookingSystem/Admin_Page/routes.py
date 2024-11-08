@@ -16,32 +16,48 @@ def create_operator():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         
         # Create a new UserTourOperator instance
-        new_operator = User(
+        new_user = User(
             first_name=form.name.data,
             email=form.email.data,
             password=hashed_password,
             role='touroperator',  # Set role as tour operator
-            # confirmed=True,
         )
 
         try:
-            db.session.add(new_operator)
+            db.session.add(new_user)
             db.session.commit()
-              # Commit both the User and TourGuide entrie
+            
+            # Create a TourOperator entry linked to the new user
             new_operator = TourOperator(
-                user_id=new_operator.id,
+                user_id=new_user.id,
                 contact_num=form.contact_number.data,
-                )
+            )
             db.session.add(new_operator)
             db.session.commit()
+
             flash('Tour Operator account created successfully!', 'success')
-            return redirect(url_for('admin.admin_dashboard'))  # Redirect to the admin dashboard
+            return redirect(url_for('admin.tour_operator_profile', operator_id=new_user.id))  # Redirect to the tour operator profile
         except Exception as e:
             db.session.rollback()  # Rollback if there's an error
             flash('An error occurred while creating the account. Please try again.', 'danger')
             print(f"Database error: {e}")  # For debugging, remove in production
 
     return render_template('admin_dashboard.html', form=form)  # Render the admin dashboard template
+
+@admin.route('/tour_operator_profile/<int:operator_id>', methods=['GET'])
+@login_required
+def tour_operator_profile(operator_id):
+    # Fetch the user and tour operator details based on operator_id
+    operator = User.query.get_or_404(operator_id)
+    tour_operator = TourOperator.query.filter_by(user_id=operator_id).first_or_404()
+
+    return render_template('touroperator_dashboard.html', operator=operator, tour_operator=tour_operator)
+
+
+
+
+
+
 
 
 @admin.route('/dashboard')
