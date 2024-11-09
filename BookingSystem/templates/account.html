@@ -11,20 +11,22 @@
     </head>
       <body>
         <!-- Top Sticky Navbar -->
+        <!-- Navbar -->
         <nav class="navbar">
           <div class="navbar-container">
-            <a href="{{ url_for('main.traveler_dashboard') }}" class="navbar-brand">PinoyGabay</a>
+              <a href="{{ url_for('main.traveler_dashboard') }}" class="logo">
+                  <span style="color: #ff9f1c; font-weight: 800;">Pinoy</span><span style="font-weight: 800;">Gabay.</span>
+              </a>
               <div class="navbar-links">
-                
                 <a href="{{ url_for('main.booking') }}" class="nav-link">My Bookings</a>
-
+    
                 <!-- Profile Icon -->
                 <div class="profile-container-nav">
                   <a href="{{ url_for('main.account') }}">
-                    <img id="profile-pic" src="{{ url_for('static', filename='profile_pics/' + current_user.profile_img) }}" alt="Profile Picture">
-
-                  </a>
+                      <img class= "profile-icon" id="profile-pic" src="{{ url_for('static', filename='profile_pics/' + current_user.profile_img) }}" alt="Profile Picture">
+                    </a>
                 </div>
+    
               </div>
           </div>
         </nav>
@@ -51,9 +53,9 @@
             <!-- Profile Section -->
             <section id="profile-section" class="content-section">
               <h2>Profile</h2>
-              <div class="profile-overview">
+              <div class="profile-overview">  
                 <div class="profile-pic-container">
-                  <img id="profile-pic" src="{{ url_for('static', filename='profile_pics/' + current_user.profile_img) }}" alt="Profile Picture">
+                  <img class= "profile-pic"  id="profile-pic" src="{{ url_for('static', filename='profile_pics/' + current_user.profile_img) }}" alt="Profile Picture">
 
                   <button class="edit-pic-btn" id="edit-pic-btn">&#9998;</button>
                 </div>

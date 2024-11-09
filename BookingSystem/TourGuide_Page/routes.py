@@ -12,6 +12,10 @@ from decimal import Decimal
 from werkzeug.utils import secure_filename
 import os
 import re
+from werkzeug.security import check_password_hash, generate_password_hash
+
+
+
 
 @tourguide.route('/upload_profile_picture', methods=['POST'])
 @login_required
@@ -322,6 +326,28 @@ def update_skills():
         return jsonify({"success": False, "message": "Failed to update skills due to a database error."}), 500
 
 
+@tourguide.route('/get_profile_data', methods=['GET'])
+@login_required
+def get_profile_data():
+    tour_guide = current_user.tour_guide
+    if not tour_guide:
+        return jsonify({"success": False, "message": "Tour guide profile not found."}), 404
+
+    try:
+        profile_data = {
+            "about_me": tour_guide.bio,
+            "characteristics": [char.characteristic for char in tour_guide.characteristics],
+            "skills": [skill.skill for skill in tour_guide.skills]
+        }
+        return jsonify({"success": True, "profile_data": profile_data})
+    except Exception as e:
+        print(f"Error fetching profile data: {e}")
+        return jsonify({"success": False, "message": "Failed to fetch profile data due to a database error."}), 500
+
+
+
+
+
 
 
 @tourguide.route('/activate_profile', methods=['POST'])
@@ -399,15 +425,24 @@ def get_active_tourguides():
     return jsonify(guides_data)
 
 
-@tourguide.route('/get_availability', methods=['GET'])
-@login_required
-def get_availability():
+@tourguide.route('/get_availability/<int:tour_guide_id>', methods=['GET'])
+def get_availability(tour_guide_id):
     try:
-        availabilities = Availability.query.filter_by(tguide_id=current_user.id).all()
-        data = [{'date': a.availability_date.strftime('%Y-%m-%d'), 'status': a.status} for a in availabilities]
+        # Fetch all availability records for the specified tour guide
+        availabilities = Availability.query.filter_by(tguide_id=tour_guide_id).all()
+        
+        # Format data to include all statuses (both "available" and "unavailable")
+        data = [
+            {
+                "date": a.availability_date.strftime('%Y-%m-%d'),
+                "status": a.status
+            } for a in availabilities
+        ]
+        
+        print("Data being sent to frontend:", data)  # Debugging output
         return jsonify(data)
     except Exception as e:
-        print("Error in /get_availability route:", e)
+        print("Error fetching availability data:", e)
         return jsonify({"error": "An error occurred"}), 500
 
 
@@ -415,11 +450,13 @@ def get_availability():
 @login_required
 def set_availability():
     data = request.get_json()
+    print("Received availability data:", data)
 
     # Ensure the tour guide entry exists for the current user
     tour_guide = TourGuide.query.filter_by(user_id=current_user.id).first()
     
     if not tour_guide:
+        # Create a default tour guide entry if it doesn't exist
         try:
             tour_guide = TourGuide(
                 user_id=current_user.id,
@@ -428,15 +465,24 @@ def set_availability():
                 active=False
             )
             db.session.add(tour_guide)
-            db.session.commit()  # Commit to ensure tour_guide exists
+            db.session.commit()
         except Exception as e:
             db.session.rollback()
+            print(f"Error creating new tour guide profile: {e}")
             return jsonify({"success": False, "message": f"Failed to create tour guide: {str(e)}"}), 500
 
+    # Process each availability entry
     try:
         for entry in data:
-            date = entry['start']
-            status = entry['status']
+            date = entry.get('start')
+            status = entry.get('status')
+
+            # Debugging output for each entry
+            print(f"Processing entry - Date: {date}, Status: {status}")
+
+            if not date or not status:
+                print(f"Skipping entry with missing date or status: {entry}")
+                continue
 
             # Find existing availability or create a new one
             availability = Availability.query.filter_by(
@@ -445,8 +491,10 @@ def set_availability():
             ).first()
 
             if availability:
+                print(f"Updating existing availability for date: {date} with status: {status}")
                 availability.status = status
             else:
+                print(f"Creating new availability for date: {date} with status: {status}")
                 availability = Availability(
                     tguide_id=tour_guide.id,
                     availability_date=date,
@@ -454,11 +502,40 @@ def set_availability():
                 )
                 db.session.add(availability)
 
-        db.session.commit()  # Commit all availability changes
+        # Commit all changes once after processing the entire batch
+        db.session.commit()
         return jsonify({"success": True, "message": "Availability saved successfully."}), 200
     except Exception as e:
         db.session.rollback()
+        print(f"Error saving availability data: {e}")
         return jsonify({"success": False, "message": f"Error saving availability: {str(e)}"}), 500
+
+
+
+
+
+
+
+
+@tourguide.route('/update_password', methods=['POST'])
+def update_password():
+    data = request.get_json()
+    new_password = data.get('new_password')
+    
+    print("Received password update request")
+
+    try:
+        # Update the user's password (hash it if needed)
+        current_user.password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+        db.session.commit()
+        return jsonify({"success": True})
+    except Exception as e:
+        print("Error updating password:", e)
+        return jsonify({"success": False, "message": "Failed to update password."}), 500
+    
+    
+    
+    
 
 
 

@@ -44,14 +44,14 @@ def create_operator():
 
     return render_template('admin_dashboard.html', form=form)  # Render the admin dashboard template
 
-@admin.route('/tour_operator_profile/<int:operator_id>', methods=['GET'])
-@login_required
-def tour_operator_profile(operator_id):
-    # Fetch the user and tour operator details based on operator_id
-    operator = User.query.get_or_404(operator_id)
-    tour_operator = TourOperator.query.filter_by(user_id=operator_id).first_or_404()
+# @admin.route('/tour_operator_profile/<int:operator_id>', methods=['GET'])
+# @login_required
+# def tour_operator_profile(operator_id):
+#     # Fetch the user and tour operator details based on operator_id
+#     operator = User.query.get_or_404(operator_id)
+#     tour_operator = TourOperator.query.filter_by(user_id=operator_id).first_or_404()
 
-    return render_template('touroperator_dashboard.html', operator=operator, tour_operator=tour_operator)
+#     return render_template('touroperator_dashboard.html',form=form, operator=operator, tour_operator=tour_operator)
 
 
 

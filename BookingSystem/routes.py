@@ -7,11 +7,10 @@ from BookingSystem.forms import TravelerLoginForm, TravelerRegistrationForm, Tra
 from BookingSystem.models import User, TourOperator , send_confirmation_email
 from flask_login import login_user, current_user, logout_user, login_required 
 from werkzeug.utils import secure_filename
+from BookingSystem.models import Availability
+from werkzeug.security import check_password_hash, generate_password_hash
 
 #from flask_mail import Message
-
-
-
 
 
 main = Blueprint('main', __name__)  # Ensure the 'main' blueprint is set
@@ -245,6 +244,10 @@ def tourguideform():
 def traveler_dashboard():
     return render_template('traveler_dashboard.html')
 
+@main.route('/tour_package')
+def tour_package():
+    return render_template('tour_package.html')
+
 
 
 
@@ -290,27 +293,49 @@ def update_profile_picture():
 
 
 
-
 @main.route('/get_availability/<int:tour_guide_id>', methods=['GET'])
 def get_availability(tour_guide_id):
     try:
-        # Fetch availability for a specific tour guide by their ID
-        availabilities = Availability.query.filter_by(tguide_id=tour_guide_id).all()
-        
-        # Format the data based on your table structure
+        print(f"Fetching availability for tour_guide_id: {tour_guide_id}")
+        availabilities = Availability.query.filter(Availability.tguide_id == tour_guide_id).all()
+
+        print("Availability records fetched:", availabilities)
+        if not availabilities:
+            print("No availability records found for this tour guide.")
+
         data = [
             {
                 'date': a.availability_date.strftime('%Y-%m-%d'),
-                'status': 'available' if a.availability else 'unavailable'
+                'status': a.status
             } for a in availabilities
         ]
-        
+
+        print("Formatted availability data to return:", data)
         return jsonify(data)
     except Exception as e:
         print("Error in /get_availability route:", e)
-        return jsonify({"error": "An error occurred"}), 500
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
 
+
+
+
+
+@main.route('/update_password', methods=['POST'])
+@login_required
+def update_password():
+    data = request.get_json()
+    new_password = data.get('password')
+    print("Received password update request")
+
+    try:
+        # Update the user's password (hash it if needed)
+        current_user.password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+        db.session.commit()
+        return jsonify({"success": True})
+    except Exception as e:
+        print("Error updating password:", e)
+        return jsonify({"success": False, "message": "Failed to update password."}), 500
    
 
     

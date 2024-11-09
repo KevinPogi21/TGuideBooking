@@ -18,8 +18,7 @@
             <a href="#" class="logo">
                 <span style="color: #ff9f1c; font-weight: 800;">Pinoy</span><span style="font-weight: 800;">Gabay.</span>
             </a>
-            <nav class="navbar">
-                <a href="{{ url_for('main.home') }}">Home</a>
+            <nav class="public-navbar">
                 <a href="{{ url_for('main.traveler_login') }}">Log In</a>
                 <a href="{{ url_for('main.traveler_register') }}">Sign Up</a>
             </nav>
@@ -59,7 +58,8 @@
 
         <!-- Tour Packages Section -->
         <section id="tour-packages">
-            <h2>Available Tour <span style="color: #ff9f1c">Packages/Itineraries</span></h2>
+            <h2>Available Tour <span style="color: #ff9f1c">Packages/Itineraries</span></h2> 
+                <a href="{{ url_for('main.tour_package') }}">See all</a>
             <div class="package-container">
                 <div class="package-card">
                     <img src="{{ url_for('static', filename='cave.webp') }}" alt="Cave Tour">

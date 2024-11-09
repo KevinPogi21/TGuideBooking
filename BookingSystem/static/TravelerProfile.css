@@ -31,75 +31,137 @@ body {
   padding-right: 10%;
 }
 
-/* Links */
-a {
-  color: #4ecdc4; /* Bright Turquoise */
-  text-decoration: none;
-  transition: color 0.3s;
-}
 
-a:hover {
-  color: #ff9f1c; /* Golden Orange */
-}
-  
-/* Navbar Styling */
-.navbar {
+    /* =======================
+   Header Styles
+======================= */
+.header {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
   width: 100%;
-  background-color: #1A535C; /* Deep Cyan */
-  padding: 5px 5px;
-  color: white;
-  z-index: 100;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Shadow for depth */
-}
-
-/* Navbar Container with Body Alignment */
-.navbar-container {
-  max-width: 100%; /* Full width */
-  padding-left: 10%; /* Same padding as the body */
-  padding-right: 10%; /* Same padding as the body */
+  padding: 20px 10%;
+  background: #1A535C;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-sizing: border-box;
+  z-index: 100; 
 }
-  
-.navbar a {
+
+.logo {
+  font-size: 25px;
   color: white;
+  text-decoration: none;
+  font-weight: 600;
   margin-left: 15px;
+}
+
+.public-navbar a {
   font-size: 18px;
+  color:  white;
+  text-decoration: none;
+  font-weight: 700;
+  margin-left: 33px;
+  margin-right: 20px;
+  transition: .3s;
 }
 
-/* Navbar Links Adjustments */
-.navbar-links {
-  display: flex;
-  align-items: center;
-  gap: 15px;
+.public-navbar a:hover {
+  color: #ff9f1c; /* Golden Orange */
+
 }
 
-/* Profile Icon */
-.profile-container-nav {
-  display: flex;
-  align-items: center;
-  margin: 0%;
-}
 
-.profile-icon {
-  width: 100%;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%; /* Circular shape */
-  object-fit: cover; /* Prevent image distortion */
-  border: 2px solid #4ecdc4; /* Bright Turquoise border */
-  cursor: pointer;
-  transition: transform 0.3s ease;
-}
 
-.profile-icon:hover {
-  transform: scale(1.1); /* Slight zoom on hover */
-}
+  a {
+    color: #4ecdc4; /* Bright Turquoise */
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  
+  a:hover {
+    color: #ff9f1c; /* Golden Orange */
+  }
+    
+  /* Navbar Styling */
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background-color: #1A535C; /* Deep Cyan */
+    padding: 5px 5px;
+    color: white;
+    z-index: 100;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+  }
+
+  /* Navbar Container with Body Alignment */
+  .navbar-container {
+    max-width: 100%; /* Full width */
+    padding-left: 10%; /* Same padding as the body */
+    padding-right: 10%; /* Same padding as the body */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+    
+  .navbar a {
+    font-size: 18px;
+    color:  white;
+    text-decoration: none;
+    font-weight: 700;
+    margin-left: 33px;
+    margin-right: 20px;
+    transition: .3s;
+  }
+
+  .navbar a:hover {
+    color: #ff9f1c; /* Golden Orange */
+  }
+
+  /* Navbar Links Adjustments */
+  .navbar-links {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  /* Navbar Adjustment on Small Screens */
+  @media (max-width: 480px) {
+    .navbar-container {
+      flex-direction: column; /* Stack links vertically */
+      gap: 10px;
+    }
+
+    .nav-link {
+      font-size: 16px; /* Adjust font size */
+    }
+  }
+
+  /* Profile Icon */
+  .profile-container {
+    display: flex;
+    align-items: center;
+    margin: 0%;
+  }
+
+  .profile-icon {
+    width: 100%;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%; /* Circular shape */
+    object-fit: cover; /* Prevent image distortion */
+    border: 2px solid #4ecdc4; /* Bright Turquoise border */
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+
+  .profile-icon:hover {
+    transform: scale(1.1); /* Slight zoom on hover */
+  }
 
 /* Tabs Panel (Left) */
 .tabs-panel {
@@ -785,3 +847,8 @@ button {
   background-color: #e63946; /* Slightly darker red */
   width: 100%;
 }
+
+
+
+
+

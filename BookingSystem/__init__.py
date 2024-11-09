@@ -7,8 +7,9 @@ from flask_mail import Mail
 from datetime import timedelta
 from flask_cors import CORS
 from flask_migrate import Migrate
+from flask import Blueprint
 
-
+main = Blueprint('main', __name__, template_folder='templates')
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()

@@ -67,6 +67,7 @@ uploadPicInput.addEventListener('change', (event) => {
       cropperModal.classList.add('show');
 
       // Initialize cropper
+      if (cropper) cropper.destroy(); // Destroy previous cropper instance
       cropper = new Cropper(img, {
         aspectRatio: 1,
         viewMode: 1,
@@ -93,25 +94,30 @@ cropBtn.addEventListener('click', async () => {
     formData.append('profile_picture', blob, 'profile.jpg');
 
     try {
+      // Show loading message or spinner here if desired
       const response = await fetch('/update_profile_picture', {
-          method: 'POST',
-          body: formData,
+        method: 'POST',
+        body: formData,
       });
-  
+
       if (!response.ok) {
-          console.error(`Failed to update profile picture. Status: ${response.status} ${response.statusText}`);
-          const errorData = await response.json();
-          console.error("Error message from server:", errorData);
+        console.error(`Failed to update profile picture. Status: ${response.status} ${response.statusText}`);
+        const errorData = await response.json();
+        console.error("Error message from server:", errorData);
+        alert('Failed to update profile picture.');
       } else {
-          const data = await response.json();
-          
-          // Append a timestamp to prevent caching issues
-          profilePic.src = `${data.image_url}?timestamp=${new Date().getTime()}`; // Update the profile picture in the UI
+        const data = await response.json();
+        
+        // Update the profile picture in the UI immediately
+        profilePic.src = `${data.image_url}?timestamp=${new Date().getTime()}`; // Append timestamp to avoid caching issues
+        alert('Profile picture updated successfully!');
       }
     } catch (error) {
       console.error("Error uploading profile picture:", error);
+      alert("An error occurred while uploading the profile picture.");
     }
 
+    // Close the cropper modal
     cropperModal.classList.remove('show');
   });
 });
@@ -120,6 +126,9 @@ cropBtn.addEventListener('click', async () => {
 closeCropperModal.addEventListener('click', () => {
   cropperModal.classList.remove('show');
 });
+
+
+
 
 
 
@@ -228,6 +237,16 @@ stars.forEach((star, index) => {
 
 
 
+
+
+
+
+
+
+
+
+
+
 // Change Password and Email
 const editEmailBtn = document.getElementById('edit-email-btn');
 const editPasswordBtn = document.getElementById('edit-password-btn');
@@ -257,38 +276,86 @@ editPasswordBtn.addEventListener('click', () => {
 });
 
 // Confirm password and open the appropriate modal
-passwordConfirmBtn.addEventListener('click', () => {
-  if (confirmPasswordInput.value === 'password123') {
-    closeModal();
-    if (activeAction === 'email') {
-      openChangeEmailModal();
-    } else if (activeAction === 'password') {
-      openChangePasswordModal();
+passwordConfirmBtn.addEventListener('click', async () => {
+  const enteredPassword = confirmPasswordInput.value;
+
+  try {
+    const response = await fetch('/tourguide/verify_password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: enteredPassword }),
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      closeModal(); // Close password confirmation modal
+      if (activeAction === 'email') {
+        openChangeEmailModal();
+      } else if (activeAction === 'password') {
+        openChangePasswordModal();
+      }
+    } else {
+      alert('Incorrect password. Please try again.');
     }
-  } else {
-    alert('Incorrect password. Please try again.');
+  } catch (error) {
+    console.error('Error verifying password:', error);
+    alert('An error occurred while verifying the password. Please try again.');
   }
 });
 
-// Save new email (for testing purposes)
-saveEmailBtn.addEventListener('click', () => {
+// Save new email
+// Save new email
+saveEmailBtn.addEventListener('click', async () => {
   const newEmail = document.getElementById('new-email-input').value;
-  alert(`New email saved: ${newEmail}`);
-  closeModal();
+  try {
+    const response = await fetch('/tourguide/update_email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: newEmail }),
+    });
+    const result = await response.json();
+    if (result.success) {
+      alert('Email updated successfully!');
+      closeModal();
+    } else {
+      alert(result.message || 'Failed to update email');
+    }
+  } catch (error) {
+    console.error('Error updating email:', error);
+    alert('An error occurred. Please try again.');
+  }
 });
 
-// Save new password (for testing purposes)
-savePasswordBtn.addEventListener('click', () => {
+// Save new password
+savePasswordBtn.addEventListener('click', async () => {
   const newPassword = document.getElementById('new-password').value;
   const confirmNewPassword = document.getElementById('confirm-new-password').value;
 
-  if (newPassword === confirmNewPassword) {
-    alert('Password changed successfully!');
-    closeModal();
-  } else {
+  if (newPassword !== confirmNewPassword) {
     alert('Passwords do not match. Please try again.');
+    return;
+  }
+
+  try {
+    const response = await fetch('/update_password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: newPassword }),
+    });
+    const result = await response.json();
+    if (result.success) {
+      alert('Password updated successfully!');
+      closeModal();
+    } else {
+      alert(result.message || 'Failed to update password');
+    }
+  } catch (error) {
+    console.error('Error updating password:', error);
+    alert('An error occurred. Please try again.');
   }
 });
+
 
 // Cancel button handlers
 passwordCancelBtn.addEventListener('click', closeModal);
@@ -315,39 +382,4 @@ function closeModal() {
   document.querySelectorAll('.modal').forEach(modal => modal.classList.remove('show'));
   modalOverlay.classList.remove('show');
   confirmPasswordInput.value = ''; // Clear password input
-}
-
-
-
-// Scoped Logout Modal Logic
-(function() {
-  // Get elements for logout modal
-  const openLogoutModalBtn = document.getElementById('open-logout-modal');
-  const logoutModal = document.getElementById('logout-modal');
-  const modalOverlay = document.getElementById('modal-overlay');
-  const cancelLogoutBtn = document.getElementById('cancel-logout');
-  const confirmLogoutBtn = document.getElementById('confirm-logout');
-
-  // Function to open the logout modal
-  function openLogoutModal() {
-    logoutModal.classList.add('show');
-    modalOverlay.classList.add('show');
-  }
-
-  // Function to close the logout modal
-  function closeLogoutModal() {
-    logoutModal.classList.remove('show');
-    modalOverlay.classList.remove('show');
-  }
-
-  // Event listeners for the logout modal
-  openLogoutModalBtn.addEventListener('click', openLogoutModal);
-  cancelLogoutBtn.addEventListener('click', closeLogoutModal);
-  modalOverlay.addEventListener('click', closeLogoutModal);
-
-  // Confirm Logout and Redirect
-  confirmLogoutBtn.addEventListener('click', () => {
-    closeLogoutModal(); // Close modal
-    window.location.href = 'Traveler - TGList.html'; // Redirect to TGList.html
-  });
-})();
+};

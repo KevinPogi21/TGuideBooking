@@ -94,17 +94,43 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 // Editable About Me Section
-// Editable About Me Section
-document.addEventListener('DOMContentLoaded', function () {
-  // About Me Section
+document.addEventListener('DOMContentLoaded', async function () {
+  // About Me Section Elements
   const editAboutBtn = document.getElementById('edit-about-btn');
   const saveAboutBtn = document.getElementById('save-about-btn');
   const aboutText = document.getElementById('about-text');
+
+  // Load existing data from server on page load
+  async function loadInitialData() {
+    try {
+      const response = await fetch('/tourguide/get_profile_data');
+      const data = await response.json();
+
+      if (data.success) {
+        const profileData = data.profile_data;
+        
+        // Populate initial data
+        if (profileData.about_me) aboutText.value = profileData.about_me;
+        if (profileData.characteristics) updateDisplayList(document.getElementById('characteristics-list'), profileData.characteristics);
+        if (profileData.skills) updateDisplayList(document.getElementById('skills-list'), profileData.skills);
+      } else {
+        console.error('Failed to load initial data:', data.message);
+      }
+    } catch (error) {
+      console.error("Error loading initial data:", error);
+    }
+  }
+
+  loadInitialData();
 
   // Toggle About Me Edit Mode
   editAboutBtn.addEventListener('click', () => toggleEdit(aboutText, editAboutBtn, saveAboutBtn));
   saveAboutBtn.addEventListener('click', async () => {
     const updatedBio = aboutText.value;
+    if (!updatedBio.trim()) {
+      alert("Please enter text for 'About Me'");
+      return;
+    }
     try {
       const response = await fetch('/tourguide/update_about_me', {
         method: 'POST',
@@ -124,7 +150,6 @@ document.addEventListener('DOMContentLoaded', function () {
     toggleEdit(aboutText, editAboutBtn, saveAboutBtn, false);
   });
 
-  // Toggle Edit Mode for Textareas
   function toggleEdit(input, editBtn, saveBtn, isEditing = true) {
     input.disabled = !isEditing;
     editBtn.classList.toggle('hidden', isEditing);
@@ -147,34 +172,39 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // Helper: Create Editable List Item
-  function createEditableListItem() {
+  function createEditableListItem(text = 'New Item') {
     const li = document.createElement('li');
     li.innerHTML = `
       <span class="checkmark">&#10003;</span>
-      <span class="editable" contenteditable="true">New Item</span>
+      <span class="editable" contenteditable="true">${text}</span>
       <button class="remove-btn">&#8722;</button>
     `;
-    li.querySelector('.remove-btn').addEventListener('click', () => li.remove());
+    li.querySelector('.remove-btn').addEventListener('click', () => {
+      if (confirm("Are you sure you want to remove this item?")) {
+        li.remove();
+      }
+    });
     return li;
   }
 
-  // Toggle List Edit Mode
   function toggleListEdit(list, isEditing, addBtn, editBtn, saveBtn) {
     Array.from(list.children).forEach((li) => {
       const editableElement = li.querySelector('.editable');
       const removeBtn = li.querySelector('.remove-btn');
-      if (editableElement) editableElement.contentEditable = isEditing;
-      if (removeBtn) removeBtn.classList.toggle('hidden', !isEditing);
+      editableElement.contentEditable = isEditing;
+      removeBtn.classList.toggle('hidden', !isEditing);
     });
     addBtn.classList.toggle('hidden', !isEditing);
     editBtn.classList.toggle('hidden', isEditing);
     saveBtn.classList.toggle('hidden', !isEditing);
   }
 
-  // Save Characteristics to the Server
   async function saveCharacteristics() {
-    const characteristics = Array.from(document.querySelectorAll('#characteristics-list .editable')).map(item => item.textContent);
+    const characteristics = Array.from(document.querySelectorAll('#characteristics-list .editable')).map(item => item.textContent.trim());
+    if (characteristics.some(item => !item)) {
+      alert("Please ensure all characteristics have content.");
+      return;
+    }
     try {
       const response = await fetch('/tourguide/update_characteristics', {
         method: 'POST',
@@ -184,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const result = await response.json();
       if (result.success) {
         alert('Characteristics updated successfully!');
-        updateDisplayList(document.getElementById('characteristics-list'), characteristics); // Update display
+        updateDisplayList(document.getElementById('characteristics-list'), characteristics);
       } else {
         alert('Failed to update Characteristics. Please try again.');
       }
@@ -194,9 +224,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // Save Skills to the Server
   async function saveSkills() {
-    const skills = Array.from(document.querySelectorAll('#skills-list .editable')).map(item => item.textContent);
+    const skills = Array.from(document.querySelectorAll('#skills-list .editable')).map(item => item.textContent.trim());
+    if (skills.some(item => !item)) {
+      alert("Please ensure all skills have content.");
+      return;
+    }
     try {
       const response = await fetch('/tourguide/update_skills', {
         method: 'POST',
@@ -206,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const result = await response.json();
       if (result.success) {
         alert('Skills updated successfully!');
-        updateDisplayList(document.getElementById('skills-list'), skills); // Update display
+        updateDisplayList(document.getElementById('skills-list'), skills);
       } else {
         alert('Failed to update Skills. Please try again.');
       }
@@ -216,16 +249,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // Helper function to update display list
   function updateDisplayList(listElement, items) {
-    listElement.innerHTML = ''; // Clear existing list
+    listElement.innerHTML = '';
     items.forEach(item => {
-      const li = document.createElement('li');
-      li.innerHTML = `
-        <span class="checkmark">&#10003;</span>
-        <span class="editable" contenteditable="false">${item}</span>
-        <button class="remove-btn hidden">&#8722;</button>
-      `;
+      const li = createEditableListItem(item);
+      li.querySelector('.editable').contentEditable = 'false';
+      li.querySelector('.remove-btn').classList.add('hidden');
       listElement.appendChild(li);
     });
   }
@@ -247,6 +276,8 @@ document.addEventListener('DOMContentLoaded', function () {
     saveSkills
   );
 });
+
+
 
 
 
@@ -460,7 +491,7 @@ const closeCropperBtn = document.getElementById('close-cropper-modal');
 const savePicBtn = document.getElementById('save-pic-btn');
 let cropper;
 
-// Open file input
+// Open file input on button click
 changePicBtn.addEventListener('click', () => uploadPicInput.click());
 
 // Show cropper modal on image selection
@@ -476,7 +507,7 @@ uploadPicInput.addEventListener('change', (event) => {
       cropperContainer.appendChild(img);
       cropperModal.classList.add('show'); // Show the cropper modal
 
-      // Destroy previous cropper if it exists and initialize a new one
+      // Destroy previous cropper instance if it exists and create a new one
       if (cropper) cropper.destroy();
       cropper = new Cropper(img, {
         aspectRatio: 1,
@@ -525,13 +556,12 @@ savePicBtn.addEventListener('click', () => {
       console.log("Server response:", data);
 
       if (data.success) {
-        // Append timestamp to avoid caching
+        // Append a timestamp to prevent caching issues and update the profile picture in the UI
         const newImageUrl = `${data.url}?t=${new Date().getTime()}`;
-        console.log("New profile picture URL:", newImageUrl);
-
         profilePic.src = newImageUrl;
+        
         savePicBtn.classList.add('hidden');
-        alert('Profile picture saved!');
+        alert('Profile picture saved successfully!');
       } else {
         alert('Failed to save profile picture.');
       }
@@ -542,6 +572,8 @@ savePicBtn.addEventListener('click', () => {
     });
   });
 });
+
+
 
 
 
@@ -674,8 +706,11 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     },
     eventClick: function (info) {
-      if (isEditing && info.event.extendedProps.status !== 'booked') info.event.remove();
-      else if (info.event.extendedProps.status === 'booked') alert('This date is booked and cannot be changed.');
+      if (isEditing && info.event.extendedProps.status !== 'booked') {
+        info.event.remove();
+      } else if (info.event.extendedProps.status === 'booked') {
+        alert('This date is booked and cannot be changed.');
+      }
     },
   });
 
@@ -683,33 +718,42 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Load availability and set FullCalendar
   async function loadAvailability() {
+    const tourGuideId = currentUserId; // Use the actual tour guide's ID
+ // Update this as necessary to dynamically retrieve the ID
     try {
-      // Adjust this URL if your app uses a different prefix or path
-      const response = await fetch('/tourguide/get_availability');
-      
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      
-      const availability = await response.json();
-      console.log("Fetched availability data:", availability); // Debugging output
-  
-      // Populate FullCalendar
-      availability.forEach(entry => {
-        const color = entry.status === 'available' ? '#4ecdc4' : '#e63946';
-        const title = entry.status === 'available' ? 'Available' : 'Unavailable';
-        calendar.addEvent({
-          title: title,
-          start: entry.date,
-          allDay: true,
-          backgroundColor: color,
-          textColor: 'white',
-          extendedProps: { status: entry.status },
+        console.log(`Fetching availability data from URL: /tourguide/get_availability/${tourGuideId}`);
+        
+        const response = await fetch(`/tourguide/get_availability/${tourGuideId}`);
+        
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
+        const availability = await response.json();
+        console.log("Fetched availability data:", availability);
+
+        if (!calendar) {
+            throw new Error("Calendar instance is not defined.");
+        }
+
+        // Clear current events to avoid duplication
+        calendar.getEvents().forEach(event => event.remove());
+
+        // Populate FullCalendar with fetched availability data
+        availability.forEach(entry => {
+            const color = entry.status === 'available' ? '#4ecdc4' : '#e63946';
+            const title = entry.status === 'available' ? 'Available' : 'Unavailable';
+            calendar.addEvent({
+                title: title,
+                start: entry.date,
+                allDay: true,
+                backgroundColor: color,
+                textColor: 'white',
+                extendedProps: { status: entry.status },
+            });
         });
-      });
     } catch (error) {
-      console.error("Error loading availability:", error);
+        console.error("Error loading availability:", error);
     }
   }
-  
 
   loadAvailability(); // Call to load availability on page load
 
@@ -779,6 +823,8 @@ document.addEventListener('DOMContentLoaded', function () {
       status: event.extendedProps.status,
     }));
 
+    console.log("Saving availability data:", savedAvailability);
+
     try {
       const response = await fetch('/tourguide/set_availability', {
         method: 'POST',
@@ -786,8 +832,12 @@ document.addEventListener('DOMContentLoaded', function () {
         body: JSON.stringify(savedAvailability),
       });
 
-      if (response.ok) alert('Availability saved successfully!');
-      else alert('Failed to save availability.');
+      if (response.ok) {
+        alert('Availability saved successfully!');
+        loadAvailability(); // Reload availability after saving to refresh the calendar
+      } else {
+        alert('Failed to save availability.');
+      }
     } catch (error) {
       console.error('Error saving availability:', error);
     }
@@ -813,19 +863,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
+
 // Elements
-// Elements EMAIL and Contact number
+// Elements EMAIL and Contact number and PASSWORD
 document.addEventListener('DOMContentLoaded', function () {
   // Elements
   const guideEditEmailBtn = document.getElementById('guide-edit-email-btn');
   const guideEditContactBtn = document.getElementById('guide-edit-contact-btn');
-  const guidePasswordModal = document.getElementById('guide-password-confirm-modal');
+  const guideEditPasswordBtn = document.getElementById('guide-edit-password-btn'); // Pencil icon for password change
+  const guidePasswordModal = document.getElementById('guide-password-confirm-modal'); // Password verification modal
+  const guideChangePasswordModal = document.getElementById('guide-change-password-modal'); // Change password modal
+  const guideChangeEmailModal = document.getElementById('guide-change-email-modal'); // Change email modal
+  const guideChangeContactModal = document.getElementById('guide-change-contact-modal'); // Change contact modal
   const guidePasswordCancelBtn = document.getElementById('guide-password-cancel-btn');
   const guidePasswordConfirmBtn = document.getElementById('guide-password-confirm-btn');
-  const passwordInput = document.getElementById('guide-confirm-password-input');
+  const verifyPasswordInput = document.getElementById('guide-confirm-password-input');
+  const newPasswordInput = document.getElementById('guide-new-password');
+  const confirmNewPasswordInput = document.getElementById('guide-confirm-new-password');
+  const guideCancelPasswordBtn = document.getElementById('guide-cancel-password-btn');
+  const guideSavePasswordBtn = document.getElementById('guide-save-password-btn');
   const emailInput = document.getElementById('email');
-  const guideChangeEmailModal = document.getElementById('guide-change-email-modal');
-  const guideChangeContactModal = document.getElementById('guide-change-contact-modal');
   const guideSaveEmailBtn = document.getElementById('guide-save-email-btn');
   const guideCancelEmailBtn = document.getElementById('guide-cancel-email-btn');
   const contactNumberInput = document.getElementById('contact-number');
@@ -833,8 +890,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const guideSaveContactBtn = document.getElementById('guide-save-contact-btn');
   const guideCancelContactBtn = document.getElementById('guide-cancel-contact-btn');
   const modalOverlay = document.getElementById('modal-overlay');
-
-  let activeAction = ''; // Track the current action: 'email' or 'contact'
+  
+  let activeAction = ''; // Track the current action: 'email', 'contact', or 'password'
 
   // Function to show the password confirmation modal with overlay
   function openGuidePasswordModal(action) {
@@ -847,7 +904,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function closeGuidePasswordModal() {
       guidePasswordModal.classList.remove('show');
       modalOverlay.classList.remove('show');
-      passwordInput.value = '';  // Clear password input field
+      verifyPasswordInput.value = ''; // Clear password input field
   }
 
   // Function to show the specific modal based on action
@@ -856,29 +913,33 @@ document.addEventListener('DOMContentLoaded', function () {
           guideChangeEmailModal.classList.add('show');
       } else if (activeAction === 'contact') {
           guideChangeContactModal.classList.add('show');
+      } else if (activeAction === 'password') {
+          guideChangePasswordModal.classList.add('show');
       }
       modalOverlay.classList.add('show');
   }
 
-  // Function to close the action modals
+  // Function to close all action modals
   function closeActionModals() {
       guideChangeEmailModal.classList.remove('show');
       guideChangeContactModal.classList.remove('show');
+      guideChangePasswordModal.classList.remove('show');
       modalOverlay.classList.remove('show');
+      newPasswordInput.value = '';
+      confirmNewPasswordInput.value = '';
   }
 
-  // Open the password modal on edit email button click
+  // Open the password verification modal on edit email, contact, or password button click
   guideEditEmailBtn.addEventListener('click', () => openGuidePasswordModal('email'));
-
-  // Open the password modal on edit contact button click
   guideEditContactBtn.addEventListener('click', () => openGuidePasswordModal('contact'));
+  guideEditPasswordBtn.addEventListener('click', () => openGuidePasswordModal('password'));
 
-  // Close the password modal on cancel button click
+  // Close the password verification modal on cancel button click
   guidePasswordCancelBtn.addEventListener('click', closeGuidePasswordModal);
 
   // Verify password and open the appropriate modal if successful
   guidePasswordConfirmBtn.addEventListener('click', async () => {
-    const password = passwordInput.value.trim();
+    const password = verifyPasswordInput.value.trim();
 
     try {
       // Send request to verify the password
@@ -901,7 +962,6 @@ document.addEventListener('DOMContentLoaded', function () {
           openActionModal(); // Only open the action modal if verification is successful
       } else {
           alert(result.message || 'Password verification failed. Please try again.');
-          // Keep the password modal open to let the user try again
       }
     } catch (error) {
       console.error('Error verifying password:', error);
@@ -912,6 +972,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Close the email and contact modals on cancel buttons
   guideCancelEmailBtn.addEventListener('click', closeActionModals);
   guideCancelContactBtn.addEventListener('click', closeActionModals);
+  guideCancelPasswordBtn.addEventListener('click', closeActionModals);
 
   // Save the updated email to the backend
   guideSaveEmailBtn.addEventListener('click', async () => {
@@ -978,7 +1039,49 @@ document.addEventListener('DOMContentLoaded', function () {
       alert('There was an error processing your request. Please try again.');
     }
   });
+
+  // Save the new password to the backend
+  guideSavePasswordBtn.addEventListener('click', async () => {
+    const newPassword = newPasswordInput.value.trim();
+    const confirmNewPassword = confirmNewPasswordInput.value.trim();
+
+    // Validate the new password inputs
+    if (!newPassword || !confirmNewPassword) {
+      alert('Please fill out all password fields.');
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      alert('New passwords do not match.');
+      return;
+    }
+    if (newPassword.length < 8) {
+      alert('New password should be at least 8 characters long.');
+      return;
+    }
+
+    try {
+      // Send a request to update the password
+      const response = await fetch('/tourguide/update_password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ new_password: newPassword })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert('Password updated successfully!');
+        closeActionModals(); // Close the modal on success
+      } else {
+        alert(result.message || 'Failed to update password. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error updating password:', error);
+      alert('There was an error processing your request. Please try again.');
+    }
+  });
 });
+
 
 
 
@@ -1002,18 +1105,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Add event listener
   guidePasswordConfirmBtn.addEventListener('click', () => {
-      if (guideConfirmPasswordInput.value === 'password123') { // Replace 'password123' with actual logic to validate the password
-          closeGuideModal();
-          if (guideActiveAction === 'email') {
-              openGuideChangeEmailModal();
-          } else if (guideActiveAction === 'password') {
-              openGuideChangePasswordModal();
-          } else if (guideActiveAction === 'contact') {
-              openGuideChangeContactModal();
-          }
-      } else {
-          alert('Incorrect password. Please try again.');
-      }
+      // if (guideConfirmPasswordInput.value === 'password123') { // Replace 'password123' with actual logic to validate the password
+      //     closeGuideModal();
+      //     if (guideActiveAction === 'email') {
+      //         openGuideChangeEmailModal();
+      //     } else if (guideActiveAction === 'password') {
+      //         openGuideChangePasswordModal();
+      //     } else if (guideActiveAction === 'contact') {
+      //         openGuideChangeContactModal();
+      //     }
+      // } else {
+      //     alert('Incorrect password. Please try again.');
+      // }
   });
 
   function closeGuideModal() {
@@ -1203,6 +1306,14 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
+
+
+
+
+
+
+
+//CURRENT PASSWORD 
 
 
 

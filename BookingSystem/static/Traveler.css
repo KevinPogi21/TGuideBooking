@@ -32,7 +32,49 @@
     padding-right: 10%;
   }
   
-  /* Links */
+ 
+    /* =======================
+   Header Styles
+======================= */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 20px 10%;
+  background: #1A535C;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  z-index: 100; 
+}
+
+.logo {
+  font-size: 25px;
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  margin-left: 15px;
+}
+
+.public-navbar a {
+  font-size: 18px;
+  color:  white;
+  text-decoration: none;
+  font-weight: 700;
+  margin-left: 33px;
+  margin-right: 20px;
+  transition: .3s;
+}
+
+.public-navbar a:hover {
+  color: #ff9f1c; /* Golden Orange */
+
+}
+
+
+
   a {
     color: #4ecdc4; /* Bright Turquoise */
     text-decoration: none;
@@ -68,9 +110,17 @@
   }
     
   .navbar a {
-    color: white;
-    margin-left: 15px;
     font-size: 18px;
+    color:  white;
+    text-decoration: none;
+    font-weight: 700;
+    margin-left: 33px;
+    margin-right: 20px;
+    transition: .3s;
+  }
+
+  .navbar a:hover {
+    color: #ff9f1c; /* Golden Orange */
   }
 
   /* Navbar Links Adjustments */
@@ -113,6 +163,10 @@
   .profile-icon:hover {
     transform: scale(1.1); /* Slight zoom on hover */
   }
+
+
+
+
 
 
   /* Section Backgrounds */
@@ -886,6 +940,179 @@
       font-size: 12px;
     }
   }
+
+
+
+
+
+
+
+
+
+
+  /* Available dates in green */
+/* Available dates in green */
+.flatpickr-day.available-day {
+  background-color: #4ecdc4 !important;
+  color: white !important;
+  border-radius: 50%;
+}
+
+.flatpickr-day.unavailable-day {
+  background-color: #e63946 !important;
+  color: white !important;
+  border-radius: 50%;
+}
+
+
+
+
+
+
+
+
+/* Notification Bell Icon !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+.notification-container {
+  position: relative;
+  display: inline-block;
+}
+
+.notification-bell {
+  background: none;
+  border: none;
+  position: relative;
+  cursor: pointer;
+}
+
+.bell-icon {
+  font-size: 24px;
+  color: white;
+}
+
+.notification-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 3px 6px;
+  font-size: 12px;
+}
+
+
+/* Notification Dropdown */
+.notification-dropdown {
+  display: none; /* Hidden by default */
+  position: absolute;
+  top: 50px;
+  right: 1;
+  width: 350px;
+  max-height: 300px;
+  background-color: #1A535C; /* Deep Cyan */
+  color: #ffffff;
+  border-radius: 5px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.6);
+  overflow-y: auto;
+  z-index: 10;
+  font-family: Arial, sans-serif;
+
+}
+
+.notification-dropdown h3 {
+  margin: 10px;
+  font-size: 18px;
+  text-align: center;
+}
+
+.notification-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.notification-item {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.view-all-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: #4ecdc4; /* Bright Turquoise */
+  color: #1A535C;
+  border: none;
+  cursor: pointer;
+  border-radius: 0 0 5px 5px;
+}
+
+.view-all-btn:hover {
+  background-color: #1a535c; /* Golden Orange */
+  color: white;
+}
+
+/* Show dropdown when active */
+.notification-container.active .notification-dropdown {
+  display: block;
+}
+
+
+  /* Icon Styles!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
+  .icon {
+    position: relative;
+    cursor: pointer;
+    font-size: 20px;
+    color: white;
+    margin-left: 10px;
+  }
+  
+  /* Notification Icon */
+  .notification .notification-count {
+    position: absolute;
+    top: -5px;
+    right: -1px;
+    background-color: #ff595e; /* Red background for notification count */
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 12px;
+    color: white;
+  }
+  
+  span.dark-mode {
+    font-size: 24;
+    color: white;
+  }
+  
+  /* Dark Mode Icon */
+  .dark-mode-toggle {
+    font-size: 24px;
+    color: white;
+  }
+  
+  /* Dark Mode Background */
+  body.dark-mode {
+    background-color: #2b2d42; /* Dark Background */
+    color: #f7fff7; /* Light Text */
+  }
+  
+  .navbar.dark-mode {
+    background-color: #1a1a2e; /* Darker Navbar */
+    color: white;
+  }
+  
+  .profile-icon.dark-mode {
+    border-color: #f7fff7; /* Adjust profile picture border in dark mode */
+  }
+  
+  /* Additional Dark Mode Toggle Styles */
+  .dark-mode-icon {
+    cursor: pointer;
+    transition: color 0.3s ease;
+
+  }
+
 
 
 

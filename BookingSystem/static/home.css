@@ -6,8 +6,7 @@ body {
     background-color: whitesmokes;
     font-family: Arial, sans-serif;
 }
-
-/* =======================
+    /* =======================
    Header Styles
 ======================= */
 .header {
@@ -22,17 +21,17 @@ body {
     align-items: center;
     box-sizing: border-box;
     z-index: 100; 
-}
-
-.logo {
+  }
+  
+  .logo {
     font-size: 25px;
     color: white;
     text-decoration: none;
     font-weight: 600;
     margin-left: 15px;
-}
-
-.navbar a {
+  }
+  
+  .public-navbar a {
     font-size: 18px;
     color:  white;
     text-decoration: none;
@@ -40,12 +39,111 @@ body {
     margin-left: 33px;
     margin-right: 20px;
     transition: .3s;
-}
-
-.navbar a:hover {
+  }
+  
+  .public-navbar a:hover {
     color: #ff9f1c; /* Golden Orange */
-
-}
+  
+  }
+  
+  
+  
+    a {
+      color: #4ecdc4; /* Bright Turquoise */
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    
+    a:hover {
+      color: #ff9f1c; /* Golden Orange */
+    }
+      
+    /* Navbar Styling */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      background-color: #1A535C; /* Deep Cyan */
+      padding: 5px 5px;
+      color: white;
+      z-index: 100;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+    }
+  
+    /* Navbar Container with Body Alignment */
+    .navbar-container {
+      max-width: 100%; /* Full width */
+      padding-left: 10%; /* Same padding as the body */
+      padding-right: 10%; /* Same padding as the body */
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+      
+    .navbar a {
+      font-size: 18px;
+      color:  white;
+      text-decoration: none;
+      font-weight: 700;
+      margin-left: 33px;
+      margin-right: 20px;
+      transition: .3s;
+    }
+  
+    .navbar a:hover {
+      color: #ff9f1c; /* Golden Orange */
+    }
+  
+    /* Navbar Links Adjustments */
+    .navbar-links {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+  
+    /* Navbar Adjustment on Small Screens */
+    @media (max-width: 480px) {
+      .navbar-container {
+        flex-direction: column; /* Stack links vertically */
+        gap: 10px;
+      }
+  
+      .nav-link {
+        font-size: 16px; /* Adjust font size */
+      }
+    }
+  
+    /* Profile Icon */
+    .profile-container {
+      display: flex;
+      align-items: center;
+      margin: 0%;
+    }
+  
+    .profile-icon {
+      width: 100%;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%; /* Circular shape */
+      object-fit: cover; /* Prevent image distortion */
+      border: 2px solid #4ecdc4; /* Bright Turquoise border */
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+  
+    .profile-icon:hover {
+      transform: scale(1.1); /* Slight zoom on hover */
+    }
+  
+  
+  
+  
+  
+  
+  
+  
 
 /* =======================
    Hero Section Styles
@@ -59,6 +157,7 @@ body {
     align-items: center;  /* Center-aligns items vertically */
     justify-content: space-around;  /* Even spacing between items */
     padding-block-end: 3rem;  /* Extra bottom padding */
+    margin-top: 30px;
 }
 
 .hero-box {
@@ -232,53 +331,145 @@ body {
     justify-content: center;
 }
 
-/* Individual package card */
-.package-card {
-    width: 250px;
-    border: 2px solid #06294e;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 0 10px rgb(255, 176, 4);
-    text-align: center;
-    background-color: #fff;
-    transition: transform 0.3s ease;
+/* =======================
+   Card Details Styles
+======================= */
+.card-details {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    color: white;
+    z-index: 1; /* Ensure text is above the gradient */
 }
 
-.package-card img {
+.title-rating {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.rating {
+    margin-left: 10px; /* Space between title and rating */
+}
+
+.heart {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px; /* Adjust size as needed */
+    color: white; /* Heart color */
+}
+
+
+
+.card-details {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    color: white;
+    z-index: 1; /* Ensure text is above the gradient */
+}
+
+.title-rating {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.rating {
+    margin-left: 10px; /* Space between title and rating */
+}
+
+.heart {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px; /* Adjust size as needed */
+    color: white; /* Heart color */
+}
+
+.card {
+    position: relative;
+    width: 300px; /* Adjust as needed */
+    height: 372px; /* Adjust as needed */
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid #06294e;
+    box-shadow: 0 0 20px rgb(255, 174, 6);
+}
+
+
+.card-content {
+    position: relative;
     width: 100%;
-    height: 150px;
+    height: 100%;
+}
+
+.card-image {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
 }
 
-.package-card h3 {
-    font-size: 1.5rem;
-    margin: 1rem 0 0.5rem;
-    color: #072f57;
+/* Gradient overlay */
+.gradient-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.87), rgba(0, 0, 0, 0));
+    z-index: 1; /* Ensure it's above the image but below the text */
 }
 
-.package-card p {
-    font-size: 1rem;
-    margin: 0 1rem 1.5rem;
-    color: #333;
+/* Overlay for the button */
+.card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(26, 83, 92, 0.9); /* Semi-transparent overlay color */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0; /* Start hidden */
+    transition: opacity 0.5s ease; /* Smooth transition */
+    z-index: 2; /* Ensure it's above everything else */
 }
 
-.package-card button {
-    background-color: #ff9f1c;
-    color: #072f57;
-    border: none;
-    padding: 0.75rem 1.25rem;
-    margin-bottom: 1.5rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+/* Show overlay on hover */
+.card:hover .card-overlay {
+    opacity: 1; /* Show overlay on hover */
 }
 
-.package-card button:hover {
-    background-color: #055a91;
-}
-
-.package-card:hover {
+.card:hover {
     transform: scale(1.05);
 }
+
+/* View Package button */
+.view-package {
+    background: #ff9f1c; /* Button color */
+    color: #101720;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s; /* Change background on hover */
+}
+
+
+/* Optional: Add hover effect to button */
+.card-overlay:hover .view-package {
+    background-color: #ff7f00; /* Darker shade on hover */
+}
+
+
+.hidden {
+    display: none;
+}
+
 
 /* =======================
    Popular Places Section
@@ -685,3 +876,160 @@ body {
     animation-timeline: view; 
     animation-range: entry 0% cover 40%;
 }
+
+
+
+
+
+
+
+
+/* Notification Bell Icon !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+.notification-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .notification-bell {
+    background: none;
+    border: none;
+    position: relative;
+    cursor: pointer;
+  }
+  
+  .bell-icon {
+    font-size: 24px;
+    color: white;
+  }
+  
+  .notification-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 3px 6px;
+    font-size: 12px;
+  }
+  
+  
+  /* Notification Dropdown */
+  .notification-dropdown {
+    display: none; /* Hidden by default */
+    position: absolute;
+    top: 50px;
+    right: 1;
+    width: 350px;
+    max-height: 300px;
+    background-color: #1A535C; /* Deep Cyan */
+    color: #ffffff;
+    border-radius: 5px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.6);
+    overflow-y: auto;
+    z-index: 10;
+    font-family: Arial, sans-serif;
+  
+  }
+  
+  .notification-dropdown h3 {
+    margin: 10px;
+    font-size: 18px;
+    text-align: center;
+  }
+  
+  .notification-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .notification-item {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    font-size: 14px;
+    color: #ffffff;
+  }
+  
+  .view-all-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #4ecdc4; /* Bright Turquoise */
+    color: #1A535C;
+    border: none;
+    cursor: pointer;
+    border-radius: 0 0 5px 5px;
+  }
+  
+  .view-all-btn:hover {
+    background-color: #1a535c; /* Golden Orange */
+    color: white;
+  }
+  
+  /* Show dropdown when active */
+  .notification-container.active .notification-dropdown {
+    display: block;
+  }
+  
+  
+    /* Icon Styles!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
+    .icon {
+      position: relative;
+      cursor: pointer;
+      font-size: 20px;
+      color: white;
+      margin-left: 10px;
+    }
+    
+    /* Notification Icon */
+    .notification .notification-count {
+      position: absolute;
+      top: -5px;
+      right: -1px;
+      background-color: #ff595e; /* Red background for notification count */
+      border-radius: 50%;
+      padding: 2px 6px;
+      font-size: 12px;
+      color: white;
+    }
+    
+    span.dark-mode {
+      font-size: 24;
+      color: white;
+    }
+    
+    /* Dark Mode Icon */
+    .dark-mode-toggle {
+      font-size: 24px;
+      color: white;
+    }
+    
+    /* Dark Mode Background */
+    body.dark-mode {
+      background-color: #2b2d42; /* Dark Background */
+      color: #f7fff7; /* Light Text */
+    }
+    
+    .navbar.dark-mode {
+      background-color: #1a1a2e; /* Darker Navbar */
+      color: white;
+    }
+    
+    .profile-icon.dark-mode {
+      border-color: #f7fff7; /* Adjust profile picture border in dark mode */
+    }
+    
+    /* Additional Dark Mode Toggle Styles */
+    .dark-mode-icon {
+      cursor: pointer;
+      transition: color 0.3s ease;
+  
+    }
+  
+  
+  
+  
+  
+  
+  
+  
