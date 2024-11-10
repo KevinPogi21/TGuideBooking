@@ -40,7 +40,7 @@
           <hr>
 
           <div class="profile-overview">
-            <img src="{{ url_for('static', filename='profile_pics/' + (current_user.profile_img or 'default.jpg')) }}" alt="Profile Picture" class="profile-pic" id="profile-pic" />
+            <img src="{{ url_for('static', filename='profile_pics/' + (current_user.profile_img or 'default.jpg')) }}" alt="Profile Picture" class="profile-pic" id="profile-pic-secondary" />
             <div class="profile-details">
               <h2 class="h2-guide-name">Mabuhay! I Am <span>{{ current_user.first_name }} {{ current_user.last_name }}</span>, Your Friendly Tour Guide</h2>
             </div>
@@ -252,11 +252,121 @@
 
             </div>
           
+            
             <!-- Booking Details Modal -->
             <div id="booking-modal" class="modal hidden">
-              <div class="modal-content">
+              <div class="booking-modal-content">
                 <h3>Booking Details</h3>
-                <p id="booking-info">Here will be the booking details...</p>
+                <button onclick="closeBookingDetailsModal()" class="close-btn">&times;</button>
+                <!-- Status Section -->
+                <div class="status-box">
+                  <span class="status-circle confirmed">Confirmed</span>
+                </div>
+
+                <!-- Traveler Information Container -->
+                <div class="container-section traveler-info expanded">
+                  <h4 class="container-header">Traveler Information</h4>
+                  <br>
+                  <div class="info-item">
+                    <strong>Traveler:</strong> <span id="modal-traveler-name"></span>
+                  </div>
+                  <div class="info-item">
+                    <strong>Tour Guide:</strong> <span id="modal-tour-guide-name"></span>
+                  </div>
+                  <div class="info-item">
+                    <strong>Tour Guide Number:</strong> <span id="modal-tour-guide-number"></span>
+                  </div>
+                  <div class="info-item">
+                    <strong>Tour Package:</strong> <span id="modal-tour-package">Island Hopping</span>
+                  </div>
+                  <div class="info-item">
+                    <strong>Date & Duration:</strong> <span id="modal-tour-date">October 15, 2024 - October 12, 2024</span>
+                  </div>
+                  <div class="info-item">
+                    <strong>Traveler Quantity:</strong> <span id="modal-traveler-quantity">2</span>
+                  </div>
+
+                  <!-- Special Notes Section -->
+                  <div class="notes-box">
+                    <h5 >Special Notes</h5>
+                    <p>Looking forward to a beach visit. Kindly arrange for snorkeling gear.</p>
+                  </div>
+                </div>
+
+                <!-- Tour Package Details Container -->
+                <div class="container-section tour-package-details expanded">
+                  <h4 class="container-header">Tour Package Details</h4>
+                  <br>
+
+    <!-- Header with Image, Title, Location, and Close Button -->
+    <div class="modal-header">
+      <img src="Image/bolinao.jpg" alt="Tour Image" class="modal-header-image">
+      <div class="header-text-overlay">
+        <h3 class="package-title">Island Hopping Adventure</h3>
+        <p class="location"><span class="location-icon">&#x1F4CD;</span> Bolinao, Pangasinan</p>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <p class="description">Experience the beautiful islands with guided tours, beach activities, and cultural insights.</p>
+    <!-- Estimated Price Section -->
+    <div class="modal-section">
+      <h4>Estimated Price</h4>
+      <ul class="price-list">
+        <li>Entrance fee: $10</li>
+        <li>Taxi: $30</li>
+      </ul>
+    </div>
+
+    <!-- Inclusions Section -->
+    <div class="modal-section">
+      <h4>Inclusions</h4>
+      <ul class="inclusions-list">
+        <li><span class="checkmark">&#10003;</span> Guided tours</li>
+        <li><span class="checkmark">&#10003;</span> Meals (breakfast and lunch)</li>
+        <li><span class="checkmark">&#10003;</span> Snorkeling gear</li>
+      </ul>
+    </div>
+
+    <!-- Exclusions Section -->
+    <div class="modal-section">
+      <h4>Exclusions</h4>
+      <ul class="exclusions-list">
+        <li><span class="crossmark">&#10007;</span> Dinner</li>
+        <li><span class="crossmark">&#10007;</span> Personal expenses</li>
+        <li><span class="crossmark">&#10007;</span> Travel insurance</li>
+      </ul>
+    </div>
+
+    <!-- Itinerary Section -->
+    <div class="modal-section itinerary-section">
+      <h4>Itinerary</h4>
+      <ul class="itinerary-list">
+        <li>
+          <span class="timeline-dot"></span>
+          <div class="timeline-content">
+            <strong>Meeting Point:</strong>
+            <p>Down the stairs of BTS Saphan Taksin station exit 3 - Bangkok</p>
+          </div>
+        </li>
+        <li>
+          <span class="timeline-dot"></span>
+          <div class="timeline-content">
+            <strong>Food & Culture:</strong>
+            <p>Discover why street food is so relevant for locals and their culture.</p>
+          </div>
+        </li>
+        <li>
+          <span class="timeline-dot"></span>
+          <div class="timeline-content">
+            <strong>Authentic Tastings:</strong>
+            <p>Enjoy sweet sticky rice, roti, and other tastings that showcase the Thai food tradition.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+                </div>
+                <br>
                 <button class="primary-btn" id="close-booking-modal">Close</button>
               </div>
             </div>
@@ -280,7 +390,7 @@
             </div>
 
             <!-- Calendar -->
-            <div id="availability-calendar"></div>
+            <div id="availability-calendar" data-tour-guide-id="{{ tour_guide_id }}"></div>
 
             <!-- Calendar Controls -->
             <div class="calendar-controls">
@@ -303,7 +413,7 @@
             <!-- Profile Picture Upload -->
             <div class="profile-overview">
               <!-- Dynamically load profile picture from the backend -->
-              <img src="{{ url_for('static', filename='profile_pics/' + (current_user.profile_img or 'default.jpg')) }}" alt="Profile Picture" class="profile-pic" id="profile-pic" />
+              <img src="{{ url_for('static', filename='profile_pics/' + (current_user.profile_img or 'default.jpg')) }}" alt="Profile Picture" class="profile-pic" id="profile-pic-main" />
 
             
               <!-- Hidden file input for image upload -->
@@ -311,7 +421,7 @@
             
               <!-- Buttons for changing and saving the profile picture -->
               <button class="primary-btn" id="change-pic-btn">Change Profile Picture</button>
-              <button class="primary-btn hidden" id="save-pic-btn">Save</button>
+              <button class="confirm-btn hidden" id="save-pic-btn">Save</button>
             
               <!-- Cropper Modal for adjusting the profile picture -->
               <div id="cropper-modal" class="modal hidden">
@@ -355,7 +465,7 @@
                   Email 
                   <button class="edit-btn" id="guide-edit-email-btn">&#9998;</button>
                 </label>
-                <input type="email" id="email" value="{{ current_user.email }}" disabled /> 
+                <input type="email" id="email-input" value="{{ current_user.email }}" disabled /> 
               </div>
 
               <!-- Contact Number Section -->

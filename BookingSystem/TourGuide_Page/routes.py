@@ -5,7 +5,7 @@ from . import tourguide
 from BookingSystem.TourOperator_Page.form import UserTourGuideForm
 from BookingSystem import bcrypt, db
 from werkzeug.security import check_password_hash, generate_password_hash
-from BookingSystem.models import User, Characteristic, Skill, Availability, TourGuide
+from BookingSystem.models import User, Characteristic, Skill, Availability, TourGuide, Booking
 from .form import PasswordConfirmationForm
 from datetime import datetime
 from decimal import Decimal
@@ -511,6 +511,18 @@ def set_availability():
         return jsonify({"success": False, "message": f"Error saving availability: {str(e)}"}), 500
 
 
+@tourguide.route('/clear_availability/<int:tour_guide_id>', methods=['POST'])
+@login_required
+def clear_availability(tour_guide_id):
+    try:
+        # Delete all availability records for the specified tour guide
+        Availability.query.filter_by(tguide_id=tour_guide_id).delete()
+        db.session.commit()
+        return jsonify({"success": True, "message": "All availability cleared successfully."}), 200
+    except Exception as e:
+        db.session.rollback()
+        print("Error clearing availability:", e)
+        return jsonify({"success": False, "message": "Error clearing availability"}), 500
 
 
 
@@ -535,11 +547,63 @@ def update_password():
     
     
     
+   
+   
+
+
+
+
+
+# Route to get bookings for tour guide
+@tourguide.route('/tourguide/bookings', methods=['GET'])
+@login_required
+def get_tourguide_bookings():
+    if not current_user.is_tourguide:  # Ensure only tour guides access this route
+        return jsonify({"error": "Unauthorized access"}), 403
     
+    # Fetch bookings related to the current tour guide
+    bookings = Booking.query.filter_by(tour_guide_id=current_user.id).all()
+    
+    # Format bookings as JSON to send to the frontend
+    booking_data = [
+        {
+            "id": booking.id,
+            "date_start": booking.date_start.strftime('%Y-%m-%d'),
+            "tour_package": booking.package.name,  # Adjust if necessary
+            "traveler_name": booking.user.name     # Adjust based on your data model
+        }
+        for booking in bookings
+    ]
+    
+    return jsonify(booking_data)
 
 
 
 
+@tourguide.route('/get_booking_details/<int:booking_id>', methods=['GET'])
+def get_booking_details(booking_id):
+    # Retrieve the booking by ID
+    booking = Booking.query.get(booking_id)
+    
+    # Check if booking exists
+    if not booking:
+        return jsonify({"error": "Booking not found"}), 404
+
+    # Prepare booking details for the modal
+    booking_details = {
+        "travelerName": f"{booking.user.first_name} {booking.user.last_name}",
+        "tourGuideName": f"{booking.tour_guide.first_name} {booking.tour_guide.last_name}",
+        "tourGuideNumber": booking.tour_guide.contact_num,
+        "tourType": booking.package_id,  # assuming package_id references a tour type name or retrieve from a related model
+        "date_start": booking.date_start.strftime('%Y-%m-%d'),
+        "date_end": booking.date_end.strftime('%Y-%m-%d'),
+        "traveler_quantity": booking.traveler_quantity,
+        "price": float(booking.price),  # Convert price to a float for JSON
+        "status": booking.status,
+        "special_notes": booking.special_notes or "N/A"
+    }
+    
+    return jsonify(booking_details), 200
 
 
 

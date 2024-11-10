@@ -121,15 +121,43 @@ document.addEventListener('DOMContentLoaded', function () {
   closeModalButton.addEventListener('click', closeModal);
 
   // Show Thank You Popup After Confirming Booking
-  function showThankYouMessage() {
-      closeModal(); // Close the booking modal
-      thankYouPopup.style.display = "flex"; // Show thank you popup
+  async function showThankYouMessage() {
+    closeModal(); // Close the booking modal
+    thankYouPopup.style.display = "flex"; // Show thank you popup
 
-      // Hide the popup automatically after 3 seconds
-      setTimeout(() => {
-          thankYouPopup.style.display = "none";
-      }, 3000);
-  }
+    // Get the booking details
+    const bookingData = {
+        date: dateInput.value,
+        tourType: tourTypeInput.options[tourTypeInput.selectedIndex].text,
+        travelerQuantity: travelerQuantityInput.value,
+        personalizedNotes: personalizedTourInput.value || "N/A"
+    };
+
+    try {
+        // Send booking data to the server
+        const response = await fetch('/submit_booking', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(bookingData)
+        });
+
+        if (response.ok) {
+            console.log("Booking data sent successfully");
+        } else {
+            console.error("Failed to send booking data");
+        }
+    } catch (error) {
+        console.error("Error sending booking data:", error);
+    }
+
+    // Hide the popup automatically after 3 seconds
+    setTimeout(() => {
+        thankYouPopup.style.display = "none";
+    }, 3000);
+}
+
 
   // Optional: Close Modal by Clicking Outside of It
   window.onclick = function (event) {
@@ -151,45 +179,58 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
+
 //  Traveler Calendar
 document.addEventListener('DOMContentLoaded', async function () {
   const dateInput = document.getElementById('date');
-  const tourGuideId = 31 // Replace with actual ID or set dynamically based on selection
+  const tourGuideId = dateInput.getAttribute('data-tour-guide-id') || 28; // Set dynamically or use a default ID
+
+  if (!tourGuideId) {
+    console.error("Tour Guide ID not found in data attribute.");
+    return;
+  }
 
   if (!dateInput) {
-      console.error("Date input field not found for Flatpickr initialization.");
-      return;
+    console.error("Date input field not found for Flatpickr initialization.");
+    return;
   }
 
   try {
-      const response = await fetch(`/tourguide/get_availability/${tourGuideId}`);
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+    // Fetch availability data for the specified tour guide
+    const response = await fetch(`/tourguide/get_availability/${tourGuideId}`);
+    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
-      const availabilityData = await response.json();
-      console.log("Fetched availability data:", availabilityData);
+    const availabilityData = await response.json();
+    console.log("Fetched availability data:", availabilityData);
 
-      const availableDates = availabilityData
-          .filter(entry => entry.status === 'available')
-          .map(entry => entry.date);
+    // Filter only available dates
+    const availableDates = availabilityData
+      .filter(entry => entry.status === 'available')
+      .map(entry => entry.date);
 
-      flatpickr(dateInput, {
-          dateFormat: 'Y-m-d',
-          minDate: "today",
-          enable: availableDates,
-          onDayCreate: function (dObj, dStr, fp, dayElem) {
-              const dateStr = dayElem.dateObj.toISOString().split('T')[0];
-              if (availableDates.includes(dateStr)) {
-                  dayElem.style.backgroundColor = '#4ecdc4';
-                  dayElem.style.color = 'white';
-                  dayElem.style.borderRadius = '50%';
-              }
-          }
-      });
+    console.log("Available dates:", availableDates); // Check if dates are being populated
+
+    // Initialize Flatpickr with only the available dates enabled
+    flatpickr(dateInput, {
+      dateFormat: 'Y-m-d',
+      minDate: "today",
+      enable: availableDates, // Directly pass the array of dates
+      onDayCreate: function (dObj, dStr, fp, dayElem) {
+        const dateStr = dayElem.dateObj.toISOString().split('T')[0];
+        if (availableDates.includes(dateStr)) {
+          dayElem.style.backgroundColor = '#4ecdc4';
+          dayElem.style.color = 'white';
+          dayElem.style.borderRadius = '50%';
+        }
+      }
+    });
   } catch (error) {
-      console.error('Error fetching availability:', error);
+    console.error('Error fetching availability:', error);
   }
 });
 
+  
+  
 
 
 

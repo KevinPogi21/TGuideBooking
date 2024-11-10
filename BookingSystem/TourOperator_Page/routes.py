@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, request, session
+from flask import render_template, redirect, url_for, flash, request, session, jsonify
 from flask_login import login_required, current_user, logout_user
 from . import touroperator  
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -15,6 +15,9 @@ def create_tourguide():
 
     if form.validate_on_submit():
         # Create a new User instance for the tour guide
+        
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        
         new_tourguide_user = User(
             first_name=form.fname.data,
             last_name=form.lname.data,
@@ -101,3 +104,43 @@ def tourguide_profile(guide_id):
 
 
 
+
+
+@touroperator.route('/tourguide/update-name', methods=['POST'])
+@login_required
+def update_name():
+    data = request.get_json()
+    new_name = data.get('name')
+    current_user.name = new_name
+    db.session.commit()
+    return jsonify({"success": True})
+
+
+
+@touroperator.route('/update_contact_number', methods=['POST'])
+@login_required
+def update_contact_number():
+    data = request.get_json()
+    new_contact_number = data.get('contact_number')
+
+    # Validate that a contact number is provided and is in the correct format
+    if not new_contact_number:
+        return jsonify({'success': False, 'error': 'Contact number is required.'}), 400
+    if not new_contact_number.isdigit() or len(new_contact_number) < 7:
+        return jsonify({'success': False, 'error': 'Invalid contact number format. Please enter a valid number.'}), 400
+
+    try:
+        # Assuming the `TourOperator` model is related to the `User` model with `tour_operator` relationship
+        tour_operator = current_user.tour_operator
+        if not tour_operator:
+            return jsonify({'success': False, 'error': 'Tour operator profile not found.'}), 404
+
+        # Update the contact number and commit to the database
+        tour_operator.contact_num = new_contact_number
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Contact number updated successfully.'}), 200
+
+    except Exception as e:
+        db.session.rollback()  # Rollback in case of an error
+        print(f"Error updating contact number: {e}")  # Log error for debugging
+        return jsonify({'success': False, 'error': 'An error occurred while updating the contact number. Please try again later.'}), 500

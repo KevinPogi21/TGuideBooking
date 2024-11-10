@@ -170,7 +170,7 @@
             <label for="date">Select Date</label>
             <input type="text" id="date" placeholder="Select a date" readonly>
 
-
+            <!--<input type="text" id="date" data-tour-guide-id="{{ tour_guide_id }}" placeholder="Select a date" readonly> -->
 
             <label for="tour-type">Tour Type</label>
             <select id="tour-type" required>
@@ -246,70 +246,70 @@
 
     <script>
 
-      // Scroll to Booking Form from Footer Button
-      const footerBookBtn = document.getElementById('footer-book-btn');
-      const bookingForm = document.querySelector('.booking-form');
 
-      footerBookBtn.addEventListener('click', () => {
-        bookingForm.scrollIntoView({ behavior: 'smooth' });
-      });
+        // Scroll to Booking Form from Footer Button
+        const footerBookBtn = document.getElementById('footer-book-btn');
+        const bookingForm = document.querySelector('.booking-form');
 
-      // Function to handle footer visibility
-      const footerBookingBar = document.getElementById('footer-booking-bar');
-      function handleFooterVisibility() {
-        if (window.innerWidth > 768) {
-          footerBookingBar.style.display = 'none'; // Hide on large screens
-        } else {
-          footerBookingBar.style.display = 'flex'; // Show on small screens
+        footerBookBtn.addEventListener('click', () => {
+          bookingForm.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Function to handle footer visibility
+        const footerBookingBar = document.getElementById('footer-booking-bar');
+        function handleFooterVisibility() {
+          if (window.innerWidth > 768) {
+            footerBookingBar.style.display = 'none'; // Hide on large screens
+          } else {
+            footerBookingBar.style.display = 'flex'; // Show on small screens
+          }
         }
-      }
 
-      // Run on load and on window resize
-      window.addEventListener('resize', handleFooterVisibility);
-      window.addEventListener('DOMContentLoaded', handleFooterVisibility);
 
+        // Run on load and on window resize
+        window.addEventListener('resize', handleFooterVisibility);
+        window.addEventListener('DOMContentLoaded', handleFooterVisibility);
+
+        
+        // Get modal and popup elements
+        const bookingModal = document.getElementById("booking-modal");
+        const thankYouPopup = document.getElementById("thank-you-popup");
+        const closeModalButton = document.getElementById("close-modal");
       
-      // Get modal and popup elements
-      const bookingModal = document.getElementById("booking-modal");
-      const thankYouPopup = document.getElementById("thank-you-popup");
-      const closeModalButton = document.getElementById("close-modal");
-    
-      // Open Modal Function
-      function openModal() {
-        bookingModal.style.display = "flex"; // Show the modal
-        document.body.style.overflow = "hidden"; // Disable background scrolling
-      }
-    
-      // Close Modal Function
-      function closeModal() {
-        bookingModal.style.display = "none"; // Hide the modal
-        document.body.style.overflow = "auto"; // Enable background scrolling
-      }
-    
-      // Attach event listener to close button
-      closeModalButton.addEventListener('click', closeModal);
-    
-      // Show Thank You Popup After Confirming Booking
-      function showThankYouMessage() {
-        closeModal(); // Close the booking modal
-        thankYouPopup.style.display = "flex"; // Show thank you popup
-    
-        // Hide the popup automatically after 3 seconds
-        setTimeout(() => {
-          thankYouPopup.style.display = "none";
-        }, 3000);
-      }
-    
-      // Optional: Close Modal by Clicking Outside of It
-      window.onclick = function (event) {
-        if (event.target === bookingModal) {
-          closeModal();
+        // Open Modal Function
+        function openModal() {
+          bookingModal.style.display = "flex"; // Show the modal
+          document.body.style.overflow = "hidden"; // Disable background scrolling
         }
-      };
+      
+        // Close Modal Function
+        function closeModal() {
+          bookingModal.style.display = "none"; // Hide the modal
+          document.body.style.overflow = "auto"; // Enable background scrolling
+        }
+      
+        // Attach event listener to close button
+        closeModalButton.addEventListener('click', closeModal);
+      
+        // Show Thank You Popup After Confirming Booking
+        function showThankYouMessage() {
+          closeModal(); // Close the booking modal
+          thankYouPopup.style.display = "flex"; // Show thank you popup
+      
+          // Hide the popup automatically after 3 seconds
+          setTimeout(() => {
+            thankYouPopup.style.display = "none";
+          }, 3000);
+        }
+      
+        // Optional: Close Modal by Clicking Outside of It
+        window.onclick = function (event) {
+          if (event.target === bookingModal) {
+            closeModal();
+          }
+        };
 
-
-
-
+    </script>
 
 
               <!--COPY ALL FOR NOTIFICATION BELL AND DARKMODE-->

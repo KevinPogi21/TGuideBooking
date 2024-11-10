@@ -475,15 +475,10 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 
 
-
-
-
-
-
-// Profile Picture Cropper Modal Logic
 const changePicBtn = document.getElementById('change-pic-btn');
 const uploadPicInput = document.getElementById('upload-pic');
-const profilePic = document.getElementById('profile-pic');
+const profilePicMain = document.getElementById('profile-pic-main');
+const profilePicSecondary = document.getElementById('profile-pic-secondary');
 const cropperModal = document.getElementById('cropper-modal');
 const cropperContainer = document.getElementById('cropper-container');
 const cropBtn = document.getElementById('crop-btn');
@@ -491,8 +486,14 @@ const closeCropperBtn = document.getElementById('close-cropper-modal');
 const savePicBtn = document.getElementById('save-pic-btn');
 let cropper;
 
+// Hide "Save" button by default on page load
+savePicBtn.classList.add('hidden');
+
 // Open file input on button click
-changePicBtn.addEventListener('click', () => uploadPicInput.click());
+changePicBtn.addEventListener('click', () => {
+  uploadPicInput.value = "";  // Reset file input to allow re-selection
+  uploadPicInput.click();
+});
 
 // Show cropper modal on image selection
 uploadPicInput.addEventListener('change', (event) => {
@@ -507,8 +508,11 @@ uploadPicInput.addEventListener('change', (event) => {
       cropperContainer.appendChild(img);
       cropperModal.classList.add('show'); // Show the cropper modal
 
-      // Destroy previous cropper instance if it exists and create a new one
-      if (cropper) cropper.destroy();
+      // Destroy previous cropper instance if it exists, and create a new one
+      if (cropper) {
+        cropper.destroy();
+        cropper = null;  // Ensure cropper is set to null after destruction
+      }
       cropper = new Cropper(img, {
         aspectRatio: 1,
         viewMode: 1,
@@ -526,16 +530,24 @@ uploadPicInput.addEventListener('change', (event) => {
 cropBtn.addEventListener('click', () => {
   const canvas = cropper.getCroppedCanvas({ width: 200, height: 200 });
   if (canvas) {
-    profilePic.src = canvas.toDataURL(); // Update the profile picture preview
+    // Update both profile picture previews
+    const newImageSrc = canvas.toDataURL();
+    profilePicMain.src = newImageSrc;
+    profilePicSecondary.src = newImageSrc;
+
     cropperModal.classList.remove('show'); // Close modal
-    savePicBtn.classList.remove('hidden'); // Show save button
+    savePicBtn.classList.remove('hidden'); // Show save button only after cropping
   } else {
     console.error("Error: Cropping failed. Canvas is not generated.");
   }
 });
 
-// Close cropper modal
+// Close cropper modal and destroy cropper instance
 closeCropperBtn.addEventListener('click', () => {
+  if (cropper) {
+    cropper.destroy();
+    cropper = null;  // Set cropper to null to ensure clean reinitialization
+  }
   cropperModal.classList.remove('show');
 });
 
@@ -556,11 +568,12 @@ savePicBtn.addEventListener('click', () => {
       console.log("Server response:", data);
 
       if (data.success) {
-        // Append a timestamp to prevent caching issues and update the profile picture in the UI
+        // Append a timestamp to prevent caching issues and update both profile pictures in the UI
         const newImageUrl = `${data.url}?t=${new Date().getTime()}`;
-        profilePic.src = newImageUrl;
-        
-        savePicBtn.classList.add('hidden');
+        profilePicMain.src = newImageUrl;
+        profilePicSecondary.src = newImageUrl;
+
+        savePicBtn.classList.add('hidden'); // Hide save button after saving
         alert('Profile picture saved successfully!');
       } else {
         alert('Failed to save profile picture.');
@@ -569,6 +582,14 @@ savePicBtn.addEventListener('click', () => {
     .catch(error => {
       console.error('Error uploading image:', error);
       alert('An error occurred while saving the picture.');
+    })
+    .finally(() => {
+      // Ensure the cropper instance is destroyed after saving
+      if (cropper) {
+        cropper.destroy();
+        cropper = null;
+      }
+      cropperModal.classList.remove('show');
     });
   });
 });
@@ -684,6 +705,8 @@ document.addEventListener('DOMContentLoaded', function () {
   let isEditing = false;
   let selectedDate = null;
 
+  //const tourGuideId = calendarEl.getAttribute('data-tour-guide-id');
+
   // Initialize FullCalendar for tour guide's availability management
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'dayGridMonth',
@@ -718,7 +741,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Load availability and set FullCalendar
   async function loadAvailability() {
-    const tourGuideId = currentUserId; // Use the actual tour guide's ID
+    const tourGuideId = 28
  // Update this as necessary to dynamically retrieve the ID
     try {
         console.log(`Fetching availability data from URL: /tourguide/get_availability/${tourGuideId}`);
@@ -809,10 +832,30 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Reset calendar events, excluding booked ones
-  resetCalendarBtn.addEventListener('click', () => {
-    calendar.getEvents().forEach(event => {
-      if (event.extendedProps.status !== 'booked') event.remove();
-    });
+  resetCalendarBtn.addEventListener('click', async () => {
+    const tourGuideId = 28; // Use the actual tour guide ID here
+  
+    // Call the backend to clear availability
+    try {
+      const response = await fetch(`/tourguide/clear_availability/${tourGuideId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+  
+      if (response.ok) {
+        // Clear the calendar in the frontend
+        calendar.getEvents().forEach(event => {
+          if (event.extendedProps.status !== 'booked') event.remove();
+        });
+  
+        alert('Calendar reset successfully!');
+      } else {
+        alert('Failed to reset calendar.');
+      }
+    } catch (error) {
+      console.error('Error resetting calendar:', error);
+      alert('An error occurred. Please try again.');
+    }
   });
 
   // Save availability data to backend
@@ -1196,14 +1239,6 @@ function closeGuideModal() {
 
 
 
-
-
-
-
-
-
-
-
 // Save new password
 document.addEventListener('DOMContentLoaded', function () {
   // Select the elements
@@ -1316,6 +1351,38 @@ document.addEventListener('DOMContentLoaded', function () {
 //CURRENT PASSWORD 
 
 
+// Function to open the booking details modal and populate it with data
+// Example of placing openBookingDetails in the tour guide dashboard JavaScript
+
+// Function to open the booking details modal and populate it with data
+function openBookingDetails(bookingId) {
+  console.log("Fetching booking details for ID:", bookingId);  // Debugging log
+  fetch(`/tourguide/get_booking_details/${bookingId}`)
+      .then(response => {
+          if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+      })
+      .then(booking => {
+          console.log("Received booking data:", booking);  // Debugging log
+          document.getElementById("modal-traveler-name").textContent = booking.travelerName;
+          document.getElementById("modal-tour-guide-name").textContent = booking.tourGuideName;
+          document.getElementById("modal-tour-guide-number").textContent = booking.tourGuideNumber;
+          document.getElementById("modal-tour-package").textContent = booking.tourType;
+          document.getElementById("modal-tour-date").textContent = `${booking.date_start} - ${booking.date_end}`;
+          document.getElementById("modal-traveler-quantity").textContent = booking.traveler_quantity;
+
+          document.getElementById("booking-modal").classList.remove("hidden");
+      })
+      .catch(error => console.error("Error loading booking details:", error));
+}
+
+
+// Function to close the booking details modal
+function closeBookingDetailsModal() {
+  document.getElementById("booking-modal").classList.add("hidden");
+}
 
 
 

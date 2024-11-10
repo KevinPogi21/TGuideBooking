@@ -52,6 +52,10 @@ class User(db.Model, UserMixin):
     @property
     def is_anonymous(self):
         return False  # This is always false for a logged-in user
+    
+    @property
+    def is_tourguide(self):
+        return self.role == 'tourguide'
 
     def get_id(self):
         return self.id  # Return the unique identifier for the user

@@ -635,6 +635,7 @@
     align-items: center;
     font-size: 12px;
     color: #4ecdc4;
+   
   }
 
 .toured-by .tour-guide-name {
@@ -775,7 +776,6 @@
       margin-top: 10px; /* Add spacing above */
     }
   }
-
   /* Footer Booking Bar */
   .footer-booking-bar {
     display: none; /* Default is hidden */

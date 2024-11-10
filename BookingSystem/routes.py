@@ -342,7 +342,29 @@ def update_password():
     
  
 
+# Route to create a new booking
+@main.route('/create_booking', methods=['POST'])
+@login_required
+def create_booking():
+    data = request.json
+    tour_guide_id = data.get("tour_guide_id")  # Get this from frontend or selection in UI
+    tour_package_id = data.get("tour_type")  # Assuming tour_type maps to package_id
 
+    booking = Booking(
+        user_id=current_user.id,
+        tour_guide_id=tour_guide_id,
+        package_id=tour_package_id,
+        status="upcoming",
+        date_start=datetime.strptime(data["date_start"], "%Y-%m-%d"),
+        traveler_quantity=data["traveler_quantity"],
+        special_notes=data.get("special_notes", ""),
+        time=datetime.now().time(),  # Example: replace with actual start time
+        price=1000.00  # Placeholder, fetch actual price from package data if needed
+    )
+    db.session.add(booking)
+    db.session.commit()
+
+    return jsonify({"success": True, "message": "Booking created successfully."})
 
 
 

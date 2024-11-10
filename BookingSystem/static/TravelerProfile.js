@@ -20,13 +20,10 @@ tabLinks.forEach(link => {
 
 
 
-// Change Profile
-const profilePic = document.getElementById('profile-pic');
+const profilePicNav = document.getElementById('profile-pic-nav'); // Navbar profile picture
+const profilePicPanel = document.getElementById('profile-pic-panel'); // Profile panel picture
 const editPicBtn = document.getElementById('edit-pic-btn');
 const uploadPicInput = document.getElementById('upload-pic');
-const confirmModal = document.getElementById('confirm-modal');
-const confirmChangeBtn = document.getElementById('confirm-change-btn');
-const cancelChangeBtn = document.getElementById('cancel-change-btn');
 const cropperModal = document.getElementById('cropper-modal');
 const cropperContainer = document.getElementById('cropper-container');
 const cropBtn = document.getElementById('crop-btn');
@@ -34,24 +31,8 @@ const closeCropperModal = document.getElementById('close-cropper-modal');
 
 let cropper;
 
-// Open confirmation modal on profile picture or edit button click
-profilePic.addEventListener('click', () => openConfirmModal());
-editPicBtn.addEventListener('click', () => openConfirmModal());
-
-function openConfirmModal() {
-  confirmModal.classList.add('show');
-}
-
-// Handle confirmation for opening file picker
-confirmChangeBtn.addEventListener('click', () => {
-  confirmModal.classList.remove('show');
-  uploadPicInput.click();
-});
-
-// Cancel changing picture
-cancelChangeBtn.addEventListener('click', () => {
-  confirmModal.classList.remove('show');
-});
+// Open file picker when clicking on the edit button
+editPicBtn.addEventListener('click', () => uploadPicInput.click());
 
 // Open cropper modal after selecting a picture
 uploadPicInput.addEventListener('change', (event) => {
@@ -94,7 +75,6 @@ cropBtn.addEventListener('click', async () => {
     formData.append('profile_picture', blob, 'profile.jpg');
 
     try {
-      // Show loading message or spinner here if desired
       const response = await fetch('/update_profile_picture', {
         method: 'POST',
         body: formData,
@@ -108,8 +88,11 @@ cropBtn.addEventListener('click', async () => {
       } else {
         const data = await response.json();
         
-        // Update the profile picture in the UI immediately
-        profilePic.src = `${data.image_url}?timestamp=${new Date().getTime()}`; // Append timestamp to avoid caching issues
+        // Update both profile pictures in the navbar and profile panel
+        const newImageUrl = `${data.image_url}?timestamp=${new Date().getTime()}`; // Append timestamp to avoid caching issues
+        profilePicNav.src = newImageUrl;
+        profilePicPanel.src = newImageUrl;
+
         alert('Profile picture updated successfully!');
       }
     } catch (error) {
@@ -126,6 +109,7 @@ cropBtn.addEventListener('click', async () => {
 closeCropperModal.addEventListener('click', () => {
   cropperModal.classList.remove('show');
 });
+
 
 
 
