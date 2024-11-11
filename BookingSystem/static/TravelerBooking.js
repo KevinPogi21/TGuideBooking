@@ -176,17 +176,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-
-
-
-
-//  Traveler Calendar
 document.addEventListener('DOMContentLoaded', async function () {
   const dateInput = document.getElementById('date');
-  const tourGuideId = dateInput.getAttribute('data-tour-guide-id') || 28; // Set dynamically or use a default ID
+
+  // Function to extract the tour guide ID from the URL path
+  function getTourGuideIdFromPath() {
+    const pathParts = window.location.pathname.split('/');
+    return pathParts[pathParts.length - 1];
+  }
+
+  // Retrieve the tour guide ID from the URL path
+  const tourGuideId = getTourGuideIdFromPath();
 
   if (!tourGuideId) {
-    console.error("Tour Guide ID not found in data attribute.");
+    console.error("Tour Guide ID not found in URL path.");
     return;
   }
 
@@ -208,33 +211,34 @@ document.addEventListener('DOMContentLoaded', async function () {
       .filter(entry => entry.status === 'available')
       .map(entry => entry.date);
 
-    console.log("Available dates:", availableDates); // Check if dates are being populated
-
     // Initialize Flatpickr with only the available dates enabled
     flatpickr(dateInput, {
       dateFormat: 'Y-m-d',
       minDate: "today",
-      enable: availableDates, // Directly pass the array of dates
-      onDayCreate: function (dObj, dStr, fp, dayElem) {
-        const dateStr = dayElem.dateObj.toISOString().split('T')[0];
+      enable: availableDates,
+      onReady: function (selectedDates, dateStr, instance) {
+        highlightAvailableDates(instance);
+      },
+      onMonthChange: function (selectedDates, dateStr, instance) {
+        highlightAvailableDates(instance);
+      }
+    });
+
+    // Function to highlight available dates
+    function highlightAvailableDates(instance) {
+      instance.calendarContainer.querySelectorAll('.flatpickr-day').forEach(dayElem => {
+        const dateStr = dayElem.dateObj.toISOString().split('T')[1];
         if (availableDates.includes(dateStr)) {
           dayElem.style.backgroundColor = '#4ecdc4';
           dayElem.style.color = 'white';
           dayElem.style.borderRadius = '50%';
         }
-      }
-    });
+      });
+    }
   } catch (error) {
     console.error('Error fetching availability:', error);
   }
 });
-
-  
-  
-
-
-
-
 
 
 

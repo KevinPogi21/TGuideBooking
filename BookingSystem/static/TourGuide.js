@@ -735,13 +735,17 @@ document.addEventListener('DOMContentLoaded', function () {
         alert('This date is booked and cannot be changed.');
       }
     },
+
+    
   });
+  
+
 
   calendar.render();
 
   // Load availability and set FullCalendar
   async function loadAvailability() {
-    const tourGuideId = 28
+    const tourGuideId = "{{ tour_guide_id }}"
  // Update this as necessary to dynamically retrieve the ID
     try {
         console.log(`Fetching availability data from URL: /tourguide/get_availability/${tourGuideId}`);
@@ -1028,24 +1032,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
     try {
       const response = await fetch('/tourguide/update_email', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ email: newEmail })
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: newEmail })
       });
-
       const result = await response.json();
-
+  
       if (result.success) {
+        const emailInput = document.getElementById('email-input'); // Ensure ID matches the actual input ID
+        if (emailInput) {
           emailInput.value = newEmail; // Update displayed email
-          closeActionModals();
-          alert('Email updated successfully!');
+        } else {
+          console.error("Email input element not found in the DOM.");
+        }
+        closeActionModals();
+        alert('Email updated successfully!');
       } else {
-          alert(result.message || 'Failed to update email. Please try again.');
+        alert(result.message || 'Failed to update email. Please try again.');
       }
     } catch (error) {
-      console.error('Error updating email:', error);
+      console.error("Error updating email:", error);
       alert('There was an error processing your request. Please try again.');
     }
   });
@@ -1234,6 +1240,14 @@ function closeGuideModal() {
       modal.classList.add('hidden');
   }
 }
+
+
+
+
+
+
+
+
 
 
 

@@ -85,16 +85,20 @@ def update_email():
     if not new_email or not re.match(r"[^@]+@[^@]+\.[^@]+", new_email):
         return jsonify({'success': False, 'error': 'Invalid email format.'}), 400
 
-    # Check if email is already in use
+    # Check if email is already in use by another user
     existing_user = User.query.filter_by(email=new_email).first()
-    if existing_user:
-        return jsonify({'success': False, 'error': 'Email is already in use.'}), 400
+    if existing_user and existing_user.id != current_user.id:
+        return jsonify({'success': False, 'error': 'Email is already in use by another account.'}), 400
 
-    # Update email in the database
-    current_user.email = new_email
-    db.session.commit()
-
-    return jsonify({'success': True})
+    # Update the email of the current user
+    try:
+        current_user.email = new_email
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Email updated successfully.'})
+    except Exception as e:
+        # Rollback in case of error and return an error message
+        db.session.rollback()
+        return jsonify({'success': False, 'error': 'An error occurred while updating the email. Please try again.'}), 500
 
 
 
@@ -138,8 +142,9 @@ def save_profile():
 @tourguide.route('/tourguide_dashboard')
 @login_required
 def tourguide_dashboard():
+    tour_guide_id = 1
     print(f"Current user in dashboard: {current_user.email}, Role: {current_user.role}")
-    return render_template('tourguide_dashboard.html')
+    return render_template('tourguide_dashboard.html', tour_guide_id=tour_guide_id)
 
 
 
