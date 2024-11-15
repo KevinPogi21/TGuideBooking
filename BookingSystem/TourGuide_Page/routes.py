@@ -5,7 +5,7 @@ from . import tourguide
 from BookingSystem.TourOperator_Page.form import UserTourGuideForm
 from BookingSystem import bcrypt, db
 from werkzeug.security import check_password_hash, generate_password_hash
-from BookingSystem.models import User, Characteristic, Skill, Availability, TourGuide, Booking
+from BookingSystem.models import User, Characteristic, Skill, Availability, TourGuide, Booking, Notification
 from .form import PasswordConfirmationForm
 from datetime import datetime
 from decimal import Decimal
@@ -559,6 +559,20 @@ def update_password():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+###########
+
+
 # Route to get bookings for tour guide
 @tourguide.route('/tourguide/bookings', methods=['GET'])
 @login_required
@@ -609,6 +623,116 @@ def get_booking_details(booking_id):
     }
     
     return jsonify(booking_details), 200
+
+
+
+# Backend route to receive booking data
+@tourguide.route('/submit_booking', methods=['POST'])
+@login_required
+def submit_booking():
+    data = request.get_json()
+    try:
+        # Extract booking details from request data
+        tour_guide_id = data.get('tour_guide_id')
+        tour_type = data.get('tourType')  # Assumes 'tourType' maps to 'package_id' or equivalent
+        traveler_quantity = data.get('travelerQuantity')
+        date_start = datetime.strptime(data.get('date'), '%Y-%m-%d')
+        personalized_notes = data.get('personalizedNotes')
+        price = data.get('price', 1200.00)  # Default price if not provided
+
+        # Create a new booking record
+        booking = Booking(
+            user_id=current_user.id,
+            tour_guide_id=tour_guide_id,
+            package_id=tour_type,  # Assuming tour_type corresponds to package_id
+            status='upcoming',
+            date_start=date_start,
+            date_end=date_start,  # Assuming single-day booking
+            traveler_quantity=traveler_quantity,
+            special_notes=personalized_notes,
+            price=price,
+            time=datetime.now().time()  # Assuming current time as booking time
+        )
+        db.session.add(booking)
+        db.session.flush()  # Flush to get booking.id before committing
+
+        # Create a notification for the tour guide
+        notification = Notification(
+            tguide_id=tour_guide_id,
+            booking_id=booking.id,
+            is_read=False
+        )
+        db.session.add(notification)
+        
+        db.session.commit()
+        
+        return jsonify({"success": True, "message": "Booking created and tour guide notified."}), 201
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error creating booking: {e}")
+        return jsonify({"success": False, "message": "Error creating booking"}), 500
+
+
+
+
+
+
+
+
+@tourguide.route('/get_notifications', methods=['GET'])
+@login_required
+def get_notifications():
+    tour_guide = TourGuide.query.filter_by(user_id=current_user.id).first()
+    if not tour_guide:
+        return jsonify([])  # Return empty if no tour guide found
+
+    notifications = Notification.query.filter_by(tguide_id=tour_guide.id).all()
+    return jsonify([
+        {
+            "message": f"New Booking from {notif.booking.traveler_name}",
+            "booking_id": notif.booking_id
+        } for notif in notifications
+    ])
+
+@tourguide.route('/get_bookings', methods=['GET'])
+@login_required
+def get_bookings():
+    tour_guide = TourGuide.query.filter_by(user_id=current_user.id).first()
+    if not tour_guide:
+        return jsonify([])
+
+    bookings = Booking.query.filter_by(tour_guide_id=tour_guide.id).all()
+    bookings_data = [{
+        "id": booking.id,
+        "date_start": booking.date_start.strftime('%Y-%m-%d'),
+        "tour_type": booking.package_id,  # Replace with actual package info if available
+        "traveler_name": booking.user.name if booking.user else "Unknown",
+        "status": booking.status
+    } for booking in bookings]
+
+    return jsonify(bookings_data)
+
+
+
+
+
+
+@tourguide.route('/mark_notification_read', methods=['POST'])
+@login_required
+def mark_notification_read():
+    notification_id = request.json.get('notification_id')
+    notification = Notification.query.get(notification_id)
+    
+    if not notification or notification.tguide_id != current_user.id:
+        return jsonify({"success": False, "message": "Notification not found"}), 404
+    
+    notification.is_read = True
+    db.session.commit()
+    
+    return jsonify({"success": True, "message": "Notification marked as read"})
+
+
+
 
 
 

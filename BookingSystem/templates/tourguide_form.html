@@ -47,7 +47,13 @@
                 <!-- Profile Icon -->
                 <div class="profile-container-nav">
                   <a href="{{ url_for('main.account') }}">
-                      <img class= "profile-icon" id="profile-pic" src="{{ url_for('static', filename='profile_pics/' + current_user.profile_img) }}" alt="Profile Picture">
+                    {% if current_user.is_authenticated %}
+                    <img class="profile-icon" id="profile-pic" src="{{ url_for('static', filename='profile_pics/' + current_user.profile_img) }}" alt="Profile Picture">
+                    {% else %}
+                    <!-- Display a default image or message when user is not logged in -->
+                    <img class="profile-icon" id="profile-pic" src="{{ url_for('static', filename='profile_pics/default.jpg') }}" alt="Default Profile Picture">
+                    {% endif %}
+                
                     </a>
                 </div>
     

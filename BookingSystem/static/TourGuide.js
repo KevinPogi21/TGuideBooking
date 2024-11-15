@@ -608,11 +608,227 @@ savePicBtn.addEventListener('click', () => {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 // Variables for Notification Interaction
-const notificationPanel = document.querySelector('.notification-list');
-const viewNotificationDetails = (notificationText) => {
-  alert(`Notification Details: ${notificationText}`);
-};
+document.addEventListener('DOMContentLoaded', async function () {
+  // Notification panel for dynamic notifications
+  const notificationPanel = document.querySelector('.notification-list');
+
+  // Function to add notifications
+  function addNotification(message, type = 'info', bookingId, notificationId) {
+      const notificationItem = document.createElement('div');
+      notificationItem.classList.add('notification-item', type);
+      notificationItem.textContent = message;
+
+      // Add a button to view details
+      const viewButton = document.createElement('button');
+      viewButton.textContent = 'View';
+      viewButton.classList.add('view-btn');
+      viewButton.onclick = () => {
+          viewNotificationDetails(bookingId);
+          markNotificationAsRead(notificationId);
+      };
+      notificationItem.appendChild(viewButton);
+
+      notificationPanel.appendChild(notificationItem);
+  }
+
+  // Function to mark a notification as read
+  async function markNotificationAsRead(notificationId) {
+      try {
+          const response = await fetch('/mark_notification_read', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ notification_id: notificationId })
+          });
+
+          const result = await response.json();
+          if (result.success) {
+              console.log("Notification marked as read.");
+          } else {
+              console.error("Failed to mark notification as read:", result.message);
+          }
+      } catch (error) {
+          console.error("Error marking notification as read:", error);
+      }
+  }
+
+  // Function to view notification details
+  async function viewNotificationDetails(bookingId) {
+      try {
+          const response = await fetch(`/get_booking_details/${bookingId}`);
+          const bookingDetails = await response.json();
+
+          if (bookingDetails.error) {
+              alert(bookingDetails.error);
+              return;
+          }
+
+          // Populate the modal with booking details
+          document.getElementById('booking-info').innerText = `
+              Traveler: ${bookingDetails.travelerName}
+              Tour Guide: ${bookingDetails.tourGuideName}
+              Tour Guide Number: ${bookingDetails.tourGuideNumber}
+              Tour Type: ${bookingDetails.tourType}
+              Date: ${bookingDetails.date_start} - ${bookingDetails.date_end}
+              Quantity: ${bookingDetails.traveler_quantity}
+              Price: ${bookingDetails.price}
+              Status: ${bookingDetails.status}
+              Notes: ${bookingDetails.special_notes || 'N/A'}
+          `;
+
+          // Open the booking modal to display details
+          document.getElementById('booking-modal').classList.remove('hidden');
+      } catch (error) {
+          console.error("Error fetching booking details:", error);
+          alert("Failed to load booking details. Please try again.");
+      }
+  }
+
+  // Close the booking modal
+  document.getElementById('booking-modal').addEventListener('click', (event) => {
+      if (event.target.id === 'booking-modal' || event.target.classList.contains('close-modal-btn')) {
+          document.getElementById('booking-modal').classList.add('hidden');
+      }
+  });
+
+  // Get elements for tab and booking display
+  const toggleTabsBtn = document.getElementById('toggle-tabs-btn');
+  const bookingsTabs = document.getElementById('bookings-tabs');
+  const bookingTabBtns = document.querySelectorAll('.booking-tab-btn');
+  const bookingCategories = document.querySelectorAll('.booking-category');
+
+  // Function to filter bookings based on selected tab
+  const filterBookings = (status) => {
+      bookingCategories.forEach(category => {
+          if (status === 'all' || category.getAttribute('data-status') === status) {
+              category.style.display = 'block';
+          } else {
+              category.style.display = 'none';
+          }
+      });
+
+      // Update the active tab button
+      bookingTabBtns.forEach(btn => {
+          btn.classList.toggle('active', btn.getAttribute('data-status') === status);
+      });
+  };
+
+  // Event listener for each tab button to filter bookings
+  bookingTabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+          const status = btn.getAttribute('data-status');
+          filterBookings(status);
+      });
+  });
+
+  // Toggle visibility of tabs on mobile
+  toggleTabsBtn.addEventListener('click', () => {
+      bookingsTabs.classList.toggle('hidden');
+      toggleTabsBtn.textContent = bookingsTabs.classList.contains('hidden') ? 'Show Tabs' : 'Hide Tabs';
+  });
+
+  // Function to dynamically add a booking card
+  function addBookingCard(bookingData) {
+      const bookingCategory = document.querySelector(`.booking-category[data-status="${bookingData.status}"]`);
+      
+      const bookingCard = document.createElement('div');
+      bookingCard.classList.add('booking-card');
+      
+      const bookingInfo = document.createElement('div');
+      bookingInfo.classList.add('booking-info');
+      bookingInfo.innerHTML = `
+          <span class="booking-date">${bookingData.date}</span>
+          <span class="tour-package">${bookingData.tourType}</span>
+          <span class="traveler-name">Traveler: ${bookingData.travelerName}</span>
+      `;
+
+      const viewDetailsButton = document.createElement('button');
+      viewDetailsButton.textContent = 'View Details';
+      viewDetailsButton.classList.add('details-btn');
+      viewDetailsButton.onclick = () => openBookingDetails(`Booking #${bookingData.id}`);
+      
+      bookingCard.appendChild(bookingInfo);
+      bookingCard.appendChild(viewDetailsButton);
+      bookingCategory.appendChild(bookingCard);
+  }
+
+  // Fetch notifications and display them
+  async function fetchNotifications() {
+      try {
+          const response = await fetch('/tourguide/get_notifications');
+          const notifications = await response.json();
+          console.log("Fetched notifications:", notifications);
+
+          notifications.forEach(notification => {
+              addNotification(notification.message, 'info', notification.booking_id, notification.id);
+          });
+      } catch (error) {
+          console.error("Error fetching notifications:", error);
+      }
+  }
+
+  // Fetch bookings and display them in the bookings section
+  async function fetchBookings() {
+      try {
+          const response = await fetch('/tourguide/get_bookings');
+          const bookings = await response.json();
+          console.log('Fetched bookings:', bookings);
+
+          bookings.forEach(booking => {
+              addBookingCard({
+                  id: booking.id,
+                  date: booking.date_start,
+                  tourType: booking.tour_type,
+                  travelerName: booking.traveler_name,
+                  status: booking.status
+              });
+          });
+
+          updateTabCounts();
+      } catch (error) {
+          console.error("Error fetching bookings:", error);
+      }
+  }
+
+  // Initialize by showing the "All" bookings and fetching data
+  filterBookings('all');
+  await fetchNotifications();
+  await fetchBookings();
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -621,6 +837,11 @@ const toggleTabsBtn = document.getElementById('toggle-tabs-btn');
 const bookingsTabs = document.getElementById('bookings-tabs');
 const bookingTabBtns = document.querySelectorAll('.booking-tab-btn');
 const bookingCategories = document.querySelectorAll('.booking-category');
+
+
+
+
+
 
 // Check screen size and adjust visibility
 function adjustTabsForScreenSize() {
@@ -1362,41 +1583,78 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-//CURRENT PASSWORD 
 
 
-// Function to open the booking details modal and populate it with data
-// Example of placing openBookingDetails in the tour guide dashboard JavaScript
-
-// Function to open the booking details modal and populate it with data
-function openBookingDetails(bookingId) {
-  console.log("Fetching booking details for ID:", bookingId);  // Debugging log
-  fetch(`/tourguide/get_booking_details/${bookingId}`)
-      .then(response => {
-          if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          return response.json();
-      })
-      .then(booking => {
-          console.log("Received booking data:", booking);  // Debugging log
-          document.getElementById("modal-traveler-name").textContent = booking.travelerName;
-          document.getElementById("modal-tour-guide-name").textContent = booking.tourGuideName;
-          document.getElementById("modal-tour-guide-number").textContent = booking.tourGuideNumber;
-          document.getElementById("modal-tour-package").textContent = booking.tourType;
-          document.getElementById("modal-tour-date").textContent = `${booking.date_start} - ${booking.date_end}`;
-          document.getElementById("modal-traveler-quantity").textContent = booking.traveler_quantity;
-
-          document.getElementById("booking-modal").classList.remove("hidden");
-      })
-      .catch(error => console.error("Error loading booking details:", error));
-}
 
 
-// Function to close the booking details modal
-function closeBookingDetailsModal() {
-  document.getElementById("booking-modal").classList.add("hidden");
-}
+
+
+
+
+
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', async function () {
+  const bookingsContainer = document.querySelector('.bookings-content');
+  const allTab = document.querySelector('[data-status="all"]');
+  const upcomingTab = document.querySelector('[data-status="upcoming"]');
+  const completedTab = document.querySelector('[data-status="completed"]');
+  const cancelledTab = document.querySelector('[data-status="cancelled"]');
+
+  // Fetch bookings and display them
+  async function loadBookings() {
+      try {
+          const response = await fetch('/tourguide/get_bookings');
+          const bookings = await response.json();
+
+          // Clear existing bookings
+          bookingsContainer.innerHTML = ''; 
+
+          let counts = { all: 0, upcoming: 0, completed: 0, cancelled: 0 };
+
+          bookings.forEach(booking => {
+              // Increment the appropriate counter
+              counts.all++;
+              counts[booking.status]++;
+
+              // Create booking card HTML
+              const bookingCard = document.createElement('div');
+              bookingCard.classList.add('booking-card');
+              bookingCard.innerHTML = `
+                  <div class="booking-info">
+                      <span class="booking-date">${booking.date_start}</span>
+                      <span class="tour-package">${booking.tour_type}</span>
+                      <span class="traveler-name">Traveler: ${booking.traveler_name}</span>
+                  </div>
+                  <button class="details-btn" onclick="openBookingDetails(${booking.id})">View Details</button>
+              `;
+
+              // Append to the appropriate category
+              const categoryDiv = bookingsContainer.querySelector(`[data-status="${booking.status}"]`);
+              categoryDiv?.appendChild(bookingCard);
+          });
+
+          // Update counts in the tabs
+          allTab.textContent = `All (${counts.all})`;
+          upcomingTab.textContent = `Upcoming (${counts.upcoming})`;
+          completedTab.textContent = `Completed (${counts.completed})`;
+          cancelledTab.textContent = `Cancelled (${counts.cancelled})`;
+
+      } catch (error) {
+          console.error("Error loading bookings:", error);
+      }
+  }
+
+  loadBookings();
+});
+
+
+
+
 
 
 

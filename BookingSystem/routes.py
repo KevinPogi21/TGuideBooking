@@ -9,7 +9,7 @@ from flask_login import login_user, current_user, logout_user, login_required
 from werkzeug.utils import secure_filename
 from BookingSystem.models import Availability
 from werkzeug.security import check_password_hash, generate_password_hash
-
+import re
 #from flask_mail import Message
 
 
@@ -368,4 +368,88 @@ def create_booking():
 
 
 
+@main.route('/update_email', methods=['POST'])
+@login_required
+def update_email():
+    # Check if the current user has the role of a traveler
+    if current_user.role != 'traveler':
+        return jsonify({'success': False, 'error': 'Unauthorized access.'}), 403
+
+    data = request.get_json()
+    new_email = data.get('email')
+
+    # Basic email format validation
+    if not new_email or not re.match(r"[^@]+@[^@]+\.[^@]+", new_email):
+        return jsonify({'success': False, 'error': 'Invalid email format.'}), 400
+
+    # Check if email is already in use by another user
+    existing_user = User.query.filter_by(email=new_email).first()
+    if existing_user and existing_user.id != current_user.id:
+        return jsonify({'success': False, 'error': 'Email is already in use by another account.'}), 400
+
+    # Update the traveler's email
+    try:
+        current_user.email = new_email
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Email updated successfully.'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': 'An error occurred while updating the email.'}), 500
+
+
+
+
+
+
+
+
+
+
+
+
+
+####
+
+@main.route('/submit_booking', methods=['POST'])
+@login_required
+def submit_booking():
+    data = request.get_json()
+
+    # Extract booking information from request data
+    tour_guide_id = data.get("tourGuideId")
+    traveler_name = data.get("travelerName")
+    tour_date = data.get("date")
+    tour_type = data.get("tourType")
+    traveler_quantity = data.get("travelerQuantity")
+    personalized_notes = data.get("personalizedNotes")
+
+    try:
+        # Create a new Booking instance
+        booking = Booking(
+            tour_guide_id=tour_guide_id,
+            traveler_id=current_user.id,
+            date_start=tour_date,
+            tour_type=tour_type,
+            traveler_quantity=traveler_quantity,
+            special_notes=personalized_notes,
+            status="upcoming"
+        )
+        db.session.add(booking)
+        db.session.flush()  # Flush to get booking.id before commit
+
+        # Create a notification for the tour guide
+        notification = Notification(
+            tguide_id=tour_guide_id,
+            booking_id=booking.id,
+            is_read=False
+        )
+        db.session.add(notification)
+
+        db.session.commit()
+
+        return jsonify({'success': True, 'message': 'Booking confirmed.'}), 200
+    except Exception as e:
+        print(f"Error saving booking: {e}")
+        db.session.rollback()
+        return jsonify({'success': False, 'message': 'Error confirming booking.'}), 500
 

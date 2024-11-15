@@ -56,7 +56,7 @@
 
 
 
-// Tourguide Form
+// TOURGUIDE FORM BOOKING PROCESS
 document.addEventListener('DOMContentLoaded', function () {
   const footerBookBtn = document.getElementById('footer-book-btn');
   const bookingForm = document.querySelector('.booking-form');
@@ -176,6 +176,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
+// TRAVELER CALENDAR
 document.addEventListener('DOMContentLoaded', async function () {
   const dateInput = document.getElementById('date');
 

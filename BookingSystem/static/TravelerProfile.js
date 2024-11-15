@@ -245,6 +245,8 @@ const saveEmailBtn = document.getElementById('save-email-btn');
 const cancelEmailBtn = document.getElementById('cancel-email-btn');
 const savePasswordBtn = document.getElementById('save-password-btn');
 const cancelPasswordBtn = document.getElementById('cancel-password-btn');
+const currentEmailInput = document.getElementById('current-email');  // Displayed email field
+const currentPasswordInput = document.getElementById('current-password'); // Displayed password field
 
 let activeAction = '';
 
@@ -289,7 +291,6 @@ passwordConfirmBtn.addEventListener('click', async () => {
 });
 
 // Save new email
-// Save new email
 saveEmailBtn.addEventListener('click', async () => {
   const newEmail = document.getElementById('new-email-input').value;
   try {
@@ -301,6 +302,7 @@ saveEmailBtn.addEventListener('click', async () => {
     const result = await response.json();
     if (result.success) {
       alert('Email updated successfully!');
+      currentEmailInput.value = newEmail; // Update displayed email immediately
       closeModal();
     } else {
       alert(result.message || 'Failed to update email');
@@ -330,6 +332,7 @@ savePasswordBtn.addEventListener('click', async () => {
     const result = await response.json();
     if (result.success) {
       alert('Password updated successfully!');
+      currentPasswordInput.value = newPassword; // Update displayed password field (if visible)
       closeModal();
     } else {
       alert(result.message || 'Failed to update password');
@@ -339,7 +342,6 @@ savePasswordBtn.addEventListener('click', async () => {
     alert('An error occurred. Please try again.');
   }
 });
-
 
 // Cancel button handlers
 passwordCancelBtn.addEventListener('click', closeModal);
@@ -366,4 +368,4 @@ function closeModal() {
   document.querySelectorAll('.modal').forEach(modal => modal.classList.remove('show'));
   modalOverlay.classList.remove('show');
   confirmPasswordInput.value = ''; // Clear password input
-};
+}

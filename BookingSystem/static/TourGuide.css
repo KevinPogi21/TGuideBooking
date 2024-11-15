@@ -18,6 +18,12 @@ body {
   background-color: #f7fff7;
 }
 
+.contact-info h2 {
+  /* text-align: center; */
+  margin-left: 185px;
+  font-size: 22px;
+}
+
 /* Tab Content */
 .tab-content {
   flex-grow: 1;

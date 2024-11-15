@@ -238,26 +238,15 @@
                 </div>
               </div>
 
-              <div class="booking-category" data-status="cancelled">
-                <h4 class="status-label">Cancelled</h4>
-                <div class="booking-card">
-                  <div class="booking-info">
-                    <span class="booking-date">Oct 22, 2024</span>
-                    <span class="tour-package">Food Tour</span>
-                    <span class="traveler-name">Traveler: Amy Cooper</span>
-                  </div>
-                  <button class="details-btn" onclick="openBookingDetails('Booking #126')">View Details</button>
-                </div>
-              </div>
-
             </div>
           
             
+            
             <!-- Booking Details Modal -->
             <div id="booking-modal" class="modal hidden">
-              <div class="booking-modal-content">
+              <div class="modal-content">
                 <h3>Booking Details</h3>
-                <button onclick="closeBookingDetailsModal()" class="close-btn">&times;</button>
+                <p id="booking-info">Here will be the booking details...</p>
                 <!-- Status Section -->
                 <div class="status-box">
                   <span class="status-circle confirmed">Confirmed</span>
@@ -268,22 +257,19 @@
                   <h4 class="container-header">Traveler Information</h4>
                   <br>
                   <div class="info-item">
-                    <strong>Traveler:</strong> <span id="modal-traveler-name"></span>
+                    <strong>Traveler:</strong> <span>John Doe</span>
                   </div>
                   <div class="info-item">
-                    <strong>Tour Guide:</strong> <span id="modal-tour-guide-name"></span>
+                    <strong>Tour Guide:</strong> <span>Jane Smith</span>
                   </div>
                   <div class="info-item">
-                    <strong>Tour Guide Number:</strong> <span id="modal-tour-guide-number"></span>
+                    <strong>Tour Guide Number:</strong> <span>09223550501</span>
                   </div>
                   <div class="info-item">
-                    <strong>Tour Package:</strong> <span id="modal-tour-package">Island Hopping</span>
+                    <strong>Date & Duration:</strong> <span>October 15, 2024 - October 12, 2024</span>
                   </div>
                   <div class="info-item">
-                    <strong>Date & Duration:</strong> <span id="modal-tour-date">October 15, 2024 - October 12, 2024</span>
-                  </div>
-                  <div class="info-item">
-                    <strong>Traveler Quantity:</strong> <span id="modal-traveler-quantity">2</span>
+                    <strong>Traveler Quantity:</strong> <span>2</span>
                   </div>
 
                   <!-- Special Notes Section -->
@@ -456,9 +442,9 @@
                 <input type="number" id="price-input" class="editable hidden" placeholder="Enter price" min="0" />
               </div>
               
-
-              <h2>Contact Information</h2>
-
+              <div class="contact-info">
+                <h2>Contact Information</h2>
+              </div>
               <!-- Email Section -->
               <div class="input-group">
                 <label for="email">
