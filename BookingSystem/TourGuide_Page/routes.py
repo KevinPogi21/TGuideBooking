@@ -137,6 +137,7 @@ def save_profile():
         db.session.rollback()
         print(f"Error saving profile: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
+    
 
 # Tour guide dashboard route
 @tourguide.route('/tourguide_dashboard')

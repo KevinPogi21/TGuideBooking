@@ -69,8 +69,7 @@ def admin_dashboard():
 
     form = UserTourOperatorForm()  # Create an instance of the OperatorForm
     
-    tour_operators = User.query.filter_by(role='touroperator').all()
-
+    tour_operators = TourOperator.query.all()
     return render_template('admin_dashboard.html', title='Admin Dashboard', form=form, tour_operators=tour_operators)  # Render the dashboard with the form
 
 

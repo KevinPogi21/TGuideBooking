@@ -1,7 +1,11 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Length
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField, DecimalField, FormField, FieldList, FileField
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Length, NumberRange
 from BookingSystem.models import User
+from wtforms.fields import FileField, DecimalField
+from flask_wtf.file import FileField, FileAllowed
+    
+
 
 class UserTourGuideForm(FlaskForm):
     fname = StringField('First Name', validators=[DataRequired()])
