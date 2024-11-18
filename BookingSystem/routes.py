@@ -21,7 +21,9 @@ main = Blueprint('main', __name__)  # Ensure the 'main' blueprint is set
 def home():
     return render_template('home.html')
 
-
+@main.route('/pg-home', endpoint='pg_home')
+def pg_home():
+    return render_template('pg-home.html')
 
 # TRAVELER LOGIN
 
