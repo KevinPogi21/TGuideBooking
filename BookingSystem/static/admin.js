@@ -74,12 +74,20 @@ window.addEventListener('DOMContentLoaded', () => {
         operatorForm.addEventListener('submit', (e) => {
             e.preventDefault(); // Prevent default form submission for custom handling
 
-            // Show success message and close the modal
-            alert('Tour Operator Account Created Successfully!');
+            // Fetch the operator's name from the form input
+            const operatorNameInput = operatorForm.querySelector('input[name="name"]');
+            const operatorName = operatorNameInput ? operatorNameInput.value : "Tour Operator";
+
+            // Show success message with the operator's name
+            alert(`Tour Operator Account Created Successfully! Welcome, ${operatorName}!`);
+
+            // Close the modal
             operatorModalWrapper.classList.remove('show');
 
             // Submit the form programmatically
-            operatorForm.submit();
+            setTimeout(() => {
+                operatorForm.submit(); // Delay the submission to mimic alert effect
+            }, 500); // Half-second delay to ensure alert is processed
         });
     }
 });

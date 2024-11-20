@@ -925,3 +925,61 @@ function closeBookingDetailsModal() {
 
 
 
+
+
+
+
+
+// ALERT ACCOUNT CREATION
+// Ensure everything runs after DOM is fully loaded
+  window.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM fully loaded.');
+
+    // --- Modal Logic for Adding a Tour Guide ---
+    const addTourGuideBtn = document.getElementById('add-tour-guide-btn');
+    const tourGuideModalWrapper = document.getElementById('tour-guide-modal');
+    const closeTourGuideModal = document.getElementById('close-tour-guide-modal');
+    const tourGuideModalOverlay = document.getElementById('tour-guide-overlay');
+
+    // Open Modal
+    if (addTourGuideBtn && tourGuideModalWrapper) {
+        addTourGuideBtn.addEventListener('click', () => {
+            tourGuideModalWrapper.classList.add('show');
+        });
+    }
+
+    // Close Modal
+    [closeTourGuideModal, tourGuideModalOverlay].forEach(element => {
+        if (element && tourGuideModalWrapper) {
+            element.addEventListener('click', () => {
+                tourGuideModalWrapper.classList.remove('show');
+            });
+        }
+    });
+
+    // --- Form Submission Logic ---
+    const tourGuideForm = document.getElementById('tour-guide-form');
+
+    if (tourGuideForm) {
+        tourGuideForm.addEventListener('submit', (e) => {
+            e.preventDefault(); // Prevent default form submission for custom handling
+
+            // Fetch the tour guide's first and last names from the form inputs
+            const firstNameInput = tourGuideForm.querySelector('input[name="fname"]');
+            const lastNameInput = tourGuideForm.querySelector('input[name="lname"]');
+            const firstName = firstNameInput ? firstNameInput.value : "Tour";
+            const lastName = lastNameInput ? lastNameInput.value : "Guide";
+
+            // Show success message with the tour guide's name
+            alert(`Tour Guide Account Created Successfully! Welcome, ${firstName} ${lastName}!`);
+
+            // Close the modal
+            tourGuideModalWrapper.classList.remove('show');
+
+            // Submit the form programmatically
+            tourGuideForm.submit();
+        });
+    }
+});
+
+

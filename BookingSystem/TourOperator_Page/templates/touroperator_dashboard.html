@@ -316,49 +316,85 @@
             
                 <div class="input-container">
                     <label for="fname">First Name</label>
-                    {{ form.fname(class="input", placeholder="Enter Guide First Name") }}
                     {% if form.fname.errors %}
-                        <span class="error">{{ form.fname.errors[0] }}</span>
+                    {{ form.fname(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                            {% for error in form.fname.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.fname(class="form-control") }}
                     {% endif %}
                 </div>
             
                 <div class="input-container">
                     <label for="lname">Last Name</label>
-                    {{ form.lname(class="input", placeholder="Enter Guide Last Name") }}
                     {% if form.lname.errors %}
-                        <span class="error">{{ form.lname.errors[0] }}</span>
+                    {{ form.lname(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                            {% for error in form.lname.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.lname(class="form-control") }}
                     {% endif %}
                 </div>
             
                 <div class="input-container">
                     <label for="email">Email</label>
-                    {{ form.email(class="input", placeholder="Enter Guide Email") }}
                     {% if form.email.errors %}
-                        <span class="error">{{ form.email.errors[0] }}</span>
+                    {{ form.email(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                            {% for error in form.email.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.email(class="form-control") }}
                     {% endif %}
                 </div>
             
                 <div class="input-container">
                     <label for="contact_number">Contact Number</label>
-                    {{ form.contact_number(class="input", placeholder="Enter Contact Number") }}
                     {% if form.contact_number.errors %}
-                        <span class="error">{{ form.contact_number.errors[0] }}</span>
+                    {{ form.contact_number(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                            {% for error in form.contact_number.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.contact_number(class="form-control") }}
                     {% endif %}
                 </div>
             
                 <div class="input-container">
                     <label for="password">Password</label>
-                    {{ form.password(class="input", placeholder="Enter Password") }}
                     {% if form.password.errors %}
-                        <span class="error">{{ form.password.errors[0] }}</span>
+                    {{ form.password(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                            {% for error in form.password.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.password(class="form-control") }}
                     {% endif %}
                 </div>
             
                 <div class="input-container">
                     <label for="confirm_password">Confirm Password</label>
-                    {{ form.confirm_password(class="input", placeholder="Confirm Password") }}
                     {% if form.confirm_password.errors %}
-                        <span class="error">{{ form.confirm_password.errors[0] }}</span>
+                    {{ form.confirm_password(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                            {% for error in form.confirm_password.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.confirm_password(class="form-control") }}
                     {% endif %}
                 </div>
             

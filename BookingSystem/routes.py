@@ -4,12 +4,13 @@ from flask import current_app, session
 from flask import Blueprint, render_template, url_for, flash, redirect, request, jsonify
 from BookingSystem import db, bcrypt, mail
 from BookingSystem.forms import TravelerLoginForm, TravelerRegistrationForm, TravelerRequestResetForm, TravelerResetPasswordForm, UpdateAccountForm
-from BookingSystem.models import User, TourOperator , send_confirmation_email
+from BookingSystem.models import User, TourOperator , send_confirmation_email, Booking, TourPackage, TourGuide
 from flask_login import login_user, current_user, logout_user, login_required 
 from werkzeug.utils import secure_filename
 from BookingSystem.models import Availability
 from werkzeug.security import check_password_hash, generate_password_hash
 import re
+from datetime import datetime, timedelta
 #from flask_mail import Message
 
 
@@ -409,47 +410,98 @@ def update_email():
 
 
 ####
-
 @main.route('/submit_booking', methods=['POST'])
-@login_required
 def submit_booking():
-    data = request.get_json()
+    print("Backend route '/submit_booking' reached.")  # Log route access
+    
+    booking_data = request.get_json()
+    print("Received booking data:", booking_data)  # Log the raw booking data
+    
+    if not booking_data:
+        print("Error: No booking data received.")
+        return jsonify({'status': 'error', 'message': 'No booking data received'}), 400
 
-    # Extract booking information from request data
-    tour_guide_id = data.get("tourGuideId")
-    traveler_name = data.get("travelerName")
-    tour_date = data.get("date")
-    tour_type = data.get("tourType")
-    traveler_quantity = data.get("travelerQuantity")
-    personalized_notes = data.get("personalizedNotes")
+    # Extract and log fields
+    date_str = booking_data.get('date')
+    tour_type = booking_data.get('tourType')
+    traveler_quantity = booking_data.get('travelerQuantity')
+    special_notes = booking_data.get('personalizedNotes', '')
+    price = booking_data.get('price')
+    package_id = booking_data.get('packageId')
+    tour_guide_id = booking_data.get('tourGuideId')
+    
+    print("Parsed booking fields:", date_str, tour_type, traveler_quantity, special_notes, price, package_id, tour_guide_id)
+
+    # Check for required fields
+    if not date_str or not tour_type or not traveler_quantity or not tour_guide_id:
+        print("Error: Missing required fields")
+        return jsonify({'status': 'error', 'message': 'Missing required fields'}), 400
+
+    # Process date
+    try:
+        date_start = datetime.strptime(date_str, '%Y-%m-%d').date()
+        print("Parsed date_start:", date_start)
+    except ValueError as e:
+        print("Error parsing date:", str(e))
+        return jsonify({'status': 'error', 'message': 'Invalid date format', 'error_details': str(e)}), 400
+
+    # Validate the package and tour guide
+    package = TourPackage.query.get(package_id)
+    tour_guide = Tour_Guide.query.get(tour_guide_id)
+    if not package:
+        print("Error: Invalid package ID")
+        return jsonify({'status': 'error', 'message': 'Invalid package'}), 400
+    if not tour_guide:
+        print("Error: Invalid tour guide ID")
+        return jsonify({'status': 'error', 'message': 'Invalid tour guide'}), 400
+
+    # Get authenticated user ID
+    user_id = current_user.id if current_user.is_authenticated else None
+    if not user_id:
+        print("Error: User is not authenticated")
+        return jsonify({'status': 'error', 'message': 'User is not authenticated'}), 400
+    print("Authenticated user ID:", user_id)
+
+    # Set the booking status
+    status = "Upcoming"
+    booking_time = datetime.now().time()
+
+    # Create a new booking entry
+    new_booking = Booking(
+        user_id=user_id,
+        tour_guide_id=tour_guide_id,
+        package_id=package_id,
+        status=status,
+        date_start=date_start,
+        traveler_quantity=traveler_quantity,
+        special_notes=special_notes,
+        time=booking_time,
+        price=price
+    )
 
     try:
-        # Create a new Booking instance
-        booking = Booking(
-            tour_guide_id=tour_guide_id,
-            traveler_id=current_user.id,
-            date_start=tour_date,
-            tour_type=tour_type,
-            traveler_quantity=traveler_quantity,
-            special_notes=personalized_notes,
-            status="upcoming"
-        )
-        db.session.add(booking)
-        db.session.flush()  # Flush to get booking.id before commit
-
-        # Create a notification for the tour guide
-        notification = Notification(
-            tguide_id=tour_guide_id,
-            booking_id=booking.id,
-            is_read=False
-        )
-        db.session.add(notification)
-
+        db.session.add(new_booking)
         db.session.commit()
-
-        return jsonify({'success': True, 'message': 'Booking confirmed.'}), 200
+        print("Booking saved successfully in database!")
+        return jsonify({'status': 'success', 'message': 'Booking saved successfully!'})
     except Exception as e:
-        print(f"Error saving booking: {e}")
         db.session.rollback()
-        return jsonify({'success': False, 'message': 'Error confirming booking.'}), 500
+        print("Error saving booking in database:", str(e))
+        return jsonify({'status': 'error', 'message': 'Failed to save booking', 'error_details': str(e)})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

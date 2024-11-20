@@ -4,15 +4,39 @@ from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Le
 from BookingSystem.models import User
 from wtforms.fields import FileField, DecimalField
 from flask_wtf.file import FileField, FileAllowed
+
+
+def UppercaseValidator(form, field):
+    if not any(char.isupper() for char in field.data):
+        raise ValidationError('Password must contain at least one uppercase letter.')
+
+def LowercaseValidator(form, field):
+    if not any(char.islower() for char in field.data):
+        raise ValidationError('Password must contain at least one lowercase letter.')
+
+def DigitalValidator(form, field):
+    if not any(char.isdigit() for char in field.data):
+        raise ValidationError('Password must contain at least one digit.')
+
+def SpecialCharacterValidator(form, field):
+    if not any(char in "!@#$%^&*()_+-=[]{}|;':,.<>?/" for char in field.data):
+        raise ValidationError('Password must contain at least one special character.')
     
 
 
 class UserTourGuideForm(FlaskForm):
     fname = StringField('First Name', validators=[DataRequired()])
     lname = StringField('Last Name', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
+    email = StringField('Email', validators=[DataRequired(), Email(), Length(min=6, max=300)])
     contact_number = StringField('Contact Number', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=6, message="Password must be at least 6 characters long.")])
+    password = PasswordField('Password', validators=[
+        DataRequired(),
+        Length(min=8, message='Password must be at least 8 characters long.'),
+        UppercaseValidator,
+        LowercaseValidator,
+        DigitalValidator,
+        SpecialCharacterValidator
+    ])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message="Passwords must match.")])
     submit = SubmitField('Create Account')
 

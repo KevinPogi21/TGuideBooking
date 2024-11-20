@@ -57,6 +57,8 @@
 
 
 // TOURGUIDE FORM BOOKING PROCESS
+// JavaScript
+// JavaScript
 document.addEventListener('DOMContentLoaded', function () {
   const footerBookBtn = document.getElementById('footer-book-btn');
   const bookingForm = document.querySelector('.booking-form');
@@ -76,96 +78,146 @@ document.addEventListener('DOMContentLoaded', function () {
   const modalTourType = document.getElementById('modal-tour-type');
   const modalTravelerQuantity = document.getElementById('modal-traveler-quantity');
   const modalPersonalizedNotes = document.getElementById('modal-personalized-notes');
+  const modalPrice = document.getElementById('modal-price');
+  const modalGuideName = document.getElementById('modal-guide-name');
 
   // Open the modal with form values
   function openModal() {
+      console.log("Attempting to open modal...");
+
       // Check if required fields are filled
       if (!dateInput.value) {
-          closeModal(); // Close the modal if it was open
+          console.warn("Date is missing");
           alert("Please select a date.");
-          dateInput.focus(); // Redirect user to date input field
-          return; // Stop the function if date is missing
+          dateInput.focus();
+          return;
       }
       if (!tourTypeInput.value) {
-          closeModal();
+          console.warn("Tour Type is missing");
           alert("Please select a tour type.");
           tourTypeInput.focus();
           return;
       }
       if (!travelerQuantityInput.value) {
-          closeModal();
+          console.warn("Traveler Quantity is missing");
           alert("Please enter the number of travelers.");
           travelerQuantityInput.focus();
           return;
       }
 
-      // Set modal content based on input values
+      // Fetch package_id and tourGuideId
+      const selectedOption = tourTypeInput.options[tourTypeInput.selectedIndex];
+      const packageId = selectedOption.getAttribute('data-package-id');
+      const guideNameElement = document.querySelector('.guide-name span');
+      const tourGuideId = guideNameElement ? guideNameElement.getAttribute('data-tour-guide-id') : null;
+
+      // Log values for debugging
+      console.log("Opening modal with data:");
+      console.log("Tour Date:", dateInput.value);
+      console.log("Tour Type:", tourTypeInput.options[tourTypeInput.selectedIndex].text);
+      console.log("Package ID:", packageId); // Debugging package ID
+      console.log("Number of Travelers:", travelerQuantityInput.value);
+      console.log("Personalized Notes:", personalizedTourInput.value);
+      console.log("Tour Guide ID:", tourGuideId); // Debugging tour guide ID
+
+      if (!tourGuideId) {
+          console.error("Error: Tour Guide ID is not found. Check the data attribute in HTML.");
+      }
+
       modalTourDate.textContent = dateInput.value;
       modalTourType.textContent = tourTypeInput.options[tourTypeInput.selectedIndex].text;
       modalTravelerQuantity.textContent = travelerQuantityInput.value;
       modalPersonalizedNotes.textContent = personalizedTourInput.value || "N/A";
 
+      const priceElement = document.querySelector('.price-label');
+      if (priceElement) {
+          modalPrice.textContent = priceElement.textContent;
+          console.log("Price fetched:", priceElement.textContent);
+      } else {
+          console.warn("Price element not found.");
+      }
+
       bookingModal.style.display = "flex";
-      document.body.style.overflow = "hidden"; // Disable background scrolling
+      document.body.style.overflow = "hidden";
+      console.log("Modal opened successfully.");
   }
 
   confirmBookingButton.addEventListener('click', openModal);
 
   // Close Modal Function
   function closeModal() {
-      bookingModal.style.display = "none"; // Hide the modal
-      document.body.style.overflow = "auto"; // Enable background scrolling
+      bookingModal.style.display = "none";
+      document.body.style.overflow = "auto";
+      console.log("Modal closed.");
   }
 
-  // Attach event listener to close button
   closeModalButton.addEventListener('click', closeModal);
 
-  // Show Thank You Popup After Confirming Booking
   async function showThankYouMessage() {
-    closeModal(); // Close the booking modal
-    thankYouPopup.style.display = "flex"; // Show thank you popup
+    closeModal();
+    thankYouPopup.style.display = "flex";
+    console.log("Thank You Popup displayed.");
 
-    // Get the booking details
+    // Get the booking details, including price and guide name
     const bookingData = {
         date: dateInput.value,
         tourType: tourTypeInput.options[tourTypeInput.selectedIndex].text,
+        packageId: packageId, // Use the fetched package ID
         travelerQuantity: travelerQuantityInput.value,
-        personalizedNotes: personalizedTourInput.value || "N/A"
+        personalizedNotes: personalizedTourInput.value || "N/A",
+        price: priceElement ? parseFloat(priceElement.textContent.replace(/[^\d.-]/g, '')) : null,
+        tourGuideId: 41 // Use the fetched tour guide ID
     };
 
+    console.log("Booking data to send:", bookingData); // Shows the data being sent
+
     try {
-        // Send booking data to the server
-        const response = await fetch('/submit_booking', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(bookingData)
-        });
-
-        if (response.ok) {
-            console.log("Booking data sent successfully");
-        } else {
-            console.error("Failed to send booking data");
-        }
+      console.log("Sending booking data to backend:", bookingData);
+      const response = await fetch('/submit_booking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(bookingData)
+      });
+      
+      console.log("Response Status from backend:", response.status); // Debug status
+      
+      if (response.ok) {
+          console.log("Booking data sent successfully to backend");
+          const result = await response.json();
+          console.log("Backend response:", result);
+      } else {
+          console.error("Failed to send booking data. Status:", response.status);
+          const errorText = await response.text();
+          console.error("Error details from backend:", errorText);
+      }
     } catch (error) {
-        console.error("Error sending booking data:", error);
+      console.error("Error sending booking data:", error);
     }
+    
+    
 
-    // Hide the popup automatically after 3 seconds
     setTimeout(() => {
         thankYouPopup.style.display = "none";
+        console.log("Thank You Popup hidden.");
     }, 3000);
-}
+  }
 
-
-  // Optional: Close Modal by Clicking Outside of It
   window.onclick = function (event) {
       if (event.target === bookingModal) {
           closeModal();
       }
   };
 });
+
+
+
+
+
+
+
+
+
+
 
 
 

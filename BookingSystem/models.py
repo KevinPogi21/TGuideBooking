@@ -121,6 +121,7 @@ def send_confirmation_email(self):
     {url_for('main.confirm_email', token=token, _external=True)}
     '''
     mail.send(msg)
+    
 class TourOperator(db.Model, UserMixin):
     __tablename__ = 'Tour_Operator'
     __table_args__ = ( 
@@ -131,6 +132,52 @@ class TourOperator(db.Model, UserMixin):
     user_id = db.Column(db.Integer, db.ForeignKey('Users.id'), unique=True, nullable=False)
     municipal = db.Column(db.String(100))
     contact_num = db.Column(db.String(15))
+    
+    @staticmethod
+    def verify_reset_token(token, expires_sec=3600):
+        """Verify the reset token and return the user if valid."""
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            user_id = s.loads(token, max_age=expires_sec)['user_id']
+        except Exception as e:
+            print(f"Error loading token: {e}")  # Debugging output
+            return None
+        return User.query.get(user_id)
+
+    def send_reset_email(self):
+        token = self.get_reset_token()
+        msg = Message('Password Reset Request', 
+                    sender=os.environ.get('MAIL_DEFAULT_SENDER'), 
+                    recipients=[self.email])
+        msg.body = f'''To reset your password, visit the following link:
+        {url_for('main.traveler_reset_token', token=token, _external=True)}
+
+        If you did not make this request, simply ignore this email and no changes will be made.
+        '''
+        print(f"Message created: {msg}")  # Debugging output
+        mail.send(msg)
+
+    def get_confirmation_token(self, expires_sec=3600):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        return s.dumps({'user_id': self.id}, salt='email-confirm')
+
+    @staticmethod
+    def verify_confirmation_token(token, expires_sec=3600):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            user_id = s.loads(token, salt='email-confirm', max_age=expires_sec)['user_id']
+        except Exception as e:
+            print(f"Error loading token: {e}")  # Debugging output
+            return None
+        return User.query.get(user_id)
+
+def send_confirmation_email(self):
+    token = self.get_confirmation_token()
+    msg = Message('Confirm Your Email', recipients=[self.email])
+    msg.body = f'''To confirm your email, visit the following link:
+    {url_for('main.confirm_email', token=token, _external=True)}
+    '''
+    mail.send(msg)
 
 
 class TourGuide(db.Model, UserMixin):
@@ -158,6 +205,52 @@ class TourGuide(db.Model, UserMixin):
     reviews = db.relationship('ReviewsRating', backref='tour_guide', cascade="all, delete-orphan")
     bookings = db.relationship('Booking', backref='tour_guide', cascade="all, delete-orphan")
     notifications = db.relationship('Notification', backref='tour_guide', cascade="all, delete-orphan")
+    
+    @staticmethod
+    def verify_reset_token(token, expires_sec=3600):
+        """Verify the reset token and return the user if valid."""
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            user_id = s.loads(token, max_age=expires_sec)['user_id']
+        except Exception as e:
+            print(f"Error loading token: {e}")  # Debugging output
+            return None
+        return User.query.get(user_id)
+
+    def send_reset_email(self):
+        token = self.get_reset_token()
+        msg = Message('Password Reset Request', 
+                    sender=os.environ.get('MAIL_DEFAULT_SENDER'), 
+                    recipients=[self.email])
+        msg.body = f'''To reset your password, visit the following link:
+        {url_for('main.traveler_reset_token', token=token, _external=True)}
+
+        If you did not make this request, simply ignore this email and no changes will be made.
+        '''
+        print(f"Message created: {msg}")  # Debugging output
+        mail.send(msg)
+
+    def get_confirmation_token(self, expires_sec=3600):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        return s.dumps({'user_id': self.id}, salt='email-confirm')
+
+    @staticmethod
+    def verify_confirmation_token(token, expires_sec=3600):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            user_id = s.loads(token, salt='email-confirm', max_age=expires_sec)['user_id']
+        except Exception as e:
+            print(f"Error loading token: {e}")  # Debugging output
+            return None
+        return User.query.get(user_id)
+
+def send_confirmation_email(self):
+    token = self.get_confirmation_token()
+    msg = Message('Confirm Your Email', recipients=[self.email])
+    msg.body = f'''To confirm your email, visit the following link:
+    {url_for('main.confirm_email', token=token, _external=True)}
+    '''
+    mail.send(msg)
 
 
 class Characteristic(db.Model):
@@ -243,6 +336,20 @@ class Booking(db.Model):
     time = db.Column(db.Time, nullable=False)
     duration = db.Column(db.Interval)
     price = db.Column(db.Numeric(10, 2))
+    
+class Notification(db.Model):
+    __tablename__ = 'Notification'
+    __table_args__ = (
+        db.Index('idx_notification_tguide_id', 'tguide_id'),   # Index on tguide_id
+        db.Index('idx_notification_booking_id', 'booking_id'), # Index on booking_id
+        db.Index('idx_notification_is_read', 'is_read'),       # Index on is_read
+        # {'schema': 'public'},
+    )
+    id = db.Column(db.Integer, primary_key=True)
+    tguide_id = db.Column(db.Integer, db.ForeignKey('Tour_Guide.id'), nullable=False)
+    booking_id = db.Column(db.Integer, db.ForeignKey('Booking.id'), nullable=False)
+    is_read = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 class ReviewsRating(db.Model):
@@ -272,19 +379,7 @@ class ReviewImages(db.Model):
     img = db.Column(db.LargeBinary)
 
 
-class Notification(db.Model):
-    __tablename__ = 'Notification'
-    __table_args__ = (
-        db.Index('idx_notification_tguide_id', 'tguide_id'),   # Index on tguide_id
-        db.Index('idx_notification_booking_id', 'booking_id'), # Index on booking_id
-        db.Index('idx_notification_is_read', 'is_read'),       # Index on is_read
-        # {'schema': 'public'},
-    )
-    id = db.Column(db.Integer, primary_key=True)
-    tguide_id = db.Column(db.Integer, db.ForeignKey('Tour_Guide.id'), nullable=False)
-    booking_id = db.Column(db.Integer, db.ForeignKey('Booking.id'), nullable=False)
-    is_read = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
     
     
     

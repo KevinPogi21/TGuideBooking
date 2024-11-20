@@ -4,7 +4,7 @@ from . import touroperator
 from werkzeug.security import generate_password_hash, check_password_hash
 from BookingSystem import bcrypt, db 
 from BookingSystem.TourOperator_Page.form import UserTourGuideForm
-from BookingSystem.models import User, TourOperator, TourGuide 
+from BookingSystem.models import User, TourOperator, TourGuide , send_confirmation_email
 
 
 
@@ -29,7 +29,8 @@ def create_tourguide():
         try:
             # Add the new tour guide user to the database
             db.session.add(new_tourguide_user)
-            db.session.flush()  # Flush to generate the new user's ID without committing yet
+            db.session.flush()
+            # Flush to generate the new user's ID without committing yet
 
             # Retrieve the TourOperator associated with the current user
             tour_operator = TourOperator.query.filter_by(user_id=current_user.id).first()
@@ -49,15 +50,16 @@ def create_tourguide():
             )
             db.session.add(new_tourguide_record)
             db.session.commit()  # Commit both the User and TourGuide entries
+            send_confirmation_email(new_tourguide_user)
 
             # Success message and redirect
             flash('Tour Guide account created successfully!', 'success')
-            return redirect(url_for('touroperator.touroperator_dashboard'))
+            return redirect(url_for('main.pending_confirmation'))
 
         except Exception as e:
             # Rollback in case of error and log for debugging
             db.session.rollback()
-            flash('An error occurred while creating the account. Please try again.', 'danger')
+            # flash('An error occurred while creating the account. Please try again.', 'danger')
             print(f"Database error: {e}")  # Debugging information
 
     # Render the tour operator dashboard with the form

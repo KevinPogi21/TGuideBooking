@@ -17,6 +17,8 @@
       <h1>Log In to Your Account</h1>
       <p class="subtitle">Welcome back! Please log in to continue.</p>
 
+
+
       <form method="POST">
         {{ form.hidden_tag() }}
         <div>
@@ -54,7 +56,21 @@
               {{ form.password(class="form-control") }}
           {% endif %}
         </div>
-        <p style="margin-bottom: 20px;"><a href="{{ url_for('main.traveler_reset_request') }}" id="forgot-password-link">Forgot Password?</a></p>
+ 
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }}" role="alert">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+
+        <div>      
+          <p style="margin-bottom: 20px;"><a href="{{ url_for('main.traveler_reset_request') }}" id="forgot-password-link">Forgot Password?</a></p>
+        </div>  
+        
         <div class="button-container">
           <button type="submit" class="primary-btn">Log In</button>
         </div>

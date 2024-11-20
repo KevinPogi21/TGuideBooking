@@ -4,7 +4,7 @@ from . import admin
 from werkzeug.security import generate_password_hash
 from BookingSystem import db, bcrypt
 from BookingSystem.Admin_Page.forms import UserTourOperatorForm
-from BookingSystem.models import User, TourOperator
+from BookingSystem.models import User, TourOperator, send_confirmation_email
 
 # Create Tour Operator
 @admin.route('/create_operator', methods=['GET', 'POST'])
@@ -34,12 +34,13 @@ def create_operator():
             )
             db.session.add(new_operator)
             db.session.commit()
+            send_confirmation_email(new_user)
 
             flash('Tour Operator account created successfully!', 'success')
-            return redirect(url_for('admin.tour_operator_profile', operator_id=new_user.id))  # Redirect to the tour operator profile
+            return redirect(url_for('main.pending_confirmation', operator_id=new_user.id))  # Redirect to the tour operator profile
         except Exception as e:
             db.session.rollback()  # Rollback if there's an error
-            flash('An error occurred while creating the account. Please try again.', 'danger')
+            # flash('An error occurred while creating the account. Please try again.', 'danger')
             print(f"Database error: {e}")  # For debugging, remove in production
 
     return render_template('admin_dashboard.html', form=form)  # Render the admin dashboard template

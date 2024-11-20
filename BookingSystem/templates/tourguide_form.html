@@ -171,7 +171,13 @@
       <!-- Right Section: Sticky Booking Form -->
       <div class="right-column">
         <div class="booking-form">
-          <h2 class="guide-name">Have a Wonderful Travel with <span id="full-name">{{ profile.name }}</span></h2>
+          <h2 class="guide-name">
+            Have a Wonderful Travel with 
+            <span id="modal-guide-name" data-tour-guide-id=41 data-guide-name="{{ profile.name }}">
+                {{ profile.name }}
+            </span>
+          </h2>
+        
           <form>
             <label for="date">Select Date</label>
             <input type="text" id="date" placeholder="Select a date" readonly>
@@ -181,9 +187,9 @@
             <label for="tour-type">Tour Type</label>
             <select id="tour-type" required>
               <option value="">Choose Package</option>
-              <option value="island">Island Tour</option>
-              <option value="hiking">Hiking Guide</option>
-              <option value="personalized">Personalized</option>
+              <option value="island" data-package-id="1">Island Tour</option>
+              <option value="hiking" data-package-id="2">Hiking Guide</option>
+              <option value="personalized" data-package-id="3">Personalized</option>
             </select>
 
             <!-- Traveler Quantity -->
@@ -197,8 +203,9 @@
 
             <!-- Price and Button Row -->
             <div class="price-button-row">
-              <span class="price-label">₱{{ profile.price }}</span>
-              <button type="button" class="confirm-btn" onclick="openModal()">Confirm Booking</button>
+              <span class="price-label" id="modal-price" data-price="{{ profile.price }}">₱{{ profile.price }}</span>
+
+              <button id="final-confirm-btn" type="button" class="confirm-btn" onclick="openModal()">Confirm Booking</button>
             </div>
           </form>
         </div>
